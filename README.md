@@ -4,4 +4,6 @@
 
 sul (2024, Godot 4 or above)
 
+Plugin for scribbling in the editor
+
 Github reference: [link](https://github.com/sulianthual/scribbler)
