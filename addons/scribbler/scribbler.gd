@@ -6,17 +6,17 @@ extends Control
 @onready var drawing: TextureRect=%drawing
 ## file_row
 @onready var mode_button: Button = %mode
-@onready var new: Button = %clear# clear is same as new
-@onready var load: Button = %load
-@onready var save: Button = %save
+@onready var new: Button = %clear# clear drawing (same as new drawing)
+@onready var load: Button = %load# load drawing
+@onready var save: Button = %save# save drawing
 ## resize_row
-@onready var resize: Button=%resize
-@onready var px: SpinBox=%px
-@onready var py: SpinBox=%py
+@onready var resize: Button=%resize# update image size
+@onready var px: SpinBox=%px# image width
+@onready var py: SpinBox=%py# image height
+## brush_row
+@onready var brush: Button=%brush# update brush
+@onready var brush_scale: SpinBox=%brush_scale
 
-#enum ACCEPTED_TEXTURE {ImageTexture, CompressedTexture2D]
-
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	## drawer
 	drawing.connect("px_changed",_on_drawing_px_changed)
@@ -27,11 +27,13 @@ func _ready():
 	save.connect("pressed",_on_save_pressed)
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
+	brush.connect("pressed",_on_brush_pressed)
 	## others
 	_update_mode()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
+	drawing.resize_brush(brush_scale.value)
 	drawing.new_drawing(px.value,py.value)
 
 ## CHANGE MODE (FROM FILE OR NODE)
@@ -48,7 +50,6 @@ func _update_mode():
 		mode_button.set_text("FILE")
 	elif mode==MODE.NODE:
 		mode_button.set_text("NODE")
-		
 	
 ## NEW DRAWING
 func _on_new_pressed():
@@ -64,7 +65,7 @@ func _load_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
 	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
-	file_dialogue.access = EditorFileDialog.ACCESS_FILESYSTEM
+	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
 	file_dialogue.filters = ["*.png ; PNG File"]
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
@@ -92,7 +93,7 @@ func _save_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
 	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_SAVE_FILE
-	file_dialogue.access = EditorFileDialog.ACCESS_FILESYSTEM
+	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
 	file_dialogue.filters = ["*.png ; PNG File"]
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
@@ -108,7 +109,7 @@ func _save_node():## save to selected node in Editor SceneView
 	if _node_valid(_selected_node):
 		var _texture=_selected_node.texture
 		if _texture==null:# empty, fill in
-			_selected_node.texture=drawing.get_texture()# beware, if user doesnt save fills unsaved texture
+			#_selected_node.texture=drawing.get_texture()# inconsistent, not linked to save file
 			_save_dialogue()# beware, if user doesnt save
 		else:# existing, use save dialogue
 			if _texture_valid(_texture):
@@ -118,12 +119,16 @@ func _save_node():## save to selected node in Editor SceneView
 ## RESIZE DRAWING
 func _on_resize_pressed():
 	drawing.resize_drawing(px.value,py.value)
-
 func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
 	px.value=input_px
 func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
 	py.value=input_py
 	
+## SETUP BRUSH
+func _on_brush_pressed():
+	drawing.resize_brush(brush_scale.value)
+	
+## UTILS
 ## rescan directory after changing files
 func _rescan_filesystem():
 	EditorInterface.get_resource_filesystem().scan()
@@ -137,16 +142,3 @@ func _texture_valid(input_texture: Texture2D):
 	valid=valid and input_texture.resource_path
 	valid=valid and input_texture.resource_path.get_extension()=="png"
 	return valid
-
-########################################
-## TESTS
-
-func _on_test_pressed():
-	print(EditorInterface.get_edited_scene_root())
-	
-
-## Apply scribble to selected node in scenetree
-func _on_apply_pressed():
-	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
-	if "texture" in _selected_node:
-		_selected_node.set_texture(drawing.get_texture())

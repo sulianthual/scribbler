@@ -25,7 +25,7 @@ extends TextureRect
 # Brush
 @export_subgroup("brush")
 ### Scaling factor of brush
-@export var brush_scaling: float=0.5
+@export var brush_scaling: float=1.0
 ### Brush color
 @export var brush_color: Color
 
@@ -34,9 +34,8 @@ extends TextureRect
 ## SETUP
 # Image
 var img: Image# the image created or edited
-const back_color: Color=Color.WHITE# background color (removed on save)
-#var px: int# width in pixels (=px)
-#var img_h: int# height in pixels (=py)
+const back_color: Color=Color.FUCHSIA#background color on new_drawing or resize (!IGNORED in loaded pictures)
+const back_color_in_file: Color=Color(1,1,1,0)# replaces background color on saved files
 # Brush
 const brush_path: String="res://addons/scribbler/brush.png"
 var brush_img: Image=Image.new()
@@ -70,13 +69,27 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		img=Image.new()
 		img.load(filename_)
 		img.convert(Image.FORMAT_RGBA8)
+		img.copy_from(_swap_color(img,back_color_in_file,back_color))# swap colors
+		#-> beware: back_color_in_file will be ignored in loaded images
 		px=img.get_width()
 		py=img.get_height()
+		# Replace back_color_on_file with back_color
 		texture_from_img()
 
 func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if img:
-		img.save_png(filename_)
+		#save image copy with swapped background color
+		_swap_color(img,back_color,back_color_in_file).save_png(filename_)
+		
+func _swap_color(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for iy in _new_img.get_height():
+			for ix in _new_img.get_width():
+				if _new_img.get_pixel(ix, iy) == source_color:
+					_new_img.set_pixel(ix, iy, new_color)
+	return _new_img
 
 ###############################################################################
 ## IMAGE AND TEXTURE
@@ -107,15 +120,17 @@ func load_brush():# set the brush
 	if FileAccess.file_exists(brush_path):
 		brush_img.load(brush_path)
 	brush_img.convert(Image.FORMAT_RGBA8)
-	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height())
-	brush_size = brush_img.get_width()
-	if true:# ensure transparent background
-		img=Image.new()
-		img.copy_from(brush_img)
-		img.fill(Color(0,0,0,1))# fill with transparent
-		brush_img.blend_rect_mask(img,brush_img,Rect2(0,0,brush_img.get_width(),brush_img.get_height()),Vector2(0,0))
-	#brush_img=utils.swap_img_color(brush_img,Color(0,0,0,1),brush_color)# initial image is black lines
 
+func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
+	brush_scaling=input_brush_scaling
+	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
+	brush_size = brush_img.get_width()
+	#
+	#if true:# ensure transparent background
+		#var _img: Image=Image.new()
+		#_img.copy_from(brush_img)
+		#_img.fill(Color(0,0,0,1))# fill with transparent
+		#brush_img.blend_rect_mask(_img,brush_img,Rect2(0,0,brush_img.get_width(),brush_img.get_height()),Vector2(0,0))
 
 	
 ###############################################################################
@@ -138,7 +153,7 @@ func _input(event):
 
 var _last_ix: int# record last ix drawn for line filling
 var _last_iy: int# record last ix drawn for line filling
-var line_fill: bool=false
+var line_fill: bool=false## TODO: test interpolation as is NOT WORKING
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
 	var _rect: Rect2=get_global_rect()
