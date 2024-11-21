@@ -1,10 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://j6n6a2bbxi3q"]
+[gd_scene load_steps=3 format=3 uid="uid://j6n6a2bbxi3q"]
 
-[ext_resource type="Texture2D" uid="uid://0lgp4b8j2fng" path="res://toto.png" id="1_0aeci"]
+[ext_resource type="Texture2D" uid="uid://0lgp4b8j2fng" path="res://toto1.png" id="1_ce0sm"]
+[ext_resource type="Texture2D" uid="uid://plscafpjve3c" path="res://toto2.png" id="2_55qd0"]
 
 [node name="Main" type="Node"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_0aeci")
+[node name="s1" type="Sprite2D" parent="."]
+position = Vector2(-84, 3)
+texture = ExtResource("1_ce0sm")
+
+[node name="s2" type="Sprite2D" parent="."]
+position = Vector2(79, 1)
+texture = ExtResource("2_55qd0")
+
+[node name="s3" type="Sprite2D" parent="."]
+position = Vector2(173, -19)

@@ -9,13 +9,17 @@ extends TextureRect
 ## Width in pixels
 @export var px: int=128:
 	set(value):
+		var prev_value: int=px
 		px=value
-		px_changed.emit()
+		if prev_value!=value:
+			px_changed.emit()
 ## Height in pixels
 @export var py: int=128:
 	set(value):
+		var prev_value: int=py
 		py=value
-		py_changed.emit()
+		if prev_value!=value:
+			py_changed.emit()
 
 
 # Brush
@@ -30,6 +34,7 @@ extends TextureRect
 ## SETUP
 # Image
 var img: Image# the image created or edited
+const back_color: Color=Color.WHITE# background color (removed on save)
 #var px: int# width in pixels (=px)
 #var img_h: int# height in pixels (=py)
 # Brush
@@ -48,20 +53,16 @@ signal px_changed(value: int)
 signal py_changed(value: int)
 func _ready():
 	load_brush()
-	new_drawing()# there is always a drawing on display
-
 
 ###############################################################################
 ## FILES
 
-func new_drawing():# create texture as image
-	# Deduce image from existing Sprite 2D
-	#var px_=int(texture.get_width()*scale.x)# account for scale and texture size
-	#var py_=int(texture.get_height()*scale.y)
+func new_drawing(input_px: int, input_py: int):# create texture as image
+	px=input_px
+	py=input_py
 	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
 	img.convert(Image.FORMAT_RGBA8)
-	#img.fill(Color(1,1,1,0))# fill with transparent
-	img.fill(Color(0,0,1,1))# TEST
+	img.fill(back_color)
 	texture_from_img()
 	
 func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
@@ -77,8 +78,6 @@ func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if img:
 		img.save_png(filename_)
 
-func close_drawing():## CALLS FROM SCRIBBLER
-	new_drawing()# just make empty new drawing
 ###############################################################################
 ## IMAGE AND TEXTURE
 
@@ -90,11 +89,11 @@ func texture_from_img():# update displayed texture from image
 func resize_drawing(input_px: int,input_py: int):
 	var _last_img: Image=Image.new()# make image copy and blend to it
 	_last_img.copy_from(img)
-	img=Image.create(input_px,input_py,false, Image.FORMAT_RGBA8)
-	img.convert(Image.FORMAT_RGBA8)
-	img.fill(Color(0,0,1,1))# TEST
 	px=input_px
 	py=input_py
+	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
+	img.convert(Image.FORMAT_RGBA8)
+	img.fill(back_color)
 	var ix: int=int(px/2-_last_img.get_width()/2)# top left corner for blending
 	var iy: int=int(py/2-_last_img.get_height()/2)
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
