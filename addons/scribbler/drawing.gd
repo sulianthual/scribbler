@@ -6,19 +6,22 @@ extends TextureRect
 ## Drawing is active or not
 var active: bool=false
 
-@export_subgroup("file")
-## save directory
-var directory: String="res://"
-## drawing name 
-var dname: String="toto"
-## Drawing extension
-var extension: String="png"
+
 
 @export_subgroup("image")
 ## Width in pixels
-@export var px: int=128#=int(texture.get_width()*scale.x)# account for scale and texture size
+@export var px: int=128:
+	set(value):
+		px=value
+		img_w=py
+		px_changed.emit()
 ## Height in pixels
-@export var py: int=128#=int(texture.get_height()*scale.y)
+@export var py: int=128:
+	set(value):
+		py=value
+		img_h=py
+		py_changed.emit()
+		img_w=img.get_width()
 
 
 # Brush
@@ -33,9 +36,9 @@ var extension: String="png"
 ## SETUP
 # Image
 var img: Image# the image created or edited
-var img_w: int# width in pixels
-var img_h: int# height in pixels
-#var texture_: ImageTexture# the image texture
+var img_w: int# width in pixels (=px)
+var img_h: int# height in pixels (=py)
+
 # Brush
 var brush_path: String="res://addons/scribbler/brush.png"
 var brush_img: Image=Image.new()
@@ -47,23 +50,68 @@ var is_drawing: bool=false# pen is doing a drawing stroke
 var is_erasing: bool=false# erase has been called
 var img_history: Array[Image]=[]# backup of img from previous strokes
 
+signal px_changed(value: int)
+signal py_changed(value: int)
 func _ready():
 	load_brush()
-	create_empty_drawing()	
-	var _texture: ImageTexture=ImageTexture.create_from_image(img)
-	texture=_texture
+	new_drawing()# there is always a drawing on display
 
-		
-func create_empty_drawing():# create texture as image
+
+###############################################################################
+## FILES
+
+func new_drawing():# create texture as image
 	# Deduce image from existing Sprite 2D
 	#var px_=int(texture.get_width()*scale.x)# account for scale and texture size
 	#var py_=int(texture.get_height()*scale.y)
 	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
 	img.convert(Image.FORMAT_RGBA8)
-	img.fill(Color(1,1,1,0))# fill with transparent
-	img_w=img.get_width()
-	img_h=img.get_height()
-	#texture_from_img()
+	#img.fill(Color(1,1,1,0))# fill with transparent
+	img.fill(Color(0,0,1,1))# TEST
+	texture_from_img()
+	
+func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
+	if FileAccess.file_exists(filename_):
+		img=Image.new()
+		img.load(filename_)
+		img.convert(Image.FORMAT_RGBA8)
+		px=img.get_width()
+		py=img.get_height()
+		texture_from_img()
+		# Deduce image from existing Sprite 2D
+		#if px==img_w and py==img_h:# dimensions match 
+			#texture_from_img()
+
+func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
+	if img:
+		img.save_png(filename_)
+
+func close_drawing():## CALLS FROM SCRIBBLER
+	new_drawing()# just make empty new drawing
+###############################################################################
+## IMAGE AND TEXTURE
+
+func texture_from_img():# update displayed texture from image
+	var _texture: ImageTexture=ImageTexture.create_from_image(img)
+	texture=_texture# beware of scale (should be 1,1)
+	#set_texture(texture)# equivalent
+
+func resize_drawing(input_px: int,input_py: int):
+	var _last_img: Image=Image.new()# make image copy and blend to it
+	_last_img.copy_from(img)
+	img=Image.create(input_px,input_py,false, Image.FORMAT_RGBA8)
+	img.convert(Image.FORMAT_RGBA8)
+	img.fill(Color(0,0,1,1))# TEST
+	px=input_px
+	py=input_py
+	var ix: int=int(img_w/2-_last_img.get_width()/2)# top left corner for blending
+	var iy: int=int(img_h/2-_last_img.get_height()/2)
+	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
+	texture_from_img()
+
+
+###############################################################################
+## BRUSH
 
 func load_brush():# set the brush
 	if FileAccess.file_exists(brush_path):
@@ -77,6 +125,11 @@ func load_brush():# set the brush
 		img.fill(Color(0,0,0,1))# fill with transparent
 		brush_img.blend_rect_mask(img,brush_img,Rect2(0,0,brush_img.get_width(),brush_img.get_height()),Vector2(0,0))
 	#brush_img=utils.swap_img_color(brush_img,Color(0,0,0,1),brush_color)# initial image is black lines
+
+
+	
+###############################################################################
+## DRAWING
 
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
 var _first_point: bool=false# is drawing first point (no line-fill)
@@ -129,7 +182,13 @@ func _draw_point():
 func get_texture()->ImageTexture:
 	return texture
 
+func activate():
+	active=true
 
+func deactivate():
+	active=false
+	#clear_history()
+	
 ###############################################################################
 ## DRAFTS
 
@@ -200,7 +259,7 @@ func add_strokepart():# strokepart (draw line between last mouse - current mouse
 	queue_redraw()# call draw again
 func end_stroke():
 	is_drawing=false
-	save_drawing()# save drawing systematically
+	#save_drawing()# save drawing systematically
 func remove_stroke():# remove stroke with rmouse
 	if len(img_history)>0:
 		img=img_history[-1]# replace with former one
@@ -211,7 +270,7 @@ func remove_stroke():# remove stroke with rmouse
 func clear_drawing():
 	img.fill(Color(1,1,1,0))# empty transparent canvas
 	clear_history()
-	erase_drawing_save()# erase the saved drawing too
+	#erase_drawing_save()# erase the saved drawing too
 func add_to_history():# add former image to histor
 	var img_former=Image.new()# save former stroke
 	img_former.copy_from(img)
@@ -222,48 +281,25 @@ func clear_history():# clear history of strokes
 ###########################################
 ### SUBFUNCTIONS
 
-func get_filename():
-	return directory+"/"+dname+"."+extension
-func save_drawing():
-	if img:
-		var filename_=get_filename()
-		img.save_png(filename_)
-func erase_drawing_save():
-	var filename_=get_filename()
-	if FileAccess.file_exists(filename_):
-		DirAccess.remove_absolute(filename_)
-func drawing_exists():
-	var filename_=get_filename()
-	return FileAccess.file_exists(filename_)
-func load_drawing():
-	var filename_=get_filename()
-	if FileAccess.file_exists(filename_):## TEST
-		img=Image.new()
-		img.load(filename_)
-		img.convert(Image.FORMAT_RGBA8)
-		img_w=img.get_width()
-		img_h=img.get_height()
-		# Deduce image from existing Sprite 2D
-		if px==img_w and py==img_h:# dimensions match 
-			texture_from_img()
-		else:# no match, make new drawing
-			create_empty_drawing()
-	else:
-		create_empty_drawing()
+
+#func save_drawing():
+	#if img:
+		#var filename_=get_filename()
+		#img.save_png(filename_)
+#func erase_drawing_save():
+	#var filename_=get_filename()
+	#if FileAccess.file_exists(filename_):
+		#DirAccess.remove_absolute(filename_)
+#func drawing_exists():
+	#var filename_=get_filename()
+	#return FileAccess.file_exists(filename_)
 
 
-func texture_from_img():# Make The Sprite2D Texture from Image (replaces whatever it was)
-	scale=Vector2(1,1)# readjust Sprite 2D to have Texture from Image, and scale=(1,1)
-	texture=ImageTexture.create_from_image(img)# (re)create image texture
-	#set_texture(texture)# equivalent to former line
+
+
 
 #############################################################################
 ## CALLS
 
-func activate():
-	active=true
 
-func deactivate():
-	active=false
-	clear_history()
 	
