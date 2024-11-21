@@ -3,9 +3,6 @@ extends TextureRect
 
 ## Scribbler: Draw and save images in Godot (for game prototyping)
 
-## Drawing is active or not
-var active: bool=false
-
 
 
 @export_subgroup("image")
@@ -13,15 +10,12 @@ var active: bool=false
 @export var px: int=128:
 	set(value):
 		px=value
-		img_w=py
 		px_changed.emit()
 ## Height in pixels
 @export var py: int=128:
 	set(value):
 		py=value
-		img_h=py
 		py_changed.emit()
-		img_w=img.get_width()
 
 
 # Brush
@@ -36,14 +30,14 @@ var active: bool=false
 ## SETUP
 # Image
 var img: Image# the image created or edited
-var img_w: int# width in pixels (=px)
-var img_h: int# height in pixels (=py)
-
+#var px: int# width in pixels (=px)
+#var img_h: int# height in pixels (=py)
 # Brush
-var brush_path: String="res://addons/scribbler/brush.png"
+const brush_path: String="res://addons/scribbler/brush.png"
 var brush_img: Image=Image.new()
 var brush_size: int# brush size (same for x,y)
 # Logic
+var active: bool=false# drawing active or not
 var mouse_pos: Vector2# mouse position
 var mouse_pos_last: Vector2# last moust position
 var is_drawing: bool=false# pen is doing a drawing stroke
@@ -78,9 +72,6 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		px=img.get_width()
 		py=img.get_height()
 		texture_from_img()
-		# Deduce image from existing Sprite 2D
-		#if px==img_w and py==img_h:# dimensions match 
-			#texture_from_img()
 
 func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if img:
@@ -104,8 +95,8 @@ func resize_drawing(input_px: int,input_py: int):
 	img.fill(Color(0,0,1,1))# TEST
 	px=input_px
 	py=input_py
-	var ix: int=int(img_w/2-_last_img.get_width()/2)# top left corner for blending
-	var iy: int=int(img_h/2-_last_img.get_height()/2)
+	var ix: int=int(px/2-_last_img.get_width()/2)# top left corner for blending
+	var iy: int=int(py/2-_last_img.get_height()/2)
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
 
@@ -157,7 +148,7 @@ func _draw_point():
 			var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
 			var ix: int=int(_diff[0]/_rect.size[0]*px)# convert to image coords (pixels)
 			var iy: int=int(_diff[1]/_rect.size[1]*py)
-			img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+img_w/2,iy-brush_size/2+img_h/2))
+			img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
 			_last_ix=ix# record last drawn point position
 			_last_iy=iy
 		else: # fill to last line ## TODO NOT WORKING
@@ -168,7 +159,7 @@ func _draw_point():
 			for i in range(_dist):
 				var lx=int(round(_last_ix+float(i/_dist)*float(ix-_last_ix)))
 				var ly=int(round(_last_iy+float(i/_dist)*float(iy-_last_iy)))
-				img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+img_w/2,ly-brush_size/2+img_h/2))
+				img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+px/2,ly-brush_size/2+py/2))
 			_last_ix=ix# record last drawn point position
 			_last_iy=iy
 		texture.update(img)
@@ -204,7 +195,7 @@ func deactivate():
 		#return
 	### TEST
 	#img.fill(Color(1,0,0,1))
-	##img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(0-brush_size/2+img_w/2,0-brush_size/2+img_h/2))
+	##img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(0-brush_size/2+px/2,0-brush_size/2+img_h/2))
 	#queue_redraw()# call draw again
 	#return
 	##
@@ -242,7 +233,7 @@ func start_stroke():# start new stroke when pressing lmouse
 func add_strokepart_start():# strokepart start (draw dot at current mouse)
 	var ix= int(round(mouse_pos.x-global_position.x))
 	var iy= int(round(mouse_pos.y-global_position.y))
-	img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+img_w/2,iy-brush_size/2+img_h/2))
+	img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
 func add_strokepart():# strokepart (draw line between last mouse - current mouse)
 	var ix0= (mouse_pos_last.x-global_position.x)
 	var iy0= (mouse_pos_last.y-global_position.y)
@@ -254,8 +245,8 @@ func add_strokepart():# strokepart (draw line between last mouse - current mouse
 		#var iy=iy0+i/dist*(iy1-iy0)
 		var ix=int(round(ix0+i/dist*(ix1-ix0)))
 		var iy=int(round(iy0+i/dist*(iy1-iy0)))
-		#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(int(round(ix-brush_size/2+img_w/2)),int(round(iy-brush_size/2+img_h/2))))
-		img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+img_w/2,iy-brush_size/2+img_h/2))
+		#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(int(round(ix-brush_size/2+px/2)),int(round(iy-brush_size/2+img_h/2))))
+		img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
 	queue_redraw()# call draw again
 func end_stroke():
 	is_drawing=false

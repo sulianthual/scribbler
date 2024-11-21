@@ -52,6 +52,7 @@ texture = SubResource("ImageTexture_jxgk5")
 expand_mode = 1
 stretch_mode = 5
 script = ExtResource("1_252d8")
+brush_scaling = 2.0
 
 [node name="margins" type="Panel" parent="VBoxContainer/MarginContainer/drawing"]
 show_behind_parent = true
