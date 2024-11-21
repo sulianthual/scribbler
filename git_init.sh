@@ -18,8 +18,6 @@ if [ "$reponame" = "" ]; then
     exit 1
 fi
 
-
-
 if [ ! -f /tmp/README.md ]; then
     echo '<!-- ![alt text](game_icon.png?raw=true "Screenshot") -->' > README.md
     echo "">>README.md
@@ -30,14 +28,13 @@ if [ ! -f /tmp/README.md ]; then
     echo "Github reference: [link](https://github.com/sulianthual/$reponame)" >> README.md
 fi
 
-
 git init
 git add -A
 git commit -m "initial comit"
 
 echo "XX"
 echo "performed git init, add and commit"
-echo "created generic README.md (unless existing)"
+echo "created generic README.md (unless already existing)"
 read -p "Confirm add origin and push by entering yesido:" yesconfirm
 if [ "$yesconfirm" != "yesido" ]; then
     echo "Did not confirm, Aborting"

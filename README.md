@@ -1,4 +1,4 @@
-<!-- ![alt text](game_icon.png?raw=true "Screenshot") -->
+![alt text](game_icon.png?raw=true "Screenshot")
 
 <h4>scribbler</h4>
 
