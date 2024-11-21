@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cjefwpcxfpecv"]
 
-[ext_resource type="Script" path="res://test_control/scribbler_texture.gd" id="1_khoew"]
+[ext_resource type="Script" path="res://tests/test_control/scribbler_texture.gd" id="1_khoew"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5npf4"]
 bg_color = Color(1, 1, 1, 1)

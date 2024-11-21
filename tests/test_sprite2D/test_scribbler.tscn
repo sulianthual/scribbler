@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://d21rrmhku8nmx"]
 
-[ext_resource type="Script" path="res://test_sprite2D/scribbler.gd" id="1_n7v2c"]
-[ext_resource type="Texture2D" uid="uid://ditisotmxpnwr" path="res://test_sprite2D/scribbler_brush.png" id="2_5j0wo"]
+[ext_resource type="Script" path="res://tests/test_sprite2D/scribbler.gd" id="1_n7v2c"]
+[ext_resource type="Texture2D" uid="uid://ditisotmxpnwr" path="res://tests/test_sprite2D/scribbler_brush.png" id="2_5j0wo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a8alp"]
 bg_color = Color(0.972549, 0, 0, 0)

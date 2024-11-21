@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ditisotmxpnwr"
-path="res://.godot/imported/scribbler_brush.png-b9383670c3444deff665458bc0d3332c.ctex"
+path="res://.godot/imported/scribbler_brush.png-0718d56ac5179ab8cc6152a303d593be.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test_sprite2D/scribbler_brush.png"
-dest_files=["res://.godot/imported/scribbler_brush.png-b9383670c3444deff665458bc0d3332c.ctex"]
+source_file="res://tests/test_sprite2D/scribbler_brush.png"
+dest_files=["res://.godot/imported/scribbler_brush.png-0718d56ac5179ab8cc6152a303d593be.ctex"]
 
 [params]
 

@@ -48,31 +48,11 @@ var is_erasing: bool=false# erase has been called
 var img_history: Array[Image]=[]# backup of img from previous strokes
 
 func _ready():
-	#create_empty_drawing()
-	#load_drawing()
-	##
-	##TEST
-	if false:
-		var _img: Image=Image.create(128,128,false, Image.FORMAT_RGBA8)
-		_img.convert(Image.FORMAT_RGBA8)
-		_img.fill(Color(0,0,1,1))
-		_img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(0-brush_size/2+img_w/2,0-brush_size/2+img_h/2))
-		#_img.save_png("res://test_control/toto.png")
-		#_img.load("res://test_control/toto.png")
-		#var _texture: ImageTexture=ImageTexture.new()
-		var _texture: ImageTexture=ImageTexture.create_from_image(_img)
-		texture=_texture
-	## TEST 2
-	if true:
-		load_brush()
-		create_empty_drawing()	
-		var _texture: ImageTexture=ImageTexture.create_from_image(img)
-		texture=_texture
-		#print(_texture
-		#print(_texture._get_width())
-		
-		#texture=_texture
-		#queue_redraw()
+	load_brush()
+	create_empty_drawing()	
+	var _texture: ImageTexture=ImageTexture.create_from_image(img)
+	texture=_texture
+
 		
 func create_empty_drawing():# create texture as image
 	# Deduce image from existing Sprite 2D
@@ -80,7 +60,7 @@ func create_empty_drawing():# create texture as image
 	#var py_=int(texture.get_height()*scale.y)
 	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
 	img.convert(Image.FORMAT_RGBA8)
-	img.fill(Color(1,1,1,1))# fill with white
+	img.fill(Color(1,1,1,0))# fill with transparent
 	img_w=img.get_width()
 	img_h=img.get_height()
 	#texture_from_img()
@@ -98,22 +78,60 @@ func load_brush():# set the brush
 		brush_img.blend_rect_mask(img,brush_img,Rect2(0,0,brush_img.get_width(),brush_img.get_height()),Vector2(0,0))
 	#brush_img=utils.swap_img_color(brush_img,Color(0,0,0,1),brush_color)# initial image is black lines
 
+var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
+var _first_point: bool=false# is drawing first point (no line-fill)
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		var _mouse_position: Vector2=get_viewport().get_mouse_position()
-		print(_mouse_position)
-		var ix: int=int(_mouse_position[0])
-		var iy: int=int(_mouse_position[1])
-		#img.fill(Color(0,0,1,1))# fill with transparent
-		img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+img_w/2,iy-brush_size/2+img_h/2))
-		texture.update(img)
+		if event.pressed:
+			#print("pressed")
+			_drawing=true
+			_first_point=true
+			_draw_point()
+		else:
+			#print("released")
+			_drawing=false
+	elif _drawing and event is InputEventMouseMotion:
+		_draw_point()
 
-#func _draw():# redraw (when calling _draw, not every _process)
-	#if texture:# and active
-		#texture.update(img)# update on an already made texture
-		
+var _last_ix: int# record last ix drawn for line filling
+var _last_iy: int# record last ix drawn for line filling
+var line_fill: bool=false
+func _draw_point():
+	var _mouse_pos: Vector2=get_global_mouse_position()
+	var _rect: Rect2=get_global_rect()
+	if _rect.has_point(_mouse_pos):
+		if not line_fill or _first_point: # just a point
+			var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
+			var ix: int=int(_diff[0]/_rect.size[0]*px)# convert to image coords (pixels)
+			var iy: int=int(_diff[1]/_rect.size[1]*py)
+			img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+img_w/2,iy-brush_size/2+img_h/2))
+			_last_ix=ix# record last drawn point position
+			_last_iy=iy
+		else: # fill to last line ## TODO NOT WORKING
+			var _diff: Vector2=_mouse_pos-_rect.get_center()# in screen pixels
+			var ix: int=int(_diff[0]/_rect.size[0]*px)
+			var iy: int=int(_diff[1]/_rect.size[1]*py)
+			var _dist=max(abs(ix-_last_ix),abs(iy-_last_iy))
+			for i in range(_dist):
+				var lx=int(round(_last_ix+float(i/_dist)*float(ix-_last_ix)))
+				var ly=int(round(_last_iy+float(i/_dist)*float(iy-_last_iy)))
+				img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+img_w/2,ly-brush_size/2+img_h/2))
+			_last_ix=ix# record last drawn point position
+			_last_iy=iy
+		texture.update(img)
+		_first_point=false# no longer first point
+	else:# outside edges
+		_drawing=false
+	
 ###############################################################################
-## METHODS
+## CALLS (from Scribbler)
+
+func get_texture()->ImageTexture:
+	return texture
+
+
+###############################################################################
+## DRAFTS
 
 
 	#bru
