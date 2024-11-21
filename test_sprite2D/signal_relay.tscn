@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://decx017d2ff05"]
+
+[ext_resource type="Script" path="res://test_sprite2D/signal_relay.gd" id="1_ncc1r"]
+
+[node name="signalinout" type="Node"]
+script = ExtResource("1_ncc1r")

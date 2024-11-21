@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://cjo1xkdprrdcu"]
+
+[ext_resource type="Script" path="res://addons/scribbler/drawing.gd" id="1_252d8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2itqs"]
+bg_color = Color(0, 0.635294, 0.109804, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0, 0, 1)
+
+[node name="Scribbler" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="borders" type="Panel" parent="MarginContainer"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2itqs")
+
+[node name="drawing" type="TextureRect" parent="MarginContainer"]
+layout_mode = 2
+script = ExtResource("1_252d8")

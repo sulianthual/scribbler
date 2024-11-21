@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://d21rrmhku8nmx"]
+
+[ext_resource type="Script" path="res://test_sprite2D/scribbler.gd" id="1_n7v2c"]
+[ext_resource type="Texture2D" uid="uid://ditisotmxpnwr" path="res://test_sprite2D/scribbler_brush.png" id="2_5j0wo"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a8alp"]
+bg_color = Color(0.972549, 0, 0, 0)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+
+[node name="scribbler_menu" type="CanvasLayer"]
+
+[node name="screen_center" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="scribbler" type="Sprite2D" parent="screen_center"]
+script = ExtResource("1_n7v2c")
+directory = "res://test"
+dname = "toto"
+brush_texture = ExtResource("2_5j0wo")
+
+[node name="borders" type="Panel" parent="screen_center/scribbler"]
+unique_name_in_owner = true
+modulate = Color(0, 0, 0, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_a8alp")
