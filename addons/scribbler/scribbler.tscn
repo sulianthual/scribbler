@@ -119,3 +119,9 @@ min_value = 1.0
 max_value = 10.0
 step = 0.1
 value = 1.0
+
+[node name="brush_color" type="ColorPickerButton" parent="VBoxContainer/brush_row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+edit_alpha = false

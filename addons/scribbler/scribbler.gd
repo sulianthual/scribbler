@@ -16,6 +16,7 @@ extends Control
 ## brush_row
 @onready var brush: Button=%brush# update brush
 @onready var brush_scale: SpinBox=%brush_scale
+@onready var brush_color: ColorPickerButton=%brush_color
 
 func _ready():
 	## drawer
@@ -28,6 +29,7 @@ func _ready():
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	brush.connect("pressed",_on_brush_pressed)
+	brush_color.connect("color_changed",_on_brush_color_changed)
 	## others
 	_update_mode()
 	## deferred
@@ -127,7 +129,8 @@ func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
 ## SETUP BRUSH
 func _on_brush_pressed():
 	drawing.resize_brush(brush_scale.value)
-	
+func _on_brush_color_changed(input_color: Color):
+	drawing.recolor_brush(input_color)
 ## UTILS
 ## rescan directory after changing files
 func _rescan_filesystem():

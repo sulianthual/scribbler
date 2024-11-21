@@ -91,6 +91,17 @@ func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 					_new_img.set_pixel(ix, iy, new_color)
 	return _new_img
 
+## swap anythin that ISNT source color with new_color
+func _swap_noncolor(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for iy in _new_img.get_height():
+			for ix in _new_img.get_width():
+				if _new_img.get_pixel(ix, iy) != source_color:
+					_new_img.set_pixel(ix, iy, new_color)
+	return _new_img
+	
 ###############################################################################
 ## IMAGE AND TEXTURE
 
@@ -125,14 +136,13 @@ func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_scaling=input_brush_scaling
 	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
 	brush_size = brush_img.get_width()
-	#
-	#if true:# ensure transparent background
-		#var _img: Image=Image.new()
-		#_img.copy_from(brush_img)
-		#_img.fill(Color(0,0,0,1))# fill with transparent
-		#brush_img.blend_rect_mask(_img,brush_img,Rect2(0,0,brush_img.get_width(),brush_img.get_height()),Vector2(0,0))
 
-	
+func recolor_brush(input_color: Color):
+	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,input_color)
+
+
+
+		
 ###############################################################################
 ## DRAWING
 
