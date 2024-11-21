@@ -25,6 +25,8 @@ if [ ! -f /tmp/README.md ]; then
     echo "">>README.md
     echo "sul ($(date +%Y), Godot 4 or above)" >> README.md
     echo "">>README.md
+    echo "...">>README.md
+    echo "">>README.md
     echo "Github reference: [link](https://github.com/sulianthual/$reponame)" >> README.md
 fi
 
