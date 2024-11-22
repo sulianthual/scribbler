@@ -16,7 +16,7 @@ extends Control
 ## brush_row
 @onready var brush: Button=%brush# update brush
 @onready var brush_scale: SpinBox=%brush_scale
-@onready var brush_color: ColorPickerButton=%brush_color
+@onready var brush_color: TextureButton=%brush_color
 
 func _ready():
 	## drawer
