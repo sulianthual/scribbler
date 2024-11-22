@@ -3,6 +3,19 @@ extends Control
 
 ## Scribbler: Scribble drawings in the editor
 ##
+
+
+## image width (pixels) (as controlled here instead of drawing)
+@export var px: int=128
+## image height (pixels) (as controlled here instead of drawing)
+@export var py: int=128
+## Dialogue Control scene for resizing
+@export var resize_dialogue: PackedScene
+
+#############################################################
+## SETUP
+
+## drawing
 @onready var drawing: TextureRect=%drawing
 ## file
 @onready var mode_button: Button = %mode
@@ -11,13 +24,12 @@ extends Control
 @onready var save: Button = %save# save drawing
 ## resize
 @onready var resize: Button=%resize# update image size
-@onready var px: SpinBox=%px# image width
-@onready var py: SpinBox=%py# image height
 ## brush
-@onready var brush: Button=%brush# update brush
 @onready var brush_color: TextureButton=%brush_color
 ## help
 @onready var help: Button=%help
+## test
+#@onready var test: Button=%test
 
 func _ready():
 	## drawer
@@ -32,13 +44,14 @@ func _ready():
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
+	#test.connect("pressed",_on_test_pressed)
 	brush_color.connect("color_changed",_on_brush_color_changed)
 	## others
 	_update_mode()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
-	drawing.new_drawing(px.value,py.value)
+	drawing.new_drawing(px,py)
 
 ## CHANGE MODE (FROM FILE OR NODE)
 enum MODE {FILE,NODE}
@@ -51,14 +64,22 @@ func _on_mode_pressed():
 	_update_mode()
 func _update_mode():
 	if mode==MODE.FILE:
-		mode_button.set_text("FILE")
+		mode_button.set_text("MODE: FILE")
 	elif mode==MODE.NODE:
-		mode_button.set_text("NODE")
+		mode_button.set_text("MODE: NODE")
 	
+
+
+## FROM DRAWING
+func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
+	px=input_px
+func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
+	py=input_py
+
 ## NEW DRAWING
 func _on_new_pressed():
-	drawing.new_drawing(px.value,py.value)
-
+	drawing.new_drawing(px,py)
+	
 ## LOAD FROM FILE
 func _on_load_pressed():
 	if mode==MODE.FILE:
@@ -120,13 +141,8 @@ func _save_node():## save to selected node in Editor SceneView
 				_save_dialogue().set_current_path(_texture.resource_path)
 
 
-## RESIZE DRAWING
-func _on_resize_pressed():
-	drawing.resize_drawing(px.value,py.value)
-func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
-	px.value=input_px
-func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
-	py.value=input_py
+
+
 	
 ## SETUP BRUSH
 func _on_brush_color_changed(input_color: Color):
@@ -174,3 +190,31 @@ func _help_dialogue():
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.popup()
 	return file_dialogue
+
+## RESIZE DRAWING (POPUP)
+func _on_resize_pressed():
+	_resize_dialogue()
+func _resize_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(320, 180))
+	file_dialogue.title="Resize Scribble"
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_resize_dialogue_confirmed)
+	var _dialogue: Control=resize_dialogue.instantiate()
+	file_dialogue.add_child(_dialogue)
+	_dialogue.px.value=px
+	_dialogue.py.value=py
+	_dialogue.px.connect("value_changed",_on_resize_dialogue_px_changed)
+	_dialogue.py.connect("value_changed",_on_resize_dialogue_py_changed)
+	file_dialogue.popup()
+	return file_dialogue
+## FROM DRAWING
+func _on_resize_dialogue_px_changed(input_px: float):## SIGNAL FROM DRAWING
+	px=int(input_px)
+func _on_resize_dialogue_py_changed(input_py: float):## SIGNAL FROM DRAWING
+	py=int(input_py)
+func _on_resize_dialogue_confirmed():
+	drawing.resize_drawing(px,py)
+
+	

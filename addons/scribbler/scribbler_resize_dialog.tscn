@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3 uid="uid://csrs4ajsvdtjx"]
+
+[ext_resource type="Script" path="res://addons/scribbler/scribbler_resize_dialog.gd" id="1_5ps8k"]
+
+[node name="resize_dialogue" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_5ps8k")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "width"
+
+[node name="px" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 1080.0
+value = 128.0
+rounded = true
+select_all_on_focus = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "height"
+
+[node name="py" type="SpinBox" parent="VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 1080.0
+value = 128.0
+rounded = true
+select_all_on_focus = true

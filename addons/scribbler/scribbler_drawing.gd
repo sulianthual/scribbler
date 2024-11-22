@@ -25,7 +25,7 @@ extends TextureRect
 # Brush
 @export_subgroup("brush")
 ### Scaling factor of brush
-@export var brush_scaling: float=1.0
+
 ### Brush color
 @export var brush_color: Color
 
@@ -40,20 +40,19 @@ const back_color_in_file: Color=Color(1,1,1,0)# replaces background color on sav
 const brush_path: String="res://addons/scribbler/scribbler_brush.png"
 const brush_size_min: float=0.2# brush size min
 const brush_size_max: float=10.0# brush size max
+const brush_size_start: float=1.0# brush size start
 const brush_resize_rate: float=1.01# rate of increase/decrease of brush size
 var brush_img_base: Image=Image.new()# base brush
-var brush_img: Image=Image.new()# variable size
-var brush_size: int# brush size (same for x,y)
+var brush_img: Image=Image.new()# image for brush
+var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
+var brush_scaling: float=1.0# brush scaling respective to size start
+var brush_size: int# brush size tracked (for maths)
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
-var mouse_pos: Vector2# mouse position
-var mouse_pos_last: Vector2# last moust position
-var is_drawing: bool=false# pen is doing a drawing stroke
-var is_erasing: bool=false# erase has been called
-var img_history: Array[Image]=[]# backup of img from previous strokes
-
+# Signals
 signal px_changed(value: int)
 signal py_changed(value: int)
+#
 func _ready():
 	load_brush()
 
@@ -129,7 +128,7 @@ func _swap_noncolor(input_image: Image,source_color: Color, new_color: Color):
 	return _new_img
 
 ###############################################################################
-## BRUSH
+## BRUSH AND ERASER
 
 func load_brush():# set the brush
 	if FileAccess.file_exists(brush_path):
@@ -137,22 +136,29 @@ func load_brush():# set the brush
 	brush_img_base.convert(Image.FORMAT_RGBA8)
 	brush_img.convert(Image.FORMAT_RGBA8)
 	brush_img.copy_from(brush_img_base)
+	resize_brush(brush_size_start)
 
 func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_scaling=input_brush_scaling
 	brush_img.copy_from(brush_img_base)
 	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
 	brush_size = brush_img.get_width()
+	eraser_from_brush()
 
 func recolor_brush(input_color: Color):
 	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,input_color)
 
+func eraser_from_brush():
+	eraser_img.copy_from(brush_img)
+	eraser_img.fill(Color.TRANSPARENT)
+	
 
 ###############################################################################
 ## DRAWING
 
 ## INPUTS
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
+var _erasing: bool=false# is ersing (within drawing area, Right Mouse Pressed)
 var _first_point: bool=false# is drawing first point (no line-fill)
 func _input(event):
 	if active:
@@ -160,12 +166,23 @@ func _input(event):
 			if event.pressed:
 				#print("pressed")
 				_drawing=true
+				_erasing=false
 				_first_point=true
 				_draw_point()
 			else:
 				#print("released")
 				_drawing=false
-		elif _drawing and event is InputEventMouseMotion:
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+			if event.pressed:
+				#print("pressed")
+				_drawing=false
+				_erasing=true
+				_first_point=true
+				_draw_point()
+			else:
+				#print("released")
+				_erasing=false
+		elif (_drawing or _erasing) and event is InputEventMouseMotion:
 			_draw_point()
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_UP:
 			resize_brush(clamp(brush_scaling*brush_resize_rate,brush_size_min,brush_size_max))
@@ -175,6 +192,7 @@ func _input(event):
 ## DRAW
 var _last_ix: int# record last ix drawn for line filling
 var _last_iy: int# record last ix drawn for line filling
+
 var line_fill: bool=false## TODO: test interpolation as is NOT WORKING
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
@@ -196,7 +214,10 @@ func _draw_point():
 			var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
 			var ix: int=int(_diff[0]/_rect.size[0]*px)# convert to image coords (pixels)
 			var iy: int=int(_diff[1]/_rect.size[1]*py)
-			img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
+			if _drawing:
+				img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
+			elif _erasing:
+				img.blit_rect_mask(eraser_img,brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
 			_last_ix=ix# record last drawn point position
 			_last_iy=iy
 		else: # fill to last line ## TODO NOT WORKING
@@ -207,7 +228,10 @@ func _draw_point():
 			for i in range(_dist):
 				var lx=int(round(_last_ix+float(i/_dist)*float(ix-_last_ix)))
 				var ly=int(round(_last_iy+float(i/_dist)*float(iy-_last_iy)))
-				img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+px/2,ly-brush_size/2+py/2))
+				if _drawing:
+					img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+px/2,ly-brush_size/2+py/2))
+				elif _erasing:
+					img.blit_rect_mask(eraser_img,brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+px/2,ly-brush_size/2+py/2))
 			_last_ix=ix# record last drawn point position
 			_last_iy=iy
 		texture.update(img)
