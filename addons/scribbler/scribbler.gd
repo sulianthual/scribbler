@@ -195,8 +195,9 @@ func _brush_color_dialogue():
 	file_dialogue.connect("confirmed",_on_brush_color_dialogue_confirmed)
 	var _dialog: ColorPicker=ColorPicker.new()
 	_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed)
+	_dialog.color=brush_color
 	_dialog.deferred_mode=true
-	_dialog.edit_alpha=false
+	_dialog.edit_alpha=true
 	_dialog.can_add_swatches=false
 	_dialog.color_modes_visible=false
 	_dialog.hex_visible=false
@@ -224,9 +225,9 @@ func _help_dialogue():
 	
 	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
 	
-	Draw with left mouse, Erase with right mouse.
+	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel.
 	
-	Brush is indicated in top left corner. Change brush size with mouse wheel, and cycle brush color using colored rectangle (only basic colors available).
+	Brush is indicated in top left corner, use button to change brush color.
 	
 	Clear, load or save image (PNG only) using the buttons (see MODE).
 	

@@ -1,7 +1,6 @@
 - when saving node: save file, if selected node and mode=node, apply texture from file
 - ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
-- arrange ui better (popupmenu)-> should hide all when minimized
+- ui-> should hide all when minimized
 - quick button add sprite...-> prefill it, same animatedsprite
-- color picker pop up?
 - last point when exiting window: still draw a line to it 
 - publish
