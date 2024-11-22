@@ -26,6 +26,8 @@ extends TextureRect
 # Image
 var img: Image# the image created or edited
 const back_color: Color=Color.TRANSPARENT#background color on new_drawing or resize (ignored in loaded images)
+# Drawing
+const line_fill: bool=true# use line algorithm to fill gaps
 # Brush
 const brush_path: String="res://addons/scribbler/scribbler_brush.png"# must be square!
 var brush_size_min: float=0.1# brush size min: (1x1 adjust according to base) 
@@ -37,6 +39,7 @@ var brush_img: Image=Image.new()# image for brush
 var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
 var brush_scaling: float=1.0# brush scaling respective to size start
 var brush_color: Color=Color.BLACK# Brush color (at ready)
+const brush_line_step_ratio: float=0.25# draw line skiping brush_size*ratio (high=performance gain but possible gaps)
 var brush_size: int# brush size tracked (for maths): Brush needs to be square!
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
@@ -189,7 +192,7 @@ func _input(event):
 				_erasing=false
 		elif event is InputEventMouseMotion:
 			mouse_position_changed.emit()
-			if _drawing or _erasing:
+			if not _first_point and (_drawing or _erasing):
 				_draw_point()
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_UP:
 			resize_brush(clamp(brush_scaling*brush_resize_rate,brush_size_min,brush_size_max))
@@ -200,10 +203,8 @@ func _input(event):
 			_drawing=false
 			_erasing=false
 ## DRAW
-var _last_ix: int# record last ix drawn for line filling
-var _last_iy: int# record last ix drawn for line filling
-
-var line_fill: bool=false## TODO: test interpolation as is NOT WORKING
+var _last_ix: float# record last ix drawn for line filling (as float for accuracy)
+var _last_iy: float# record last ix drawn for line filling
 var _rect: Rect2# area of drawing rectangle (important)
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
@@ -221,34 +222,43 @@ func _draw_point():
 		_rect=_rectm
 	# draw
 	if _rect.has_point(_mouse_pos):
-		if not line_fill or _first_point: # just a point
+		if not line_fill or _first_point: # blit brush at a point
 			var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
-			var ix: int=int(_diff[0]/_rect.size[0]*px)# convert to image coords (pixels)
-			var iy: int=int(_diff[1]/_rect.size[1]*py)
+			var ix: float=_diff[0]/float(_rect.size[0])*float(px)# convert to image coords (pixels)
+			var iy: float=_diff[1]/float(_rect.size[1])*float(py)# as float for refined positining
+			var offr: Rect2=Rect2(0,0,brush_size,brush_size)
+			var offx: float=-float(brush_size)/2+float(px)/2# precompute
+			var offy: float=-float(brush_size)/2+float(py)/2
 			if _drawing:
-				img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
+				img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 			elif _erasing:
-				img.blit_rect_mask(eraser_img,brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
-			_last_ix=ix# record last drawn point position
+				img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+			_last_ix=ix# record last drawn point position (as int!)
 			_last_iy=iy
-		else: # fill to last line ## TODO NOT WORKING
+			_first_point=false# no longer first point
+		else: # blit brush along a line between last point and current point
 			var _diff: Vector2=_mouse_pos-_rect.get_center()# in screen pixels
-			var ix: int=int(_diff[0]/_rect.size[0]*px)
-			var iy: int=int(_diff[1]/_rect.size[1]*py)
-			var _dist=max(abs(ix-_last_ix),abs(iy-_last_iy))
-			for i in range(_dist):
-				var lx=int(round(_last_ix+float(i/_dist)*float(ix-_last_ix)))
-				var ly=int(round(_last_iy+float(i/_dist)*float(iy-_last_iy)))
+			var ix: float=_diff[0]/float(_rect.size[0])*float(px)# convert to image coords (pixels)
+			var iy: float=_diff[1]/float(_rect.size[1])*float(py)
+			#var _dist: float=max(abs(ix-_last_ix),abs(iy-_last_iy))
+			var _dist: float=ceili(sqrt((ix-_last_ix)**2+(iy-_last_iy)**2))
+			var offr: Rect2=Rect2(0,0,brush_size,brush_size)
+			var offx: float=-float(brush_size)/2+float(px)/2# precompute
+			var offy: float=-float(brush_size)/2+float(py)/2
+			for i in range(0,_dist+1,int(brush_size*brush_line_step_ratio)):# fill while trying to skip steps to increase performance
+				var lx: float=_last_ix+float(i)/_dist*(ix-_last_ix)
+				var ly: float=_last_iy+float(i)/_dist*(iy-_last_iy)
 				if _drawing:
-					img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+px/2,ly-brush_size/2+py/2))
+					img.blend_rect(brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 				elif _erasing:
-					img.blit_rect_mask(eraser_img,brush_img,Rect2(0,0,brush_size,brush_size),Vector2(lx-brush_size/2+px/2,ly-brush_size/2+py/2))
-			_last_ix=ix# record last drawn point position
+					img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+			_last_ix=ix# record last drawn point position (as int!)
 			_last_iy=iy
 		texture.update(img)
-		_first_point=false# no longer first point
+		
 	else:# outside edges
 		_drawing=false
+		_erasing=false
 
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])

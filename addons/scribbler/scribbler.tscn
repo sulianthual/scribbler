@@ -81,6 +81,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_2itqs")
 
 [node name="brush_indicator" type="TextureRect" parent="VBoxContainer/MarginContainer"]
+modulate = Color(1, 1, 1, 0.5)
 texture_filter = 1
 layout_mode = 2
 size_flags_vertical = 3

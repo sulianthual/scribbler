@@ -1,8 +1,8 @@
 - when saving node: save file, if selected node and mode=node, apply texture from file
-- brush doesnt draws lines, correct it
 - ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
 - arrange ui better (popupmenu)-> should hide all when minimized
-- publish
 - quick button add sprite...-> prefill it, same animatedsprite
 - pop up that expands drawing area: move child around
 - color picker pop up?
+- last point when exiting window: still draw a line to it 
+- publish
