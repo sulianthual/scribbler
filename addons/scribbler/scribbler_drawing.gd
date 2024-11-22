@@ -245,7 +245,8 @@ func _draw_point():
 			var offr: Rect2=Rect2(0,0,brush_size,brush_size)
 			var offx: float=-float(brush_size)/2+float(px)/2# precompute
 			var offy: float=-float(brush_size)/2+float(py)/2
-			for i in range(0,_dist+1,int(brush_size*brush_line_step_ratio)):# fill while trying to skip steps to increase performance
+			var _step: int=clampi(int(brush_size*brush_line_step_ratio),1,brush_size)
+			for i in range(0,_dist+1,_step):# fill while trying to skip steps to increase performance
 				var lx: float=_last_ix+float(i)/_dist*(ix-_last_ix)
 				var ly: float=_last_iy+float(i)/_dist*(iy-_last_iy)
 				if _drawing:
