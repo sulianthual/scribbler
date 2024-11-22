@@ -324,22 +324,26 @@ func _help_dialogue():
 	
 	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. Brush is indicated in top left corner.
 	
-	load: generate scribble from existing PNG file (see MODE).
-	save: save scribble to an existing or new PNG file (see MODE).
+	x: minimize/expand menu
 	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
+	undo: undo last stroke (only 10 undos allowed)
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels)
-	
+	edit files/edit nodes: see MODE
+	load: generate scribble from existing PNG file (see MODE).
+	save: save scribble to an existing or new PNG file (see MODE).
+	just draw/draw behind/draw over: see DRAW
+	brush color: pick a new brush color
+
 	if DRAW==just draw: draw normally.
 	if DRAW==draw behind: draw behind existing strokes (noticeable if using a different brush color).
 	if DRAW==draw over: draw only over existing strokes (typically using a different brush color).
 
-	if MODE==FILE: scribble loads from and saves to PNG files in res://.
-	if MODE==NODE: scribble loads from node selected in Scene View, from node.texture \
-	(if texture is ImageTexture or CompressedTexture2D with a resource_path that is PNG). \
-	Saving scribble modifies image texture, or generates a new one if empty.
+	if MODE==edit files: scribble loads from and saves to PNG files in res://.
+	if MODE==edit nodes: scribble loads from node selected in Scene View, from node.texture**.
+	   Saving scribble generates a new node.texture if it is empty.
+	   **Only if node.texture is ImageTexture or CompressedTexture2D, and has PNG in resource_path.
 	
-	Any bugs or feedback use the github, enjoy!
 	"""
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)

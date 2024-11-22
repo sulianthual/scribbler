@@ -1,4 +1,3 @@
 - ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
-- ui-> should hide all when minimized
-- quick button add sprite...-> prefill it, same animatedsprite
+- shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)
 - publish
