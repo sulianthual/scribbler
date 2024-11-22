@@ -1,5 +1,7 @@
 - when saving node: save file, if selected node and mode=node, apply texture from file
 - brush doesnt draws lines, correct it
-- issue with drawing/erasing entering mouse: correct bugs
+- show brush size in some way
+- ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
 - arrange ui better (popupmenu)
 - publish
+- quick button add sprite...-> prefill it, same animatedsprite

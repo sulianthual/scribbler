@@ -1,7 +1,16 @@
-[gd_scene format=3 uid="uid://j6n6a2bbxi3q"]
+[gd_scene load_steps=3 format=3 uid="uid://j6n6a2bbxi3q"]
+
+[ext_resource type="Texture2D" uid="uid://bwe6h61tqcpji" path="res://demo/background.png" id="1_cclwj"]
+[ext_resource type="Texture2D" uid="uid://dptyriebwot03" path="res://demo/player.png" id="2_vyfi7"]
 
 [node name="Main" type="Node"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="back" type="Sprite2D" parent="."]
+position = Vector2(0, 184)
+texture = ExtResource("1_cclwj")
+
+[node name="player" type="Sprite2D" parent="."]
+position = Vector2(-304, 95)
+texture = ExtResource("2_vyfi7")
