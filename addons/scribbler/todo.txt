@@ -4,3 +4,4 @@
 - quick button add sprite...-> prefill it, same animatedsprite
 - last point when exiting window: still draw a line to it 
 - publish
+- possibiliy to draw behind existing (for filling)

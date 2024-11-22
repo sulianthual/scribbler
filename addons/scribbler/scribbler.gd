@@ -55,6 +55,10 @@ func _ready():
 func _postready()->void:
 	drawing.new_drawing(px,py)
 
+
+################################################################
+## FILE
+
 ## CHANGE MODE (FROM FILE OR NODE)
 enum MODE {FILE,NODE}
 var mode: MODE=MODE.FILE
@@ -72,11 +76,9 @@ func _update_mode():
 	
 
 
-## FROM DRAWING
-func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
-	px=input_px
-func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
-	py=input_py
+
+
+
 
 ## NEW DRAWING
 func _on_new_pressed():
@@ -130,17 +132,29 @@ func _save_dialogue():
 	return file_dialogue
 func _on_save_dialogue_file_selected(input_file: String):
 	drawing.save_drawing(input_file)
+	_apply_saved_image_to_empty_node_texture(input_file)
 	_rescan_filesystem()
 func _save_node():## save to selected node in Editor SceneView
 	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
 	if _node_valid(_selected_node):
 		var _texture=_selected_node.texture
 		if _texture==null:# empty, fill in
-			#_selected_node.texture=drawing.get_texture()# inconsistent, not linked to save file
-			_save_dialogue()# beware, if user doesnt save
+			_save_dialogue().set_current_file(_selected_node.name.to_lower()+".png")
 		else:# existing, use save dialogue
 			if _texture_valid(_texture):
 				_save_dialogue().set_current_path(_texture.resource_path)
+func _apply_saved_image_to_empty_node_texture(input_file: String):
+	if mode==MODE.NODE:# if node selected has empty texture, update it with saved file
+		var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
+		if _node_valid(_selected_node):
+			var _texture=_selected_node.texture
+			if _texture==null:# empty, fill in
+				#await get_tree().create_timer(0.5, false, false, true).timeout# wait to make sure resource is written
+				await EditorInterface.get_resource_filesystem().filesystem_changed# wait for update in filesystem
+				#-> Beware, for large image resource may not be written yet
+				if ResourceLoader.exists(input_file):
+					_selected_node.texture=ResourceLoader.load(input_file)
+
 
 ## UTILS
 ## rescan directory after changing files
@@ -157,6 +171,15 @@ func _texture_valid(input_texture: Texture2D):
 	valid=valid and input_texture.resource_path.get_extension()=="png"
 	return valid
 
+################################################################
+## IMAGE AND BRUSH
+
+## PX,PY FROM DRAWING
+func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
+	px=input_px# happens e.g. when loading new file
+func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
+	py=input_py
+	
 ## RESIZE DRAWING (POPUP)
 func _on_resize_pressed():
 	_resize_dialogue()
