@@ -45,13 +45,18 @@ const brush_resize_rate: float=1.01# rate of increase/decrease of brush size
 var brush_img_base: Image=Image.new()# base brush
 var brush_img: Image=Image.new()# image for brush
 var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
-var brush_scaling: float=1.0# brush scaling respective to size start
+var brush_scaling: float=1.0:# brush scaling respective to size start
+	set(value):
+		brush_scaling=value
+		brush_scaling_changed.emit()
 var brush_size: int# brush size tracked (for maths)
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
 # Signals
 signal px_changed(value: int)
 signal py_changed(value: int)
+signal mouse_position_changed()
+signal brush_scaling_changed()
 #
 func _ready():
 	load_brush()
@@ -172,7 +177,7 @@ func _input(event):
 			else:
 				#print("released")
 				_drawing=false
-		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 			if event.pressed:
 				#print("pressed")
 				_drawing=false
@@ -182,8 +187,10 @@ func _input(event):
 			else:
 				#print("released")
 				_erasing=false
-		elif (_drawing or _erasing) and event is InputEventMouseMotion:
-			_draw_point()
+		elif event is InputEventMouseMotion:
+			mouse_position_changed.emit()
+			if _drawing or _erasing:
+				_draw_point()
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_UP:
 			resize_brush(clamp(brush_scaling*brush_resize_rate,brush_size_min,brush_size_max))
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:
@@ -194,6 +201,7 @@ var _last_ix: int# record last ix drawn for line filling
 var _last_iy: int# record last ix drawn for line filling
 
 var line_fill: bool=false## TODO: test interpolation as is NOT WORKING
+var _rect: Rect2# area of drawing rectangle (important)
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
 	# determine drawing rectangle (must control for margins)
@@ -201,7 +209,7 @@ func _draw_point():
 	var _rectc: Vector2=_rectm.get_center()# center
 	var _rects: Vector2=_rectm.size# size
 	var _rectr: float=float(px)/float(py)/float(_rectm.size[0])*float(_rectm.size[1])# ratio
-	var _rect: Rect2=_rectm
+	#var _rect: Rect2=_rectm
 	if _rectr<1.0:# has width margins
 		_rect=rect_from_centered_rect(Rect2(_rectc,Vector2(_rects[0]*_rectr,_rects[1])))
 	elif _rectr>1.0:# has height margins

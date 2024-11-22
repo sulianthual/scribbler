@@ -17,6 +17,7 @@ extends Control
 
 ## drawing
 @onready var drawing: TextureRect=%drawing
+@onready var marker: Sprite2D=%marker
 ## file
 @onready var mode_button: Button = %mode
 @onready var new: Button = %clear# clear drawing (same as new drawing)
@@ -37,6 +38,12 @@ func _ready():
 	drawing.connect("py_changed",_on_drawing_py_changed)
 	drawing.connect("mouse_entered",drawing.activate)
 	drawing.connect("mouse_exited",drawing.deactivate)
+	## marker
+	drawing.connect("mouse_entered",show_marker)
+	drawing.connect("mouse_entered",update_marker_scale)
+	drawing.connect("mouse_exited",hide_marker)
+	drawing.connect("mouse_position_changed",update_marker_position)
+	drawing.connect("brush_scaling_changed",update_marker_scale)
 	## buttons
 	mode_button.connect("pressed",_on_mode_pressed)
 	new.connect("pressed",_on_new_pressed)
@@ -44,7 +51,6 @@ func _ready():
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
-	#test.connect("pressed",_on_test_pressed)
 	brush_color.connect("color_changed",_on_brush_color_changed)
 	## others
 	_update_mode()
@@ -52,6 +58,17 @@ func _ready():
 	_postready.call_deferred()
 func _postready()->void:
 	drawing.new_drawing(px,py)
+
+## MARKER
+func show_marker():
+	marker.show()
+func hide_marker():
+	marker.hide()
+func update_marker_position():
+	marker.global_position=get_global_mouse_position()
+func update_marker_scale():
+	var maker_factor: float=0.01
+	marker.scale=maker_factor*drawing.brush_scaling*drawing._rect.size
 
 ## CHANGE MODE (FROM FILE OR NODE)
 enum MODE {FILE,NODE}
@@ -173,7 +190,7 @@ func _help_dialogue():
 	
 	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
 	
-	Draw with left mouse, change brush size with mouse wheel.
+	Draw with left mouse, Erase with right mouse, change brush size with mouse wheel.
 	
 	Clear, load or save image (PNG only) using the buttons (see MODE).
 	
