@@ -1,6 +1,4 @@
 - ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
 - ui-> should hide all when minimized
 - quick button add sprite...-> prefill it, same animatedsprite
-- last point when exiting window: still draw a line to it 
-- add undo
 - publish

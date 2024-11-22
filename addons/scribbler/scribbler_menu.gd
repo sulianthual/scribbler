@@ -38,6 +38,7 @@ var detached: bool=false# dock starts detached or not
 ## detach
 @onready var detach: Button=%detach# update image size
 @onready var undo: Button=%undo# update image size
+@onready var hide_button: Button=%hide# update image size
 ## test
 #@onready var test: Button=%test
 
@@ -58,10 +59,12 @@ func _ready():
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
 	draw_mode_button.connect("pressed",_on_draw_mode_pressed)
 	undo.connect("pressed",_on_undo_pressed)
+	hide_button.connect("pressed",_on_hide_pressed)
 	#test.connect("pressed",_on_test_pressed)
 	## others
 	_update_mode()
 	_update_draw_mode()
+	_update_hiding_buttons()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
@@ -71,8 +74,18 @@ func _postready()->void:
 ################################################################
 ## MENU
 
-## DETACH MENU (POPUP)
+## HIDE BUTTONS
+var hiding_buttons: bool=false
+func _on_hide_pressed():
+	hiding_buttons=not hiding_buttons
+	_update_hiding_buttons()
+func _update_hiding_buttons():
+	for i in [mode_button,new,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo]:
+		i.visible=not hiding_buttons
 
+
+
+## DETACH MENU (POPUP)
 func _on_detach_pressed():
 	if not detached:
 		_detach_dialogue()
