@@ -17,6 +17,8 @@ extends Control
 #############################################################
 ## SETUP
 
+## menu
+@onready var parent_container: Control# ref to parent before detach
 ## drawing
 @onready var drawing: TextureRect=%drawing
 ## file
@@ -30,6 +32,8 @@ extends Control
 @onready var brush_color_button: Button=%brush_color
 ## help
 @onready var help: Button=%help
+## detach
+@onready var detach: Button=%detach# update image size
 ## test
 #@onready var test: Button=%test
 
@@ -46,6 +50,7 @@ func _ready():
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
+	detach.connect("pressed",_on_detach_pressed)
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
 	#test.connect("pressed",_on_test_pressed)
 	## others
@@ -53,6 +58,7 @@ func _ready():
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
+	parent_container=get_parent()# must know own parent to be able to detach
 	drawing.new_drawing(px,py)
 
 
@@ -266,3 +272,32 @@ func _help_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 	
+## DETACH MENU (POPUP)
+var detached: bool=false
+func _on_detach_pressed():
+	if not detached:
+		_detach_dialogue()
+	else:
+		_reatach_dialogue()
+func _detach_dialogue():
+	detached=true
+	detach.text="dock"
+	var file_dialogue = Window.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_reatach_dialogue)
+	#file_dialogue.set_flag(Window.Flags.FLAG_POPUP,true)
+	#file_dialogue.set_flag(Window.Flags.FLAG_BORDERLESS,true)
+	file_dialogue.title="Scribbler"
+	file_dialogue.keep_title_visible=false
+	parent_container.remove_child(self)
+	file_dialogue.add_child(self)
+	file_dialogue.popup()
+	return file_dialogue
+func _reatach_dialogue():
+	detached=false
+	detach.text="detach"
+	var _window: Window=get_parent()
+	_window.remove_child(self)
+	parent_container.add_child(self)
+	_window.queue_free()
