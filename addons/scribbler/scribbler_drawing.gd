@@ -27,8 +27,8 @@ extends TextureRect
 var img: Image# the image created or edited
 const back_color: Color=Color.TRANSPARENT#background color on new_drawing or resize (ignored in loaded images)
 # Brush
-const brush_path: String="res://addons/scribbler/scribbler_brush.png"
-const brush_size_min: float=0.2# brush size min
+const brush_path: String="res://addons/scribbler/scribbler_brush.png"# must be square!
+var brush_size_min: float=0.1# brush size min: (1x1 adjust according to base) 
 const brush_size_max: float=10.0# brush size max
 const brush_size_start: float=1.0# brush size start
 const brush_resize_rate: float=1.03# rate of increase/decrease of brush size
@@ -37,7 +37,7 @@ var brush_img: Image=Image.new()# image for brush
 var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
 var brush_scaling: float=1.0# brush scaling respective to size start
 var brush_color: Color=Color.BLACK# Brush color (at ready)
-var brush_size: int# brush size tracked (for maths)
+var brush_size: int# brush size tracked (for maths): Brush needs to be square!
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
 # Signals
@@ -53,7 +53,7 @@ func _ready():
 	_postready.call_deferred()
 func _postready():
 	pass
-	#brush_color_changed.emit()# emit for other nodes
+
 
 ###############################################################################
 ## FILES
@@ -74,7 +74,6 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		#img.copy_from(_swap_color(img,back_color_in_file,back_color))# swap colors
 		px=img.get_width()
 		py=img.get_height()
-		# Replace back_color_on_file with back_color
 		texture_from_img()
 
 func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
@@ -90,7 +89,6 @@ func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 func texture_from_img():# update displayed texture from image
 	var _texture: ImageTexture=ImageTexture.create_from_image(img)
 	texture=_texture# beware of scale (should be 1,1)
-	#set_texture(texture)# equivalent
 
 func resize_drawing(input_px: int,input_py: int):
 	var _last_img: Image=Image.new()# make image copy and blend to it
@@ -109,21 +107,22 @@ func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 	var _new_img: Image=Image.new()
 	_new_img.convert(Image.FORMAT_RGBA8)
 	_new_img.copy_from(input_image)
-	for iy in _new_img.get_height():
-			for ix in _new_img.get_width():
-				if _new_img.get_pixel(ix, iy) == source_color:
-					_new_img.set_pixel(ix, iy, new_color)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			if _new_img.get_pixel(_ix, _iy) == source_color:
+				_new_img.set_pixel(_ix, _iy, new_color)
 	return _new_img
 
-## swap anythin that ISNT source color with new_color
-func _swap_noncolor(input_image: Image,source_color: Color, new_color: Color):
-	var _new_img: Image=Image.new()
+## swap anythin that ISNT transparent with new_color
+func _swap_color_nontransparent(input_image: Image,new_color: Color):
+	var _new_img: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
 	_new_img.convert(Image.FORMAT_RGBA8)
-	_new_img.copy_from(input_image)
-	for iy in _new_img.get_height():
-			for ix in _new_img.get_width():
-				if _new_img.get_pixel(ix, iy) != source_color:
-					_new_img.set_pixel(ix, iy, new_color)
+	_new_img.fill(Color.TRANSPARENT)
+	var _cfill: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
+	_cfill.convert(Image.FORMAT_RGBA8)
+	_cfill.fill(new_color)
+	_new_img.blit_rect_mask(_cfill,input_image,Rect2(0,0,input_image.get_width(),input_image.get_height()),Vector2(0,0))
+
 	return _new_img
 
 ###############################################################################
@@ -134,22 +133,23 @@ func load_brush():# set the brush
 		brush_img_base.load(brush_path)
 	brush_img_base.convert(Image.FORMAT_RGBA8)
 	brush_img.convert(Image.FORMAT_RGBA8)
-	brush_img.copy_from(brush_img_base)
+	brush_size_min=float(1.5/brush_img_base.get_width())# 1x1 min size (1.5 instead of 1 or disappears from rounding artifacts)
 	resize_brush(brush_size_start)
 	
 
 func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_scaling=input_brush_scaling
 	brush_img.copy_from(brush_img_base)
-	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
 	brush_size = brush_img.get_width()
+	brush_img.resize(round(brush_scaling*brush_size),round(brush_scaling*brush_size),Image.INTERPOLATE_NEAREST)
+	brush_size = brush_img.get_width()# brush must be square
 	brush_scaling_changed.emit()
 	recolor_brush(brush_color)
 	eraser_from_brush()
 
 func recolor_brush(input_color: Color):
 	brush_color=input_color
-	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,brush_color)
+	brush_img=_swap_color_nontransparent(brush_img,brush_color)
 	brush_color_changed.emit()
 	brush_changed_in_chain.emit()# Single signal after size, color changed
 
