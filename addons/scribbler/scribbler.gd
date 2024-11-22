@@ -9,6 +9,8 @@ extends Control
 @export var px: int=256
 ## image height (pixels) (as controlled here instead of drawing)
 @export var py: int=256
+## brush color (as controlled here instead of drawing)
+@export var brush_color: Color=Color.BLACK
 ## Dialogue Control scene for resizing
 @export var resize_dialogue: PackedScene
 
@@ -17,7 +19,6 @@ extends Control
 
 ## drawing
 @onready var drawing: TextureRect=%drawing
-#@onready var marker: Sprite2D=%marker# deprecated
 ## file
 @onready var mode_button: Button = %mode
 @onready var new: Button = %clear# clear drawing (same as new drawing)
@@ -26,7 +27,7 @@ extends Control
 ## resize
 @onready var resize: Button=%resize# update image size
 ## brush
-@onready var brush_color: TextureButton=%brush_color
+@onready var brush_color_button: Button=%brush_color
 ## help
 @onready var help: Button=%help
 ## test
@@ -38,14 +39,6 @@ func _ready():
 	drawing.connect("py_changed",_on_drawing_py_changed)
 	drawing.connect("mouse_entered",drawing.activate)
 	drawing.connect("mouse_exited",drawing.deactivate)
-	## marker (deprecated)
-	#drawing.connect("mouse_entered",show_marker)
-	#drawing.connect("mouse_entered",update_marker_scale)
-	#drawing.connect("mouse_entered",update_marker_color)
-	#drawing.connect("mouse_exited",hide_marker)
-	#drawing.connect("mouse_position_changed",update_marker_position)
-	#drawing.connect("brush_scaling_changed",update_marker_scale)
-	#drawing.connect("brush_color_changed",update_marker_color)
 	## buttons
 	mode_button.connect("pressed",_on_mode_pressed)
 	new.connect("pressed",_on_new_pressed)
@@ -53,26 +46,14 @@ func _ready():
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
-	brush_color.connect("color_changed",_on_brush_color_changed)
+	brush_color_button.connect("pressed",_on_brush_color_pressed)
+	#test.connect("pressed",_on_test_pressed)
 	## others
 	_update_mode()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
 	drawing.new_drawing(px,py)
-
-## MARKER (deprecated)
-#func show_marker():
-	#marker.show()
-#func hide_marker():
-	#marker.hide()
-#func update_marker_position():
-	#marker.global_position=get_global_mouse_position()
-#func update_marker_scale():
-	#var maker_factor: float=1.0/220.# empirical
-	#marker.scale=maker_factor*drawing.brush_scaling*drawing._rect.size
-#func update_marker_color():
-	#marker.modulate=drawing.brush_color
 
 ## CHANGE MODE (FROM FILE OR NODE)
 enum MODE {FILE,NODE}
@@ -161,13 +142,6 @@ func _save_node():## save to selected node in Editor SceneView
 			if _texture_valid(_texture):
 				_save_dialogue().set_current_path(_texture.resource_path)
 
-
-
-
-	
-## SETUP BRUSH
-func _on_brush_color_changed(input_color: Color):
-	drawing.recolor_brush(input_color)
 ## UTILS
 ## rescan directory after changing files
 func _rescan_filesystem():
@@ -182,35 +156,6 @@ func _texture_valid(input_texture: Texture2D):
 	valid=valid and input_texture.resource_path
 	valid=valid and input_texture.resource_path.get_extension()=="png"
 	return valid
-
-## HELP
-func _on_help_pressed():
-	_help_dialogue()
-func _help_dialogue():
-	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.title="Help"
-	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2):
-	
-	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
-	
-	Draw with left mouse, Erase with right mouse, change brush size with mouse wheel.
-	
-	Clear, load or save image (PNG only) using the buttons (see MODE).
-	
-	Change image size by setting width(w), height(h) then pressing resize.
-	
-	Cycle brush color by pressing the colored rectangle (only basic colors available).
-	
-	if MODE==FILE: drawings loads from and saves to PNG files in res://.
-	if MODE==NODE: drawing loads from texture of node selected in Scene View (texture must be ImageTexture or CompressedTexture2D with a resource_path that is PNG). Drawing saves to a PNG file (if node with valid texture is selected, it will suggest overwriting the associated .png file).
-	
-	Any bugs or feedback use the github, enjoy!
-	"""
-	file_dialogue.dialog_autowrap=true
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.popup()
-	return file_dialogue
 
 ## RESIZE DRAWING (POPUP)
 func _on_resize_pressed():
@@ -238,4 +183,62 @@ func _on_resize_dialogue_py_changed(input_py: float):## SIGNAL FROM DRAWING
 func _on_resize_dialogue_confirmed():
 	drawing.resize_drawing(px,py)
 
+## BRUSH COLOR
+func _on_brush_color_pressed():
+	_brush_color_dialogue()
+func _brush_color_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(320, 180))
+	file_dialogue.title="Pick Brush Color"
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_brush_color_dialogue_confirmed)
+	var _dialog: ColorPicker=ColorPicker.new()
+	_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed)
+	_dialog.deferred_mode=true
+	_dialog.edit_alpha=false
+	_dialog.can_add_swatches=false
+	_dialog.color_modes_visible=false
+	_dialog.hex_visible=false
+	_dialog.presets_visible=false
+	_dialog.sampler_visible=false
+	_dialog.sliders_visible=true
+	file_dialogue.add_child(_dialog)
+	file_dialogue.popup()
+	return file_dialogue
+## FROM DRAWING
+func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
+	brush_color=input_color
+func _on_brush_color_dialogue_confirmed():
+	drawing.recolor_brush(brush_color)
+
+
+## HELP
+func _on_help_pressed():
+	_help_dialogue()
+func _help_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	file_dialogue.title="Help"
+	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2):
+	
+	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
+	
+	Draw with left mouse, Erase with right mouse.
+	
+	Brush is indicated in top left corner. Change brush size with mouse wheel, and cycle brush color using colored rectangle (only basic colors available).
+	
+	Clear, load or save image (PNG only) using the buttons (see MODE).
+	
+	Change image size by setting width(w), height(h) then pressing resize.
+	
+	if MODE==FILE: drawings loads from and saves to PNG files in res://.
+	if MODE==NODE: drawing loads from texture of node selected in Scene View (texture must be ImageTexture or CompressedTexture2D with a resource_path that is PNG). Drawing saves to a PNG file (if node with valid texture is selected, it will suggest overwriting the associated .png file).
+	
+	Any bugs or feedback use the github, enjoy!
+	"""
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.popup()
+	return file_dialogue
 	
