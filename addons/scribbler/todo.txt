@@ -3,6 +3,5 @@
 - right mouse: erase?
 - middle mouse: change brush scaling
 - pointer on image showing brush size
-- brush color: make 6-7 main ones, push button to cycle through (remove color picker)
 - arrange ui better
 - publish

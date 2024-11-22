@@ -4,7 +4,7 @@ extends TextureButton
 ## Change brush color toggling several ones
 
 signal color_changed(value: Color)
-const brush_colors: Array[Color]=[Color.BLACK,Color.DARK_RED,Color.DARK_BLUE,Color.DARK_GREEN]
+const brush_colors: Array[Color]=[Color.BLACK,Color.DARK_RED,Color.DARK_ORANGE,Color.YELLOW,Color.DARK_BLUE,Color.DARK_GREEN,Color.DARK_MAGENTA]
 const bx: int=40
 const by: int=20
 var index:int=0# index of brush colors
