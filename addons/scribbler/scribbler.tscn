@@ -153,7 +153,20 @@ texture_normal = SubResource("PlaceholderTexture2D_m6yrq")
 stretch_mode = 0
 script = ExtResource("4_uqfrl")
 
-[node name="mode" type="Button" parent="VBoxContainer/MarginContainer2/VBoxContainer/brush_row"]
+[node name="mode_row" type="HBoxContainer" parent="VBoxContainer/MarginContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="mode" type="Button" parent="VBoxContainer/MarginContainer2/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "FILE"
+
+[node name="help" type="Button" parent="VBoxContainer/MarginContainer2/VBoxContainer/mode_row"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "help"
+
+[node name="test" type="Button" parent="VBoxContainer/MarginContainer2/VBoxContainer/mode_row"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "help"

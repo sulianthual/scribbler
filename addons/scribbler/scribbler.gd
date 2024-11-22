@@ -4,18 +4,20 @@ extends Control
 ## Scribbler: Scribble drawings in the editor
 ##
 @onready var drawing: TextureRect=%drawing
-## file_row
+## file
 @onready var mode_button: Button = %mode
 @onready var new: Button = %clear# clear drawing (same as new drawing)
 @onready var load: Button = %load# load drawing
 @onready var save: Button = %save# save drawing
-## resize_row
+## resize
 @onready var resize: Button=%resize# update image size
 @onready var px: SpinBox=%px# image width
 @onready var py: SpinBox=%py# image height
-## brush_row
+## brush
 @onready var brush: Button=%brush# update brush
 @onready var brush_color: TextureButton=%brush_color
+## help
+@onready var help: Button=%help
 
 func _ready():
 	## drawer
@@ -29,7 +31,7 @@ func _ready():
 	save.connect("pressed",_on_save_pressed)
 	load.connect("pressed",_on_load_pressed)
 	resize.connect("pressed",_on_resize_pressed)
-	brush.connect("pressed",_on_brush_pressed)
+	help.connect("pressed",_on_help_pressed)
 	brush_color.connect("color_changed",_on_brush_color_changed)
 	## others
 	_update_mode()
@@ -143,3 +145,32 @@ func _texture_valid(input_texture: Texture2D):
 	valid=valid and input_texture.resource_path
 	valid=valid and input_texture.resource_path.get_extension()=="png"
 	return valid
+
+## HELP
+func _on_help_pressed():
+	_help_dialogue()
+func _help_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	file_dialogue.title="Help"
+	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2):
+	
+	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
+	
+	Draw with left mouse, change brush size with mouse wheel.
+	
+	Clear, load or save image (PNG only) using the buttons (see MODE).
+	
+	Change image size by setting width(w), height(h) then pressing resize.
+	
+	Cycle brush color by pressing the colored rectangle (only basic colors available).
+	
+	if MODE==FILE: drawings loads from and saves to PNG files in res://.
+	if MODE==NODE: drawing loads from texture of node selected in Scene View (texture must be ImageTexture or CompressedTexture2D with a resource_path that is PNG). Drawing saves to a PNG file (if node with valid texture is selected, it will suggest overwriting the associated .png file).
+	
+	Any bugs or feedback use the github, enjoy!
+	"""
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.popup()
+	return file_dialogue
