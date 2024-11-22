@@ -13,7 +13,9 @@ extends Control
 @export var brush_color: Color=Color.BLACK
 ## Dialogue Control scene for resizing
 @export var resize_dialogue: PackedScene
-
+## Draw mode (must match drawing.gd)
+@export_enum("regular","over","behind") var draw_mode: String="regular"
+var detached: bool=false# dock starts detached or not
 #############################################################
 ## SETUP
 
@@ -21,6 +23,7 @@ extends Control
 @onready var parent_container: Control# ref to parent before detach
 ## drawing
 @onready var drawing: TextureRect=%drawing
+@onready var draw_mode_button: Button=%draw_mode
 ## file
 @onready var mode_button: Button = %mode
 @onready var new: Button = %clear# clear drawing (same as new drawing)
@@ -34,6 +37,7 @@ extends Control
 @onready var help: Button=%help
 ## detach
 @onready var detach: Button=%detach# update image size
+@onready var undo: Button=%undo# update image size
 ## test
 #@onready var test: Button=%test
 
@@ -52,15 +56,51 @@ func _ready():
 	help.connect("pressed",_on_help_pressed)
 	detach.connect("pressed",_on_detach_pressed)
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
+	draw_mode_button.connect("pressed",_on_draw_mode_pressed)
+	undo.connect("pressed",_on_undo_pressed)
 	#test.connect("pressed",_on_test_pressed)
 	## others
 	_update_mode()
+	_update_draw_mode()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
 	parent_container=get_parent()# must know own parent to be able to detach
 	drawing.new_drawing(px,py)
 
+################################################################
+## MENU
+
+## DETACH MENU (POPUP)
+
+func _on_detach_pressed():
+	if not detached:
+		_detach_dialogue()
+	else:
+		_reatach_dialogue()
+func _detach_dialogue():
+	detached=true
+	detach.text="attach dock"
+	var file_dialogue = Window.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_reatach_dialogue)
+	#file_dialogue.set_flag(Window.Flags.FLAG_POPUP,true)
+	#file_dialogue.set_flag(Window.Flags.FLAG_BORDERLESS,true)
+	file_dialogue.title="Scribbler"
+	file_dialogue.keep_title_visible=false
+	parent_container.remove_child(self)
+	file_dialogue.add_child(self)
+	file_dialogue.popup()
+	return file_dialogue
+func _reatach_dialogue():
+	detached=false
+	detach.text="detach dock"
+	var _window: Window=get_parent()
+	_window.remove_child(self)
+	parent_container.add_child(self)
+	_window.queue_free()
+	
 
 ################################################################
 ## FILE
@@ -76,14 +116,9 @@ func _on_mode_pressed():
 	_update_mode()
 func _update_mode():
 	if mode==MODE.FILE:
-		mode_button.set_text("MODE: FILE")
+		mode_button.set_text("edit files")
 	elif mode==MODE.NODE:
-		mode_button.set_text("MODE: NODE")
-	
-
-
-
-
+		mode_button.set_text("edit nodes")
 
 
 ## NEW DRAWING
@@ -180,12 +215,32 @@ func _texture_valid(input_texture: Texture2D):
 ################################################################
 ## IMAGE AND BRUSH
 
+func _on_undo_pressed():
+	drawing.undo()
 ## PX,PY FROM DRAWING
 func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
 	px=input_px# happens e.g. when loading new file
 func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
 	py=input_py
-	
+
+## CHANGE DRAW MODE
+func _on_draw_mode_pressed():
+	if draw_mode=="regular":
+		draw_mode="behind"
+	elif draw_mode=="behind":
+		draw_mode="over"
+	elif draw_mode=="over":
+		draw_mode="regular"
+	_update_draw_mode()
+func _update_draw_mode():
+	drawing. set_draw_mode(draw_mode)
+	if draw_mode=="over":
+		draw_mode_button.set_text("draw over")
+	elif draw_mode=="behind":
+		draw_mode_button.set_text("draw behind")
+	else:
+		draw_mode_button.set_text("just draw")
+
 ## RESIZE DRAWING (POPUP)
 func _on_resize_pressed():
 	_resize_dialogue()
@@ -254,16 +309,22 @@ func _help_dialogue():
 	
 	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
 	
-	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel.
+	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. Brush is indicated in top left corner.
 	
-	Brush is indicated in top left corner, use button to change brush color.
+	load: generate scribble from existing PNG file (see MODE).
+	save: save scribble to an existing or new PNG file (see MODE).
+	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
+	clear: clear the scribble
+	resize: resize the scribble (choose new width and height in pixels)
 	
-	Clear, load or save image (PNG only) using the buttons (see MODE).
-	
-	Change image size by setting width(w), height(h) then pressing resize.
-	
-	if MODE==FILE: drawings loads from and saves to PNG files in res://.
-	if MODE==NODE: drawing loads from texture of node selected in Scene View (texture must be ImageTexture or CompressedTexture2D with a resource_path that is PNG). Drawing saves to a PNG file (if node with valid texture is selected, it will suggest overwriting the associated .png file).
+	if DRAW==just draw: draw normally.
+	if DRAW==draw behind: draw behind existing strokes (noticeable if using a different brush color).
+	if DRAW==draw over: draw only over existing strokes (typically using a different brush color).
+
+	if MODE==FILE: scribble loads from and saves to PNG files in res://.
+	if MODE==NODE: scribble loads from node selected in Scene View, from node.texture \
+	(if texture is ImageTexture or CompressedTexture2D with a resource_path that is PNG). \
+	Saving scribble modifies image texture, or generates a new one if empty.
 	
 	Any bugs or feedback use the github, enjoy!
 	"""
@@ -272,32 +333,3 @@ func _help_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 	
-## DETACH MENU (POPUP)
-var detached: bool=false
-func _on_detach_pressed():
-	if not detached:
-		_detach_dialogue()
-	else:
-		_reatach_dialogue()
-func _detach_dialogue():
-	detached=true
-	detach.text="dock"
-	var file_dialogue = Window.new()
-	file_dialogue.set_size(Vector2(640, 360))
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_reatach_dialogue)
-	#file_dialogue.set_flag(Window.Flags.FLAG_POPUP,true)
-	#file_dialogue.set_flag(Window.Flags.FLAG_BORDERLESS,true)
-	file_dialogue.title="Scribbler"
-	file_dialogue.keep_title_visible=false
-	parent_container.remove_child(self)
-	file_dialogue.add_child(self)
-	file_dialogue.popup()
-	return file_dialogue
-func _reatach_dialogue():
-	detached=false
-	detach.text="detach"
-	var _window: Window=get_parent()
-	_window.remove_child(self)
-	parent_container.add_child(self)
-	_window.queue_free()

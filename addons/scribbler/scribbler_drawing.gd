@@ -28,6 +28,7 @@ var img: Image# the image created or edited
 const back_color: Color=Color.TRANSPARENT#background color on new_drawing or resize (ignored in loaded images)
 # Drawing
 const line_fill: bool=true# use line algorithm to fill gaps
+const max_undos: int=10## Max number of undos (important, high=performance issues)
 # Brush
 const brush_path: String="res://addons/scribbler/scribbler_brush.png"# must be square!
 var brush_size_min: float=0.1# brush size min: (1x1 adjust according to base) 
@@ -68,6 +69,7 @@ func new_drawing(input_px: int, input_py: int):# create texture as image
 	img.convert(Image.FORMAT_RGBA8)
 	img.fill(back_color)
 	texture_from_img()
+	clear_undos()
 	
 func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if FileAccess.file_exists(filename_):
@@ -125,9 +127,17 @@ func _swap_color_nontransparent(input_image: Image,new_color: Color):
 	_cfill.convert(Image.FORMAT_RGBA8)
 	_cfill.fill(new_color)
 	_new_img.blit_rect_mask(_cfill,input_image,Rect2(0,0,input_image.get_width(),input_image.get_height()),Vector2(0,0))
-
 	return _new_img
 
+## swap transparent and visible (transparent becomes white)->for making masks
+func _swap_transparent(input_image: Image)->Image:
+	var _new_img: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	_new_img=_swap_color_nontransparent(_new_img,Color.RED)
+	_new_img=_swap_color(_new_img,Color.TRANSPARENT, Color.WHITE)
+	_new_img=_swap_color(_new_img,Color.RED, Color.TRANSPARENT)
+	return _new_img
 ###############################################################################
 ## BRUSH AND ERASER
 
@@ -164,6 +174,39 @@ func eraser_from_brush():
 ###############################################################################
 ## DRAWING
 
+## UNDOS
+var undo_imgs: Array[Image]
+func undo():## CALLS FROM SCRIBBLER
+	if len(undo_imgs)>1:
+		img=undo_imgs[-2]
+		undo_imgs.pop_back()
+		texture_from_img()
+func save_undo():
+	if len(undo_imgs)>=max_undos:
+		undo_imgs.pop_front()
+	var _new_img: Image=Image.create(img.get_width(),img.get_height(),false, Image.FORMAT_RGBA8)
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(img)
+	undo_imgs.append(_new_img)
+
+func clear_undos():
+	undo_imgs=[]
+	save_undo()
+	
+## MODE
+var draw_over: bool=false# draw over existing 
+var draw_behind: bool=false# draw behind existing
+func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
+	if input_draw_mode=="regular":
+		draw_over=false
+		draw_behind=false
+	elif input_draw_mode=="over":
+		draw_over=true
+		draw_behind=false
+	elif input_draw_mode=="behind":
+		draw_over=false
+		draw_behind=true
+
 ## INPUTS
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
 var _erasing: bool=false# is ersing (within drawing area, Right Mouse Pressed)
@@ -179,6 +222,7 @@ func _input(event):
 				_draw_point()
 			else:
 				#print("released")
+				save_undo()
 				_drawing=false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 			if event.pressed:
@@ -188,6 +232,7 @@ func _input(event):
 				_first_point=true
 				_draw_point()
 			else:
+				save_undo()
 				#print("released")
 				_erasing=false
 		elif event is InputEventMouseMotion:
@@ -230,7 +275,16 @@ func _draw_point():
 			var offx: float=-float(brush_size)/2+float(px)/2# precompute
 			var offy: float=-float(brush_size)/2+float(py)/2
 			if _drawing:
-				img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				if draw_behind:
+					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
+					var _mask: Image=_swap_transparent(img.get_region(_region))
+					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				elif draw_over:
+					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
+					var _mask: Image=img.get_region(_region)
+					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				else:
+					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 			elif _erasing:
 				img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 			_last_ix=ix# record last drawn point position (as int!)
@@ -250,7 +304,16 @@ func _draw_point():
 				var lx: float=_last_ix+float(i)/_dist*(ix-_last_ix)
 				var ly: float=_last_iy+float(i)/_dist*(iy-_last_iy)
 				if _drawing:
-					img.blend_rect(brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					if draw_behind:
+						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
+						var _mask: Image=_swap_transparent(img.get_region(_region))
+						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_over:
+						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
+						var _mask: Image=img.get_region(_region)
+						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					else:
+						img.blend_rect(brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 				elif _erasing:
 					img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 			_last_ix=ix# record last drawn point position (as int!)
@@ -260,6 +323,7 @@ func _draw_point():
 	else:# outside edges
 		_drawing=false
 		_erasing=false
+		save_undo()
 
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
@@ -276,5 +340,6 @@ func deactivate():
 	active=false
 	_drawing=false
 	_erasing=false
-	
+
+
 ###############################################################################
