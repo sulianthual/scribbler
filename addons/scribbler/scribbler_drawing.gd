@@ -38,7 +38,11 @@ const back_color: Color=Color.TRANSPARENT#background color on new_drawing or res
 const back_color_in_file: Color=Color(1,1,1,0)# replaces background color on saved files
 # Brush
 const brush_path: String="res://addons/scribbler/scribbler_brush.png"
-var brush_img: Image=Image.new()
+const brush_size_min: float=0.2# brush size min
+const brush_size_max: float=10.0# brush size max
+const brush_resize_rate: float=1.01# rate of increase/decrease of brush size
+var brush_img_base: Image=Image.new()# base brush
+var brush_img: Image=Image.new()# variable size
 var brush_size: int# brush size (same for x,y)
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
@@ -129,11 +133,14 @@ func _swap_noncolor(input_image: Image,source_color: Color, new_color: Color):
 
 func load_brush():# set the brush
 	if FileAccess.file_exists(brush_path):
-		brush_img.load(brush_path)
+		brush_img_base.load(brush_path)
+	brush_img_base.convert(Image.FORMAT_RGBA8)
 	brush_img.convert(Image.FORMAT_RGBA8)
+	brush_img.copy_from(brush_img_base)
 
 func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_scaling=input_brush_scaling
+	brush_img.copy_from(brush_img_base)
 	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
 	brush_size = brush_img.get_width()
 
@@ -144,6 +151,7 @@ func recolor_brush(input_color: Color):
 ###############################################################################
 ## DRAWING
 
+## INPUTS
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
 var _first_point: bool=false# is drawing first point (no line-fill)
 func _input(event):
@@ -159,7 +167,12 @@ func _input(event):
 				_drawing=false
 		elif _drawing and event is InputEventMouseMotion:
 			_draw_point()
+		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_UP:
+			resize_brush(clamp(brush_scaling*brush_resize_rate,brush_size_min,brush_size_max))
+		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:
+			resize_brush(clamp(brush_scaling/brush_resize_rate,brush_size_min,brush_size_max))
 
+## DRAW
 var _last_ix: int# record last ix drawn for line filling
 var _last_iy: int# record last ix drawn for line filling
 var line_fill: bool=false## TODO: test interpolation as is NOT WORKING

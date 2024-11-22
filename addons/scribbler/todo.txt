@@ -1,7 +1,7 @@
 - when saving node: save file, if selected node and mode=node, apply texture from file
 - brush doesnt draws lines, correct it
 - right mouse: erase?
-- middle mouse: change brush scaling
+- middle mouse: change brush scaling user power law
 - pointer on image showing brush size
 - arrange ui better
 - publish

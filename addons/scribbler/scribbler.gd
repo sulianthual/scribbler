@@ -15,7 +15,6 @@ extends Control
 @onready var py: SpinBox=%py# image height
 ## brush_row
 @onready var brush: Button=%brush# update brush
-@onready var brush_scale: SpinBox=%brush_scale
 @onready var brush_color: TextureButton=%brush_color
 
 func _ready():
@@ -37,7 +36,6 @@ func _ready():
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
-	drawing.resize_brush(brush_scale.value)
 	drawing.new_drawing(px.value,py.value)
 
 ## CHANGE MODE (FROM FILE OR NODE)
@@ -129,8 +127,6 @@ func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
 	py.value=input_py
 	
 ## SETUP BRUSH
-func _on_brush_pressed():
-	drawing.resize_brush(brush_scale.value)
 func _on_brush_color_changed(input_color: Color):
 	drawing.recolor_brush(input_color)
 ## UTILS
