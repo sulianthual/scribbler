@@ -5,3 +5,4 @@
 - arrange ui better (popupmenu)
 - publish
 - quick button add sprite...-> prefill it, same animatedsprite
+- pop up that expands drawing area: move child around

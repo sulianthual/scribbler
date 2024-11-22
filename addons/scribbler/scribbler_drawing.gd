@@ -21,11 +21,6 @@ extends TextureRect
 		if prev_value!=value:
 			py_changed.emit(py)
 
-
-
-
-
-
 ###############################################################################
 ## SETUP
 # Image
@@ -40,14 +35,8 @@ const brush_resize_rate: float=1.03# rate of increase/decrease of brush size
 var brush_img_base: Image=Image.new()# base brush
 var brush_img: Image=Image.new()# image for brush
 var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
-var brush_scaling: float=1.0:# brush scaling respective to size start
-	set(value):
-		brush_scaling=value
-		brush_scaling_changed.emit()
-var brush_color: Color=Color.BLACK:# Brush color (at ready)
-	set(value):
-		brush_color=value
-		brush_color_changed.emit()
+var brush_scaling: float=1.0# brush scaling respective to size start
+var brush_color: Color=Color.BLACK# Brush color (at ready)
 var brush_size: int# brush size tracked (for maths)
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
@@ -57,6 +46,7 @@ signal py_changed(value: int)
 signal mouse_position_changed()
 signal brush_scaling_changed()
 signal brush_color_changed()
+signal brush_changed_in_chain()# end of chained changes (scaling, color)
 #
 func _ready():
 	load_brush()
@@ -153,12 +143,15 @@ func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_img.copy_from(brush_img_base)
 	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
 	brush_size = brush_img.get_width()
+	brush_scaling_changed.emit()
 	recolor_brush(brush_color)
 	eraser_from_brush()
 
 func recolor_brush(input_color: Color):
 	brush_color=input_color
 	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,brush_color)
+	brush_color_changed.emit()
+	brush_changed_in_chain.emit()# Single signal after size, color changed
 
 func eraser_from_brush():
 	eraser_img.copy_from(brush_img)
