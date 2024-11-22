@@ -7,14 +7,14 @@ extends TextureRect
 
 @export_subgroup("image")
 ## Width in pixels
-@export var px: int=128:
+@export var px: int=256:
 	set(value):
 		var prev_value: int=px
 		px=value
 		if prev_value!=value:
 			px_changed.emit(px)
 ## Height in pixels
-@export var py: int=128:
+@export var py: int=256:
 	set(value):
 		var prev_value: int=py
 		py=value
@@ -22,20 +22,15 @@ extends TextureRect
 			py_changed.emit(py)
 
 
-# Brush
-@export_subgroup("brush")
-### Scaling factor of brush
 
-### Brush color
-@export var brush_color: Color
+
 
 
 ###############################################################################
 ## SETUP
 # Image
 var img: Image# the image created or edited
-const back_color: Color=Color.TRANSPARENT#background color on new_drawing or resize (!IGNORED in loaded pictures)
-const back_color_in_file: Color=Color(1,1,1,0)# replaces background color on saved files
+const back_color: Color=Color.TRANSPARENT#background color on new_drawing or resize (ignored in loaded images)
 # Brush
 const brush_path: String="res://addons/scribbler/scribbler_brush.png"
 const brush_size_min: float=0.2# brush size min
@@ -49,6 +44,10 @@ var brush_scaling: float=1.0:# brush scaling respective to size start
 	set(value):
 		brush_scaling=value
 		brush_scaling_changed.emit()
+var brush_color: Color=Color.BLACK:# Brush color (at ready)
+	set(value):
+		brush_color=value
+		brush_color_changed.emit()
 var brush_size: int# brush size tracked (for maths)
 # Logic
 var active: bool=false# drawing active or not (able to receive inputs)
@@ -57,9 +56,14 @@ signal px_changed(value: int)
 signal py_changed(value: int)
 signal mouse_position_changed()
 signal brush_scaling_changed()
+signal brush_color_changed()
 #
 func _ready():
 	load_brush()
+	_postready.call_deferred()
+func _postready():
+	pass
+	#brush_color_changed.emit()# emit for other nodes
 
 ###############################################################################
 ## FILES
@@ -142,16 +146,19 @@ func load_brush():# set the brush
 	brush_img.convert(Image.FORMAT_RGBA8)
 	brush_img.copy_from(brush_img_base)
 	resize_brush(brush_size_start)
+	
 
 func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_scaling=input_brush_scaling
 	brush_img.copy_from(brush_img_base)
 	brush_img.resize(brush_scaling*brush_img.get_width(),brush_scaling*brush_img.get_height(),Image.INTERPOLATE_NEAREST)
 	brush_size = brush_img.get_width()
+	recolor_brush(brush_color)
 	eraser_from_brush()
 
 func recolor_brush(input_color: Color):
-	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,input_color)
+	brush_color=input_color
+	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,brush_color)
 
 func eraser_from_brush():
 	eraser_img.copy_from(brush_img)
@@ -193,9 +200,12 @@ func _input(event):
 				_draw_point()
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_UP:
 			resize_brush(clamp(brush_scaling*brush_resize_rate,brush_size_min,brush_size_max))
+			_drawing=false
+			_erasing=false
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:
 			resize_brush(clamp(brush_scaling/brush_resize_rate,brush_size_min,brush_size_max))
-
+			_drawing=false
+			_erasing=false
 ## DRAW
 var _last_ix: int# record last ix drawn for line filling
 var _last_iy: int# record last ix drawn for line filling
@@ -261,26 +271,6 @@ func activate():
 func deactivate():
 	active=false
 	_drawing=false
+	_erasing=false
 	
 ###############################################################################
-## DRAFTS
-
-
-#
-#func add_strokepart_start():# strokepart start (draw dot at current mouse)
-	#var ix= int(round(mouse_pos.x-global_position.x))
-	#var iy= int(round(mouse_pos.y-global_position.y))
-	#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
-#func add_strokepart():# strokepart (draw line between last mouse - current mouse)
-	#var ix0= (mouse_pos_last.x-global_position.x)
-	#var iy0= (mouse_pos_last.y-global_position.y)
-	#var ix1= (mouse_pos.x-global_position.x)
-	#var iy1= (mouse_pos.y-global_position.y)
-	#var dist=max(abs(ix1-ix0),abs(iy1-iy0))
-	#for i in range(dist):
-		##var ix=ix0+i/dist*(ix1-ix0)
-		##var iy=iy0+i/dist*(iy1-iy0)
-		#var ix=int(round(ix0+i/dist*(ix1-ix0)))
-		#var iy=int(round(iy0+i/dist*(iy1-iy0)))
-		##img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(int(round(ix-brush_size/2+px/2)),int(round(iy-brush_size/2+img_h/2))))
-		#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))

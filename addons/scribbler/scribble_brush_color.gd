@@ -17,7 +17,7 @@ func _ready():
 func make_initial_texture():
 	var img: Image =Image.create(bx,by,false, Image.FORMAT_RGBA8)
 	img.convert(Image.FORMAT_RGBA8)
-	img.fill(Color.WHITE)
+	img.fill(Color.WHITE)# will modulate
 	var _texture: ImageTexture=ImageTexture.create_from_image(img)
 	texture_normal=_texture
 	

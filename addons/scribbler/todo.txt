@@ -1,7 +1,5 @@
 - when saving node: save file, if selected node and mode=node, apply texture from file
 - brush doesnt draws lines, correct it
-- right mouse: erase?
-- brush: make a bigger one and scale down?
-- pointer on image showing brush size
+- issue with drawing/erasing entering mouse: correct bugs
 - arrange ui better (popupmenu)
 - publish

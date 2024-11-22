@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ditisotmxpnwr"
-path="res://.godot/imported/scribbler_brush.png-0718d56ac5179ab8cc6152a303d593be.ctex"
+uid="uid://plscafpjve3c"
+path="res://.godot/imported/toto2.png-8903e5f36562d321ccb6a76f70c9a3e7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tests/test_sprite2D/scribbler_brush.png"
-dest_files=["res://.godot/imported/scribbler_brush.png-0718d56ac5179ab8cc6152a303d593be.ctex"]
+source_file="res://demo/toto2.png"
+dest_files=["res://.godot/imported/toto2.png-8903e5f36562d321ccb6a76f70c9a3e7.ctex"]
 
 [params]
 

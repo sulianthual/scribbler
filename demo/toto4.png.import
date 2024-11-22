@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://n6nqfklt8k6g"
-path="res://.godot/imported/toto.png-131aea5c3d02031f30a0a21747708b25.ctex"
+uid="uid://b8s2olngctael"
+path="res://.godot/imported/toto4.png-30c58829c4bc026b3e5b27d420d8a05c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tests/test_control/toto.png"
-dest_files=["res://.godot/imported/toto.png-131aea5c3d02031f30a0a21747708b25.ctex"]
+source_file="res://demo/toto4.png"
+dest_files=["res://.godot/imported/toto4.png-30c58829c4bc026b3e5b27d420d8a05c.ctex"]
 
 [params]
 

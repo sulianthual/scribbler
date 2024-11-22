@@ -6,9 +6,9 @@ extends Control
 
 
 ## image width (pixels) (as controlled here instead of drawing)
-@export var px: int=128
+@export var px: int=256
 ## image height (pixels) (as controlled here instead of drawing)
-@export var py: int=128
+@export var py: int=256
 ## Dialogue Control scene for resizing
 @export var resize_dialogue: PackedScene
 
@@ -17,7 +17,7 @@ extends Control
 
 ## drawing
 @onready var drawing: TextureRect=%drawing
-@onready var marker: Sprite2D=%marker
+#@onready var marker: Sprite2D=%marker# deprecated
 ## file
 @onready var mode_button: Button = %mode
 @onready var new: Button = %clear# clear drawing (same as new drawing)
@@ -38,12 +38,14 @@ func _ready():
 	drawing.connect("py_changed",_on_drawing_py_changed)
 	drawing.connect("mouse_entered",drawing.activate)
 	drawing.connect("mouse_exited",drawing.deactivate)
-	## marker
-	drawing.connect("mouse_entered",show_marker)
-	drawing.connect("mouse_entered",update_marker_scale)
-	drawing.connect("mouse_exited",hide_marker)
-	drawing.connect("mouse_position_changed",update_marker_position)
-	drawing.connect("brush_scaling_changed",update_marker_scale)
+	## marker (deprecated)
+	#drawing.connect("mouse_entered",show_marker)
+	#drawing.connect("mouse_entered",update_marker_scale)
+	#drawing.connect("mouse_entered",update_marker_color)
+	#drawing.connect("mouse_exited",hide_marker)
+	#drawing.connect("mouse_position_changed",update_marker_position)
+	#drawing.connect("brush_scaling_changed",update_marker_scale)
+	#drawing.connect("brush_color_changed",update_marker_color)
 	## buttons
 	mode_button.connect("pressed",_on_mode_pressed)
 	new.connect("pressed",_on_new_pressed)
@@ -59,16 +61,18 @@ func _ready():
 func _postready()->void:
 	drawing.new_drawing(px,py)
 
-## MARKER
-func show_marker():
-	marker.show()
-func hide_marker():
-	marker.hide()
-func update_marker_position():
-	marker.global_position=get_global_mouse_position()
-func update_marker_scale():
-	var maker_factor: float=0.01
-	marker.scale=maker_factor*drawing.brush_scaling*drawing._rect.size
+## MARKER (deprecated)
+#func show_marker():
+	#marker.show()
+#func hide_marker():
+	#marker.hide()
+#func update_marker_position():
+	#marker.global_position=get_global_mouse_position()
+#func update_marker_scale():
+	#var maker_factor: float=1.0/220.# empirical
+	#marker.scale=maker_factor*drawing.brush_scaling*drawing._rect.size
+#func update_marker_color():
+	#marker.modulate=drawing.brush_color
 
 ## CHANGE MODE (FROM FILE OR NODE)
 enum MODE {FILE,NODE}
