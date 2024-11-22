@@ -41,7 +41,7 @@ const brush_path: String="res://addons/scribbler/scribbler_brush.png"
 var brush_img: Image=Image.new()
 var brush_size: int# brush size (same for x,y)
 # Logic
-var active: bool=false# drawing active or not
+var active: bool=false# drawing active or not (able to receive inputs)
 var mouse_pos: Vector2# mouse position
 var mouse_pos_last: Vector2# last moust position
 var is_drawing: bool=false# pen is doing a drawing stroke
@@ -80,26 +80,7 @@ func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		img.save_png(filename_)
 		#_swap_color(img,back_color,back_color_in_file).save_png(filename_)# swap color
 		
-func _swap_color(input_image: Image,source_color: Color, new_color: Color):
-	var _new_img: Image=Image.new()
-	_new_img.convert(Image.FORMAT_RGBA8)
-	_new_img.copy_from(input_image)
-	for iy in _new_img.get_height():
-			for ix in _new_img.get_width():
-				if _new_img.get_pixel(ix, iy) == source_color:
-					_new_img.set_pixel(ix, iy, new_color)
-	return _new_img
 
-## swap anythin that ISNT source color with new_color
-func _swap_noncolor(input_image: Image,source_color: Color, new_color: Color):
-	var _new_img: Image=Image.new()
-	_new_img.convert(Image.FORMAT_RGBA8)
-	_new_img.copy_from(input_image)
-	for iy in _new_img.get_height():
-			for ix in _new_img.get_width():
-				if _new_img.get_pixel(ix, iy) != source_color:
-					_new_img.set_pixel(ix, iy, new_color)
-	return _new_img
 	
 ###############################################################################
 ## IMAGE AND TEXTURE
@@ -122,6 +103,26 @@ func resize_drawing(input_px: int,input_py: int):
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
 
+func _swap_color(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for iy in _new_img.get_height():
+			for ix in _new_img.get_width():
+				if _new_img.get_pixel(ix, iy) == source_color:
+					_new_img.set_pixel(ix, iy, new_color)
+	return _new_img
+
+## swap anythin that ISNT source color with new_color
+func _swap_noncolor(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for iy in _new_img.get_height():
+			for ix in _new_img.get_width():
+				if _new_img.get_pixel(ix, iy) != source_color:
+					_new_img.set_pixel(ix, iy, new_color)
+	return _new_img
 
 ###############################################################################
 ## BRUSH
@@ -140,39 +141,43 @@ func recolor_brush(input_color: Color):
 	brush_img=_swap_noncolor(brush_img,Color.TRANSPARENT,input_color)
 
 
-
-		
 ###############################################################################
 ## DRAWING
 
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
 var _first_point: bool=false# is drawing first point (no line-fill)
 func _input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			#print("pressed")
-			_drawing=true
-			_first_point=true
+	if active:
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				#print("pressed")
+				_drawing=true
+				_first_point=true
+				_draw_point()
+			else:
+				#print("released")
+				_drawing=false
+		elif _drawing and event is InputEventMouseMotion:
 			_draw_point()
-		else:
-			#print("released")
-			_drawing=false
-	elif _drawing and event is InputEventMouseMotion:
-		_draw_point()
 
 var _last_ix: int# record last ix drawn for line filling
 var _last_iy: int# record last ix drawn for line filling
 var line_fill: bool=false## TODO: test interpolation as is NOT WORKING
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
-	var _rect: Rect2=get_global_rect()# wrong, includes margins
-	#
-	#TEST
-	var _rectm: Rect2=get_global_rect()# includes margins
-	var _rectc: Vector2=get_global_rect().get_center()
-	print(px/py,":",_rectm.size[0]/_rectm.size[1])
-	#var _rect2: Rect2=Rect2(_rectp,)
-	#
+	# determine drawing rectangle (must control for margins)
+	var _rectm: Rect2=get_global_rect()# drawable rectangle +potential margins
+	var _rectc: Vector2=_rectm.get_center()# center
+	var _rects: Vector2=_rectm.size# size
+	var _rectr: float=float(px)/float(py)/float(_rectm.size[0])*float(_rectm.size[1])# ratio
+	var _rect: Rect2=_rectm
+	if _rectr<1.0:# has width margins
+		_rect=rect_from_centered_rect(Rect2(_rectc,Vector2(_rects[0]*_rectr,_rects[1])))
+	elif _rectr>1.0:# has height margins
+		_rect=rect_from_centered_rect(Rect2(_rectc,Vector2(_rects[0],_rects[1]/_rectr)))
+	else:# no margins
+		_rect=_rectm
+	# draw
 	if _rect.has_point(_mouse_pos):
 		if not line_fill or _first_point: # just a point
 			var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
@@ -196,7 +201,9 @@ func _draw_point():
 		_first_point=false# no longer first point
 	else:# outside edges
 		_drawing=false
-	
+
+func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
+	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
 ###############################################################################
 ## CALLS (from Scribbler)
 
@@ -208,119 +215,27 @@ func activate():
 
 func deactivate():
 	active=false
-	#clear_history()
+	_drawing=false
 	
 ###############################################################################
 ## DRAFTS
 
 
-	#bru
-	#if event.is_action_type()
-#func _draw():# redraw (when calling _draw, not every _process)
-	#if texture:# and active
-		#texture.update(img)# update on an already made texture
 #
-#func _process(delta):
-	#if not active:
-		#return
-	### TEST
-	#img.fill(Color(1,0,0,1))
-	##img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(0-brush_size/2+px/2,0-brush_size/2+img_h/2))
-	#queue_redraw()# call draw again
-	#return
-	##
-#
-	### controls
-	#mouse_pos_last=mouse_pos# last one
-	#mouse_pos=get_global_mouse_position()
-	### drawing
-	#if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		#if not is_drawing:
-			#is_drawing=true
-			#start_stroke()
-			#add_strokepart_start()
-		#else:
-			#add_strokepart()
-	#else:	
-		#if is_drawing:
-			#is_drawing=false
-			#end_stroke()
-	### erasing
-	#if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		#if not is_erasing:
-			#is_erasing=true
-			#remove_stroke()
-	#else:
-		#if is_erasing:
-			#is_erasing=false
-
-###########################################
-### DRAWING FUNCTIONS
-
-func start_stroke():# start new stroke when pressing lmouse
-	is_drawing=true
-	add_to_history()
-func add_strokepart_start():# strokepart start (draw dot at current mouse)
-	var ix= int(round(mouse_pos.x-global_position.x))
-	var iy= int(round(mouse_pos.y-global_position.y))
-	img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
-func add_strokepart():# strokepart (draw line between last mouse - current mouse)
-	var ix0= (mouse_pos_last.x-global_position.x)
-	var iy0= (mouse_pos_last.y-global_position.y)
-	var ix1= (mouse_pos.x-global_position.x)
-	var iy1= (mouse_pos.y-global_position.y)
-	var dist=max(abs(ix1-ix0),abs(iy1-iy0))
-	for i in range(dist):
-		#var ix=ix0+i/dist*(ix1-ix0)
-		#var iy=iy0+i/dist*(iy1-iy0)
-		var ix=int(round(ix0+i/dist*(ix1-ix0)))
-		var iy=int(round(iy0+i/dist*(iy1-iy0)))
-		#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(int(round(ix-brush_size/2+px/2)),int(round(iy-brush_size/2+img_h/2))))
-		img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
-	queue_redraw()# call draw again
-func end_stroke():
-	is_drawing=false
-	#save_drawing()# save drawing systematically
-func remove_stroke():# remove stroke with rmouse
-	if len(img_history)>0:
-		img=img_history[-1]# replace with former one
-		img_history.pop_back()# remove last from history (as it become the img)
-	else:
-		clear_drawing()
-	queue_redraw()# call draw again
-func clear_drawing():
-	img.fill(Color(1,1,1,0))# empty transparent canvas
-	clear_history()
-	#erase_drawing_save()# erase the saved drawing too
-func add_to_history():# add former image to histor
-	var img_former=Image.new()# save former stroke
-	img_former.copy_from(img)
-	img_history.append(img_former)
-func clear_history():# clear history of strokes
-	img_history=[]
-
-###########################################
-### SUBFUNCTIONS
-
-
-#func save_drawing():
-	#if img:
-		#var filename_=get_filename()
-		#img.save_png(filename_)
-#func erase_drawing_save():
-	#var filename_=get_filename()
-	#if FileAccess.file_exists(filename_):
-		#DirAccess.remove_absolute(filename_)
-#func drawing_exists():
-	#var filename_=get_filename()
-	#return FileAccess.file_exists(filename_)
-
-
-
-
-
-#############################################################################
-## CALLS
-
-
-	
+#func add_strokepart_start():# strokepart start (draw dot at current mouse)
+	#var ix= int(round(mouse_pos.x-global_position.x))
+	#var iy= int(round(mouse_pos.y-global_position.y))
+	#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))
+#func add_strokepart():# strokepart (draw line between last mouse - current mouse)
+	#var ix0= (mouse_pos_last.x-global_position.x)
+	#var iy0= (mouse_pos_last.y-global_position.y)
+	#var ix1= (mouse_pos.x-global_position.x)
+	#var iy1= (mouse_pos.y-global_position.y)
+	#var dist=max(abs(ix1-ix0),abs(iy1-iy0))
+	#for i in range(dist):
+		##var ix=ix0+i/dist*(ix1-ix0)
+		##var iy=iy0+i/dist*(iy1-iy0)
+		#var ix=int(round(ix0+i/dist*(ix1-ix0)))
+		#var iy=int(round(iy0+i/dist*(iy1-iy0)))
+		##img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(int(round(ix-brush_size/2+px/2)),int(round(iy-brush_size/2+img_h/2))))
+		#img.blend_rect(brush_img,Rect2(0,0,brush_size,brush_size),Vector2(ix-brush_size/2+px/2,iy-brush_size/2+py/2))

@@ -2,8 +2,9 @@
 extends TextureRect
 
 
-## canvas behind drawing, blank color
-## should move in the same way
+## canvas behind drawing
+## is an exact (color filled) copy of drawing, that redraws if px,py modified
+## used to visualize where margins starts, as TextureRect doesnt provide it
 
 ## background color
 @export var back_color: Color=Color.WHITE
@@ -15,6 +16,10 @@ var py: int=128
 func _ready():
 	drawing.connect("px_changed",on_px_changed)
 	drawing.connect("py_changed",on_py_changed)
+	_postready.call_deferred()
+func _postready():
+	px=drawing.px
+	py=drawing.py
 	update_canvas()
 func on_px_changed(input_px:int):
 	px=input_px

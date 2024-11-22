@@ -1,0 +1,9 @@
+- when saving node: save file, if selected node and mode=node, apply texture from file
+- brush draws wrongly when margins, correct it
+- brush doesnt draws lines, correct it
+- right mouse: erase?
+- middle mouse: change brush scaling
+- pointer on image showing brush size
+- brush color: make 6-7 main ones, push button to cycle through (remove color picker)
+- arrange ui better
+- publish

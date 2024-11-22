@@ -22,6 +22,8 @@ func _ready():
 	## drawer
 	drawing.connect("px_changed",_on_drawing_px_changed)
 	drawing.connect("py_changed",_on_drawing_py_changed)
+	drawing.connect("mouse_entered",drawing.activate)
+	drawing.connect("mouse_exited",drawing.deactivate)
 	## buttons
 	mode_button.connect("pressed",_on_mode_pressed)
 	new.connect("pressed",_on_new_pressed)
