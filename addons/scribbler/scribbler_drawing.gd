@@ -12,14 +12,14 @@ extends TextureRect
 		var prev_value: int=px
 		px=value
 		if prev_value!=value:
-			px_changed.emit()
+			px_changed.emit(px)
 ## Height in pixels
 @export var py: int=128:
 	set(value):
 		var prev_value: int=py
 		py=value
 		if prev_value!=value:
-			py_changed.emit()
+			py_changed.emit(py)
 
 
 # Brush
@@ -34,10 +34,10 @@ extends TextureRect
 ## SETUP
 # Image
 var img: Image# the image created or edited
-const back_color: Color=Color.FUCHSIA#background color on new_drawing or resize (!IGNORED in loaded pictures)
+const back_color: Color=Color.TRANSPARENT#background color on new_drawing or resize (!IGNORED in loaded pictures)
 const back_color_in_file: Color=Color(1,1,1,0)# replaces background color on saved files
 # Brush
-const brush_path: String="res://addons/scribbler/brush.png"
+const brush_path: String="res://addons/scribbler/scribbler_brush.png"
 var brush_img: Image=Image.new()
 var brush_size: int# brush size (same for x,y)
 # Logic
@@ -69,8 +69,7 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		img=Image.new()
 		img.load(filename_)
 		img.convert(Image.FORMAT_RGBA8)
-		img.copy_from(_swap_color(img,back_color_in_file,back_color))# swap colors
-		#-> beware: back_color_in_file will be ignored in loaded images
+		#img.copy_from(_swap_color(img,back_color_in_file,back_color))# swap colors
 		px=img.get_width()
 		py=img.get_height()
 		# Replace back_color_on_file with back_color
@@ -78,8 +77,8 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 
 func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if img:
-		#save image copy with swapped background color
-		_swap_color(img,back_color,back_color_in_file).save_png(filename_)
+		img.save_png(filename_)
+		#_swap_color(img,back_color,back_color_in_file).save_png(filename_)# swap color
 		
 func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 	var _new_img: Image=Image.new()
@@ -166,7 +165,14 @@ var _last_iy: int# record last ix drawn for line filling
 var line_fill: bool=false## TODO: test interpolation as is NOT WORKING
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
-	var _rect: Rect2=get_global_rect()
+	var _rect: Rect2=get_global_rect()# wrong, includes margins
+	#
+	#TEST
+	var _rectm: Rect2=get_global_rect()# includes margins
+	var _rectc: Vector2=get_global_rect().get_center()
+	print(px/py,":",_rectm.size[0]/_rectm.size[1])
+	#var _rect2: Rect2=Rect2(_rectp,)
+	#
 	if _rect.has_point(_mouse_pos):
 		if not line_fill or _first_point: # just a point
 			var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
