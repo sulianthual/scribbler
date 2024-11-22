@@ -24,6 +24,7 @@ var detached: bool=false# dock starts detached or not
 ## drawing
 @onready var drawing: TextureRect=%drawing
 @onready var draw_mode_button: Button=%draw_mode
+@onready var image_size_label: Label=%image_size
 ## file
 @onready var mode_button: Button = %mode
 @onready var new: Button = %clear# clear drawing (same as new drawing)
@@ -65,6 +66,7 @@ func _ready():
 	_update_mode()
 	_update_draw_mode()
 	_update_hiding_buttons()
+	_update_image_size_label()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
@@ -82,8 +84,6 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	for i in [mode_button,new,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo]:
 		i.visible=not hiding_buttons
-
-
 
 ## DETACH MENU (POPUP)
 func _on_detach_pressed():
@@ -226,15 +226,18 @@ func _texture_valid(input_texture: Texture2D):
 	return valid
 
 ################################################################
-## IMAGE AND BRUSH
+## DRAWING AND BRUSH
 
 func _on_undo_pressed():
 	drawing.undo()
-## PX,PY FROM DRAWING
 func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
 	px=input_px# happens e.g. when loading new file
+	_update_image_size_label()
 func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
 	py=input_py
+	_update_image_size_label()
+func _update_image_size_label():
+	image_size_label.text=str(px)+"x"+str(py)
 
 ## CHANGE DRAW MODE
 func _on_draw_mode_pressed():
@@ -304,7 +307,6 @@ func _brush_color_dialogue():
 	file_dialogue.add_child(_dialog)
 	file_dialogue.popup()
 	return file_dialogue
-## FROM DRAWING
 func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
 	brush_color=input_color
 func _on_brush_color_dialogue_confirmed():

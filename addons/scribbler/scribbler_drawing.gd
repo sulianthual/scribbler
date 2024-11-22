@@ -3,8 +3,6 @@ extends TextureRect
 
 ## Scribbler: Draw and save images in Godot (for game prototyping)
 
-
-
 @export_subgroup("image")
 ## Width in pixels
 @export var px: int=256:
@@ -80,6 +78,7 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		px=img.get_width()
 		py=img.get_height()
 		texture_from_img()
+		clear_undos()
 
 func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if img:
