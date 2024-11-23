@@ -265,8 +265,6 @@ var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
 var _erasing: bool=false# is ersing (within drawing area, Right Mouse Pressed)
 var _first_point: bool=false# is drawing first point (no line-fill)
 func _input(event):
-	print(active)
-
 	if active:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
