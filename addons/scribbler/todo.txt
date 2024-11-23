@@ -3,3 +3,5 @@
 - add replace color: current color replaces all of color below cursor
 - test if works when exporting game
 - publish
+- not writing anymore wtf
+- remove detach: can already make floating lol

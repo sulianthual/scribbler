@@ -20,7 +20,5 @@ texture = ExtResource("1_cclwj")
 texture = ExtResource("3_sc50a")
 region_enabled = true
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("4_c03tx")

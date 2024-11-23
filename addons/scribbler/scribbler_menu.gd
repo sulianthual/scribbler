@@ -433,9 +433,9 @@ func _save_from_sheet_select_subset_dialogue(input_file: String):
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Select Sheet Subset"
 	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_load_from_sheet_dialogue_confirmed)
+	file_dialogue.connect("confirmed",_on_save_from_sheet_dialogue_confirmed)
 	var _dialogue: Control=sheet_dialogue.instantiate()
-	_dialogue.connect("subset_changed",_on_load_from_sheet_dialogue_subset_changed)
+	_dialogue.connect("subset_changed",_on_save_from_sheet_dialogue_subset_changed)
 	file_dialogue.add_child(_dialogue)
 	_dialogue.set_subset(sheet_dialogue_input_subset)
 	_dialogue.make_source_image(input_file)
@@ -444,8 +444,9 @@ func _save_from_sheet_select_subset_dialogue(input_file: String):
 func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
 	sheet_dialogue_input_subset=input_subset
 func _on_save_from_sheet_dialogue_confirmed():
+	print("saving test")
 	if save_from_sheet_selected_file:
-		## here load the file, blit and overwrite it...
-		#drawing.load_drawing_subset(load_from_sheet_selected_file, sheet_dialogue_input_subset)
+		drawing.save_drawing_subset(save_from_sheet_selected_file,sheet_dialogue_input_subset)
+		## TODO: subset might not match source image correctly
 		save_from_sheet_selected_file=""
 		

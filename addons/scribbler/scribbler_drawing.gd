@@ -86,7 +86,6 @@ func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		#_swap_color(img,back_color,back_color_in_file).save_png(filename_)# swap color
 		
 ### SHEETS: load or save subset
-
 func load_drawing_subset(filename_: String, input_subset: Array[int]):## CALLS FROM SCRIBBLER, subset=subx,suby,ix,iy
 	if FileAccess.file_exists(filename_):
 		var source_img: Image=Image.new()
