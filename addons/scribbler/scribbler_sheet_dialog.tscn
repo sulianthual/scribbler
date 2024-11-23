@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3 uid="uid://cl6vb28iyt4ed"]
+
+[ext_resource type="Script" path="res://addons/scribbler/scribbler_sheet_dialog.gd" id="1_6b8k8"]
+
+[node name="sheet_dialogue" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6b8k8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="setup" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="subdivisonx" type="HBoxContainer" parent="VBoxContainer/setup"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/setup/subdivisonx"]
+layout_mode = 2
+text = "subx"
+
+[node name="subx" type="SpinBox" parent="VBoxContainer/setup/subdivisonx"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+select_all_on_focus = true
+
+[node name="subdivisiony" type="HBoxContainer" parent="VBoxContainer/setup"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/setup/subdivisiony"]
+layout_mode = 2
+text = "suby"
+
+[node name="suby" type="SpinBox" parent="VBoxContainer/setup/subdivisiony"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+select_all_on_focus = true
+
+[node name="index_x" type="HBoxContainer" parent="VBoxContainer/setup"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/setup/index_x"]
+layout_mode = 2
+text = "ix"
+
+[node name="ix" type="SpinBox" parent="VBoxContainer/setup/index_x"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+select_all_on_focus = true
+
+[node name="index_y" type="HBoxContainer" parent="VBoxContainer/setup"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/setup/index_y"]
+layout_mode = 2
+text = "iy"
+
+[node name="iy" type="SpinBox" parent="VBoxContainer/setup/index_y"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+select_all_on_focus = true
+
+[node name="source_image" type="TextureRect" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+
+[node name="grid_image" type="TextureRect" parent="VBoxContainer/source_image"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5

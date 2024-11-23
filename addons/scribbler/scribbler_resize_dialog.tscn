@@ -21,6 +21,7 @@ grow_vertical = 2
 
 [node name="setup" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+alignment = 1
 
 [node name="width" type="HBoxContainer" parent="VBoxContainer/setup"]
 layout_mode = 2
