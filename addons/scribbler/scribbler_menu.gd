@@ -163,6 +163,7 @@ func _load_dialogue():
 	return file_dialogue
 func _on_load_dialogue_file_loaded(input_file: String):
 	drawing.load_drawing(input_file)
+	#drawing.load_drawing_subset(input_file, 2, 2, 1, 1)
 func _load_node():## get from selected node in Editor SceneView
 	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
 	if _node_valid(_selected_node):
@@ -191,6 +192,7 @@ func _save_dialogue():
 	return file_dialogue
 func _on_save_dialogue_file_selected(input_file: String):
 	drawing.save_drawing(input_file)
+	#drawing.save_drawing_subset(input_file, 2, 2, 1, 1)
 	_apply_saved_image_to_empty_node_texture(input_file)
 	_rescan_filesystem()
 func _save_node():## save to selected node in Editor SceneView

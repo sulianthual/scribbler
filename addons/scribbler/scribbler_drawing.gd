@@ -85,8 +85,40 @@ func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		img.save_png(filename_)
 		#_swap_color(img,back_color,back_color_in_file).save_png(filename_)# swap color
 		
+### SHEETS: load or save subset
 
-	
+func load_drawing_subset(filename_: String, subx: int, suby:int, ix:int, iy:int):## CALLS FROM SCRIBBLER
+	if FileAccess.file_exists(filename_):
+		var source_img: Image=Image.new()
+		source_img.convert(Image.FORMAT_RGBA8)
+		source_img.load(filename_)
+		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
+		img=Image.new()
+		img.convert(Image.FORMAT_RGBA8)
+		img=source_img.get_region(subset_rect)
+		px=img.get_width()
+		py=img.get_height()
+		texture_from_img()
+		clear_undo_history()#-> clears all previous!
+
+func save_drawing_subset(filename_: String,subx: int, suby:int, ix:int, iy:int):## CALLS FROM SCRIBBLER
+	if FileAccess.file_exists(filename_):
+		var source_img: Image=Image.new()
+		source_img.convert(Image.FORMAT_RGBA8)
+		source_img.load(filename_)
+		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
+		var img_rect: Rect2i=Rect2i(0,0,img.get_width(),img.get_height())
+		source_img.blit_rect(img,img_rect,subset_rect.position)
+		source_img.save_png(filename_)
+
+func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:int)->Rect2i:#->determine subset
+	# ix,iy are the coordinates and start at 1,1
+	var subset_rect_w: int=roundi(source_img.get_width()/subx)
+	var subset_rect_h: int=roundi(source_img.get_height()/suby)
+	var subset_rect_x: int=subset_rect_w*clamp(ix-1,0,subx-1)
+	var subset_rect_y: int=subset_rect_w*clamp(iy-1,0,suby-1)
+	var subset_rect: Rect2i=Rect2i(subset_rect_x,subset_rect_y,subset_rect_w,subset_rect_h)
+	return subset_rect
 ###############################################################################
 ## IMAGE AND TEXTURE
 

@@ -1,7 +1,5 @@
 - ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
 - shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)
 - add replace color: current color replaces all of color below cursor
-- undo when resizing, undo when clearing
-- when resizing, either crop or rescale
 - test if works when exporting game
 - publish
