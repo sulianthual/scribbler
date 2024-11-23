@@ -23,23 +23,23 @@ var detached: bool=false# dock starts detached or not
 @onready var parent_container: Control# ref to parent before detach
 ## drawing
 @onready var drawing: TextureRect=%drawing
-@onready var draw_mode_button: Button=%draw_mode
 @onready var image_size_label: Label=%image_size
+## dock
+@onready var detach: Button=%detach# update image size
+@onready var hide_button: Button=%hide# update image size
+@onready var help: Button=%help
 ## file
 @onready var mode_button: Button = %mode
-@onready var new: Button = %clear# clear drawing (same as new drawing)
+@onready var new: Button = %new# new drawing
 @onready var load: Button = %load# load drawing
 @onready var save: Button = %save# save drawing
-## resize
-@onready var resize: Button=%resize# update image size
-## brush
-@onready var brush_color_button: Button=%brush_color
-## help
-@onready var help: Button=%help
-## detach
-@onready var detach: Button=%detach# update image size
+## edit
 @onready var undo: Button=%undo# update image size
-@onready var hide_button: Button=%hide# update image size
+@onready var clear: Button = %clear# clear drawing (same as new drawing)
+@onready var resize: Button=%resize# update image size
+## drawing settings
+@onready var draw_mode_button: Button=%draw_mode
+@onready var brush_color_button: Button=%brush_color
 ## test
 #@onready var test: Button=%test
 
@@ -51,6 +51,7 @@ func _ready():
 	drawing.connect("mouse_exited",drawing.deactivate)
 	## buttons
 	mode_button.connect("pressed",_on_mode_pressed)
+	clear.connect("pressed",_on_clear_pressed)
 	new.connect("pressed",_on_new_pressed)
 	save.connect("pressed",_on_save_pressed)
 	load.connect("pressed",_on_load_pressed)
@@ -82,7 +83,7 @@ func _on_hide_pressed():
 	hiding_buttons=not hiding_buttons
 	_update_hiding_buttons()
 func _update_hiding_buttons():
-	for i in [mode_button,new,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo]:
+	for i in [mode_button,new,clear,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo]:
 		i.visible=not hiding_buttons
 
 ## DETACH MENU (POPUP)
@@ -133,6 +134,10 @@ func _update_mode():
 	elif mode==MODE.NODE:
 		mode_button.set_text("edit nodes")
 
+
+## CLEAR DRAWING
+func _on_clear_pressed():
+	drawing.clear_drawing()
 
 ## NEW DRAWING
 func _on_new_pressed():
@@ -227,7 +232,6 @@ func _texture_valid(input_texture: Texture2D):
 
 ################################################################
 ## DRAWING AND BRUSH
-
 func _on_undo_pressed():
 	drawing.undo()
 func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING

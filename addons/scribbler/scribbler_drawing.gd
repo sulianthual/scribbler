@@ -67,7 +67,7 @@ func new_drawing(input_px: int, input_py: int):# create texture as image
 	img.convert(Image.FORMAT_RGBA8)
 	img.fill(back_color)
 	texture_from_img()
-	clear_undos()
+	clear_undo_history()#-> clears all previous
 	
 func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if FileAccess.file_exists(filename_):
@@ -78,7 +78,7 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		px=img.get_width()
 		py=img.get_height()
 		texture_from_img()
-		clear_undos()
+		clear_undo_history()#-> clears all previous!
 
 func save_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if img:
@@ -94,7 +94,13 @@ func texture_from_img():# update displayed texture from image
 	var _texture: ImageTexture=ImageTexture.create_from_image(img)
 	texture=_texture# beware of scale (should be 1,1)
 
+func clear_drawing():
+	save_img_to_undo_history()
+	img.fill(back_color)
+	texture_from_img()
+	
 func resize_drawing(input_px: int,input_py: int):
+	save_img_to_undo_history()#-> save to history
 	var _last_img: Image=Image.new()# make image copy and blend to it
 	_last_img.copy_from(img)
 	px=input_px
@@ -106,6 +112,7 @@ func resize_drawing(input_px: int,input_py: int):
 	var iy: int=int(py/2-_last_img.get_height()/2)
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
+	
 
 func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 	var _new_img: Image=Image.new()
@@ -173,24 +180,25 @@ func eraser_from_brush():
 ###############################################################################
 ## DRAWING
 
-## UNDOS
+## UNDOS HISTORY
 var undo_imgs: Array[Image]
 func undo():## CALLS FROM SCRIBBLER
 	if len(undo_imgs)>1:
 		img=undo_imgs[-2]
-		undo_imgs.pop_back()
+		px=img.get_width()
+		py=img.get_height()
 		texture_from_img()
-func save_undo():
+		undo_imgs.pop_back()
+func save_img_to_undo_history():
 	if len(undo_imgs)>=max_undos:
 		undo_imgs.pop_front()
 	var _new_img: Image=Image.create(img.get_width(),img.get_height(),false, Image.FORMAT_RGBA8)
 	_new_img.convert(Image.FORMAT_RGBA8)
 	_new_img.copy_from(img)
 	undo_imgs.append(_new_img)
-
-func clear_undos():
+func clear_undo_history():
 	undo_imgs=[]
-	save_undo()
+	save_img_to_undo_history()
 	
 ## MODE
 var draw_over: bool=false# draw over existing 
@@ -221,7 +229,7 @@ func _input(event):
 				_draw_point()
 			else:
 				#print("released")
-				save_undo()
+				save_img_to_undo_history()
 				_drawing=false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 			if event.pressed:
@@ -231,7 +239,7 @@ func _input(event):
 				_first_point=true
 				_draw_point()
 			else:
-				save_undo()
+				save_img_to_undo_history()
 				#print("released")
 				_erasing=false
 		elif event is InputEventMouseMotion:
@@ -322,7 +330,7 @@ func _draw_point():
 	else:# outside edges
 		_drawing=false
 		_erasing=false
-		save_undo()
+		save_img_to_undo_history()
 
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
