@@ -370,83 +370,84 @@ func _help_dialogue():
 	
 ## TESsT
 func _on_test_pressed():
+	pass
 	#_load_from_sheet_select_file_dialogue()# workds
-	_save_from_sheet_select_file_dialogue()
+	#_save_from_sheet_select_file_dialogue()
 
-## LOAD SCRIBBLE FROM SHEET
-var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
-var load_from_sheet_selected_file: String# pass selected file
-func _load_from_sheet_select_file_dialogue():
-	var file_dialogue = EditorFileDialog.new()
-	file_dialogue.clear_filters()
-	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
-	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
-	file_dialogue.filters = ["*.png ; PNG File"]
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("file_selected", _on_load_from_sheet_select_file_file_selected)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_load_from_sheet_select_file_file_selected(input_file: String):
-	load_from_sheet_selected_file=input_file# keep for later dialogue
-	_load_from_sheet_select_subset_dialogue(input_file)
-func _load_from_sheet_select_subset_dialogue(input_file: String):
-	var file_dialogue = ConfirmationDialog.new()
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.title="Select Sheet Subset"
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_load_from_sheet_dialogue_confirmed)
-	var _dialogue: Control=sheet_dialogue.instantiate()
-	_dialogue.connect("subset_changed",_on_load_from_sheet_dialogue_subset_changed)
-	file_dialogue.add_child(_dialogue)
-	_dialogue.set_subset(sheet_dialogue_input_subset)
-	_dialogue.make_source_image(input_file)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_load_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
-	sheet_dialogue_input_subset=input_subset
-func _on_load_from_sheet_dialogue_confirmed():
-	if load_from_sheet_selected_file:
-		drawing.load_drawing_subset(load_from_sheet_selected_file, sheet_dialogue_input_subset)
-		load_from_sheet_selected_file=""
-
-## SAVE SCRIBBLE TO SHEET
-var save_from_sheet_selected_file: String# pass selected file
-func _save_from_sheet_select_file_dialogue():
-	var file_dialogue = EditorFileDialog.new()
-	file_dialogue.clear_filters()
-	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_SAVE_FILE
-	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
-	file_dialogue.filters = ["*.png ; PNG File"]
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("file_selected", _on_save_from_sheet_select_file_file_selected)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_save_from_sheet_select_file_file_selected(input_file: String):
-	save_from_sheet_selected_file=input_file# keep for later dialogue
-	_save_from_sheet_select_subset_dialogue(input_file)
-func _save_from_sheet_select_subset_dialogue(input_file: String):
-	var file_dialogue = ConfirmationDialog.new()
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.title="Select Sheet Subset"
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_save_from_sheet_dialogue_confirmed)
-	var _dialogue: Control=sheet_dialogue.instantiate()
-	_dialogue.connect("subset_changed",_on_save_from_sheet_dialogue_subset_changed)
-	file_dialogue.add_child(_dialogue)
-	_dialogue.set_subset(sheet_dialogue_input_subset)
-	_dialogue.make_source_image(input_file)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
-	sheet_dialogue_input_subset=input_subset
-func _on_save_from_sheet_dialogue_confirmed():
-	print("saving test")
-	if save_from_sheet_selected_file:
-		drawing.save_drawing_subset(save_from_sheet_selected_file,sheet_dialogue_input_subset)
-		## TODO: subset might not match source image correctly
-		save_from_sheet_selected_file=""
+### LOAD SCRIBBLE FROM SHEET
+#var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
+#var load_from_sheet_selected_file: String# pass selected file
+#func _load_from_sheet_select_file_dialogue():
+	#var file_dialogue = EditorFileDialog.new()
+	#file_dialogue.clear_filters()
+	#file_dialogue.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
+	#file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
+	#file_dialogue.filters = ["*.png ; PNG File"]
+	#file_dialogue.set_size(Vector2(640, 360))
+	#file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
+	#EditorInterface.popup_dialog_centered(file_dialogue)
+	#file_dialogue.connect("file_selected", _on_load_from_sheet_select_file_file_selected)
+	#file_dialogue.popup()
+	#return file_dialogue
+#func _on_load_from_sheet_select_file_file_selected(input_file: String):
+	#load_from_sheet_selected_file=input_file# keep for later dialogue
+	#_load_from_sheet_select_subset_dialogue(input_file)
+#func _load_from_sheet_select_subset_dialogue(input_file: String):
+	#var file_dialogue = ConfirmationDialog.new()
+	#file_dialogue.set_size(Vector2(640, 360))
+	#file_dialogue.title="Select Sheet Subset"
+	#EditorInterface.popup_dialog_centered(file_dialogue)
+	#file_dialogue.connect("confirmed",_on_load_from_sheet_dialogue_confirmed)
+	#var _dialogue: Control=sheet_dialogue.instantiate()
+	#_dialogue.connect("subset_changed",_on_load_from_sheet_dialogue_subset_changed)
+	#file_dialogue.add_child(_dialogue)
+	#_dialogue.set_subset(sheet_dialogue_input_subset)
+	#_dialogue.make_source_image(input_file)
+	#file_dialogue.popup()
+	#return file_dialogue
+#func _on_load_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
+	#sheet_dialogue_input_subset=input_subset
+#func _on_load_from_sheet_dialogue_confirmed():
+	#if load_from_sheet_selected_file:
+		#drawing.load_drawing_subset(load_from_sheet_selected_file, sheet_dialogue_input_subset)
+		#load_from_sheet_selected_file=""
+#
+### SAVE SCRIBBLE TO SHEET
+#var save_from_sheet_selected_file: String# pass selected file
+#func _save_from_sheet_select_file_dialogue():
+	#var file_dialogue = EditorFileDialog.new()
+	#file_dialogue.clear_filters()
+	#file_dialogue.file_mode = EditorFileDialog.FILE_MODE_SAVE_FILE
+	#file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
+	#file_dialogue.filters = ["*.png ; PNG File"]
+	#file_dialogue.set_size(Vector2(640, 360))
+	#file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
+	#EditorInterface.popup_dialog_centered(file_dialogue)
+	#file_dialogue.connect("file_selected", _on_save_from_sheet_select_file_file_selected)
+	#file_dialogue.popup()
+	#return file_dialogue
+#func _on_save_from_sheet_select_file_file_selected(input_file: String):
+	#save_from_sheet_selected_file=input_file# keep for later dialogue
+	#_save_from_sheet_select_subset_dialogue(input_file)
+#func _save_from_sheet_select_subset_dialogue(input_file: String):
+	#var file_dialogue = ConfirmationDialog.new()
+	#file_dialogue.set_size(Vector2(640, 360))
+	#file_dialogue.title="Select Sheet Subset"
+	#EditorInterface.popup_dialog_centered(file_dialogue)
+	#file_dialogue.connect("confirmed",_on_save_from_sheet_dialogue_confirmed)
+	#var _dialogue: Control=sheet_dialogue.instantiate()
+	#_dialogue.connect("subset_changed",_on_save_from_sheet_dialogue_subset_changed)
+	#file_dialogue.add_child(_dialogue)
+	#_dialogue.set_subset(sheet_dialogue_input_subset)
+	#_dialogue.make_source_image(input_file)
+	#file_dialogue.popup()
+	#return file_dialogue
+#func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
+	#sheet_dialogue_input_subset=input_subset
+#func _on_save_from_sheet_dialogue_confirmed():
+	#print("saving test")
+	#if save_from_sheet_selected_file:
+		#drawing.save_drawing_subset(save_from_sheet_selected_file,sheet_dialogue_input_subset)
+		### TODO: subset might not match source image correctly
+		#save_from_sheet_selected_file=""
 		
