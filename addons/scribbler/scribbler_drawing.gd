@@ -99,7 +99,7 @@ func clear_drawing():
 	img.fill(back_color)
 	texture_from_img()
 	
-func resize_drawing(input_px: int,input_py: int):
+func resize_drawing(input_px: int,input_py: int):# crop mode
 	save_img_to_undo_history()#-> save to history
 	var _last_img: Image=Image.new()# make image copy and blend to it
 	_last_img.copy_from(img)
@@ -112,7 +112,14 @@ func resize_drawing(input_px: int,input_py: int):
 	var iy: int=int(py/2-_last_img.get_height()/2)
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
-	
+
+func rescale_drawing(input_px: int,input_py: int, interpolation_mode: Image.Interpolation):# stretch mode
+	save_img_to_undo_history()#-> save to history
+	px=input_px
+	py=input_py
+	img.resize(input_px,input_py,interpolation_mode)
+	texture_from_img()
+
 
 func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 	var _new_img: Image=Image.new()

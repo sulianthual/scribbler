@@ -262,6 +262,7 @@ func _update_draw_mode():
 		draw_mode_button.set_text("just draw")
 
 ## RESIZE DRAWING (POPUP)
+var resize_mode: String="stretch"
 func _on_resize_pressed():
 	_resize_dialogue()
 func _resize_dialogue():
@@ -277,6 +278,7 @@ func _resize_dialogue():
 	_dialogue.py.value=py
 	_dialogue.px.connect("value_changed",_on_resize_dialogue_px_changed)
 	_dialogue.py.connect("value_changed",_on_resize_dialogue_py_changed)
+	_dialogue.connect("scale_mode_changed",_on_resize_dialogue_resize_mode_changed)
 	file_dialogue.popup()
 	return file_dialogue
 ## FROM DRAWING
@@ -284,8 +286,14 @@ func _on_resize_dialogue_px_changed(input_px: float):## SIGNAL FROM DRAWING
 	px=int(input_px)
 func _on_resize_dialogue_py_changed(input_py: float):## SIGNAL FROM DRAWING
 	py=int(input_py)
+func _on_resize_dialogue_resize_mode_changed(input_mode: String):## SIGNAL FROM DRAWING
+	resize_mode=input_mode
 func _on_resize_dialogue_confirmed():
-	drawing.resize_drawing(px,py)
+	if resize_mode=="stretch":
+		drawing.rescale_drawing(px,py,Image.INTERPOLATE_NEAREST)
+	elif resize_mode=="crop":
+		drawing.resize_drawing(px,py)
+
 
 ## BRUSH COLOR
 func _on_brush_color_pressed():
@@ -326,30 +334,30 @@ func _help_dialogue():
 	file_dialogue.title="Help"
 	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2):
 	
-	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping.
-	
-	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. Brush is indicated in top left corner.
+	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping. \
+	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. \
+	Brush is indicated in top left corner, and scribble dimensions (in pixels) in top right.
 	
 	x: minimize/expand menu
 	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
+	help: show help
+	
 	undo: undo last stroke (only 10 undos allowed)
 	clear: clear the scribble
-	resize: resize the scribble (choose new width and height in pixels)
-	edit files/edit nodes: see MODE
-	load: generate scribble from existing PNG file (see MODE).
-	save: save scribble to an existing or new PNG file (see MODE).
-	just draw/draw behind/draw over: see DRAW
-	brush color: pick a new brush color
-
+	resize: resize the scribble (choose new width and height in pixels, and the mode)
+	
 	if DRAW==just draw: draw normally.
 	if DRAW==draw behind: draw behind existing strokes (noticeable if using a different brush color).
 	if DRAW==draw over: draw only over existing strokes (typically using a different brush color).
-
+	brush color: pick a new brush color
+	
 	if MODE==edit files: scribble loads from and saves to PNG files in res://.
 	if MODE==edit nodes: scribble loads from node selected in Scene View, from node.texture**.
 	   Saving scribble generates a new node.texture if it is empty.
 	   **Only if node.texture is ImageTexture or CompressedTexture2D, and has PNG in resource_path.
-	
+	load: generate scribble from existing PNG file (see MODE).
+	save: save scribble to an existing or new PNG file (see MODE).
+	new: new scribble.
 	"""
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)

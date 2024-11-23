@@ -21,7 +21,6 @@ grow_vertical = 2
 
 [node name="setup" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
-alignment = 1
 
 [node name="width" type="HBoxContainer" parent="VBoxContainer/setup"]
 layout_mode = 2
@@ -54,6 +53,11 @@ max_value = 1080.0
 value = 256.0
 rounded = true
 select_all_on_focus = true
+
+[node name="scale_mode" type="Button" parent="VBoxContainer/setup"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "mode: stretch"
 
 [node name="modifiers" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
