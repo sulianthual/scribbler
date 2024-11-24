@@ -79,6 +79,18 @@ func _postready()->void:
 	drawing.new_drawing(px,py)
 
 ################################################################
+## DRAWING WINDOW
+
+func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
+	px=input_px# happens e.g. when loading new file
+	_update_image_size_label()
+func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
+	py=input_py
+	_update_image_size_label()
+func _update_image_size_label():
+	image_size_label.text=str(px)+"x"+str(py)
+	
+################################################################
 ## MENU
 
 ## HIDE BUTTONS
@@ -120,38 +132,148 @@ func _reatach_dialogue():
 	parent_container.add_child(self)
 	_window.queue_free()
 	
+## HELP
+func _on_help_pressed():
+	_help_dialogue()
+func _help_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	file_dialogue.title="Help"
+	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2): \
+	Make basic drawings without leaving the editor, useful for prototyping. \
+	Disclaimer: this plugin is buggy.  
+	
+	Controls:
+	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. \
+	Brush is indicated in top left corner, and scribble dimensions (in pixels) in top right.
+	
+	Buttons:
+	x: minimize/expand menu
+	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
+	help: show help
+	undo: undo last stroke (only 10 undos allowed)
+	clear: clear the scribble
+	resize: resize the scribble (choose new width and height in pixels, and resize mode)
+	just draw: draw normally, behind existing strokes or over existing strokes.
+	color: pick a new brush color
+	load: generate scribble from existing PNG file in res://.
+	save: save scribble to an existing or new PNG file in res://.
+	new: new scribble.
+	
+	Load/Save Options:
+	Use Node Texture: load/save node.texture from node selected in Scene View, if applicable**. 
+	Use Sheet Subregion: load/save subset of PNG file (useful for sprite sheets).
+	**node.texture must be ImageTexture or CompressedTexture2D, and have a PNG in resource_path.\
+	Saving scribble generates a new node.texture if it is empty.
+	
+	"""
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.popup()
+	return file_dialogue
+
 
 ################################################################
-## FILE
-
-
-#func _on_mode_pressed():
-	#if mode==MODE.FILE:
-		#mode=MODE.NODE
-	#else:
-		#mode=MODE.FILE
-	#_update_mode()
-#func _update_mode():
-	#if mode==MODE.FILE:
-		#mode_button.set_text("edit files")
-	#elif mode==MODE.NODE:
-		#mode_button.set_text("edit nodes")
-
-
+## DRAWING AND BRUSH
+func _on_undo_pressed():
+	drawing.undo()
+	
 ## CLEAR DRAWING
 func _on_clear_pressed():
 	drawing.clear_drawing()
 
+## RESIZE DRAWING (POPUP)
+var resize_mode: String="crop"
+func _on_resize_pressed():
+	_resize_dialogue()
+func _resize_dialogue():
+	resize_mode="crop"
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	file_dialogue.title="Resize Scribble"
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_resize_dialogue_confirmed)
+	var _dialogue: Control=resize_dialogue.instantiate()
+	file_dialogue.add_child(_dialogue)
+	_dialogue.px.value=px
+	_dialogue.py.value=py
+	_dialogue.px.connect("value_changed",_on_resize_dialogue_px_changed)
+	_dialogue.py.connect("value_changed",_on_resize_dialogue_py_changed)
+	_dialogue.connect("scale_mode_changed",_on_resize_dialogue_resize_mode_changed)
+	file_dialogue.popup()
+	return file_dialogue
+## FROM DRAWING
+func _on_resize_dialogue_px_changed(input_px: float):## SIGNAL FROM DRAWING
+	px=int(input_px)
+func _on_resize_dialogue_py_changed(input_py: float):## SIGNAL FROM DRAWING
+	py=int(input_py)
+func _on_resize_dialogue_resize_mode_changed(input_mode: String):## SIGNAL FROM DRAWING
+	resize_mode=input_mode
+func _on_resize_dialogue_confirmed():
+	if resize_mode=="stretch":
+		drawing.rescale_drawing(px,py,Image.INTERPOLATE_NEAREST)
+	elif resize_mode=="crop":
+		drawing.resize_drawing(px,py)
+
+
+## CHANGE DRAW MODE
+## Draw mode (must match drawing.gd)
+var draw_mode: String="regular"
+func _on_draw_mode_pressed():
+	if draw_mode=="regular":
+		draw_mode="behind"
+	elif draw_mode=="behind":
+		draw_mode="over"
+	elif draw_mode=="over":
+		draw_mode="regular"
+	_update_draw_mode()
+func _update_draw_mode():
+	drawing. set_draw_mode(draw_mode)
+	if draw_mode=="over":
+		draw_mode_button.set_text("draw over")
+	elif draw_mode=="behind":
+		draw_mode_button.set_text("draw behind")
+	else:
+		draw_mode_button.set_text("just draw")
+
+## BRUSH COLOR
+## brush color (as controlled here instead of drawing)
+var brush_color: Color=Color.BLACK
+func _on_brush_color_pressed():
+	_brush_color_dialogue()
+func _brush_color_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(320, 180))
+	file_dialogue.title="Pick Brush Color"
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_brush_color_dialogue_confirmed)
+	var _dialog: ColorPicker=ColorPicker.new()
+	_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed)
+	_dialog.color=brush_color
+	_dialog.deferred_mode=true
+	_dialog.edit_alpha=true
+	_dialog.can_add_swatches=false
+	_dialog.color_modes_visible=false
+	_dialog.hex_visible=false
+	_dialog.presets_visible=false
+	_dialog.sampler_visible=false
+	_dialog.sliders_visible=true
+	file_dialogue.add_child(_dialog)
+	file_dialogue.popup()
+	return file_dialogue
+func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
+	brush_color=input_color
+func _on_brush_color_dialogue_confirmed():
+	drawing.recolor_brush(brush_color)
+	
+################################################################
+## FILE
+
 ## NEW DRAWING
 func _on_new_pressed():
 	drawing.new_drawing(px,py)
-	
-	
-	
-### TESTS
-
-
-
 
 ###
 ## LOAD FROM FILE
@@ -230,9 +352,6 @@ func _on_load_from_sheet_dialogue_confirmed():
 		load_from_sheet_selected_file=""
 #########################################################################################
 ## SAVE TO FILE
-
-
-
 
 enum MODE {FILE,NODE}
 var mode: MODE=MODE.FILE
@@ -345,151 +464,12 @@ func _texture_valid(input_texture: Texture2D):
 	valid=valid and input_texture.resource_path.get_extension()=="png"
 	return valid
 
+
+
 ################################################################
-## DRAWING AND BRUSH
-func _on_undo_pressed():
-	drawing.undo()
-func _on_drawing_px_changed(input_px: int):## SIGNAL FROM DRAWING
-	px=input_px# happens e.g. when loading new file
-	_update_image_size_label()
-func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
-	py=input_py
-	_update_image_size_label()
-func _update_image_size_label():
-	image_size_label.text=str(px)+"x"+str(py)
+################################################################
 
-## CHANGE DRAW MODE
-## Draw mode (must match drawing.gd)
-var draw_mode: String="regular"
-func _on_draw_mode_pressed():
-	if draw_mode=="regular":
-		draw_mode="behind"
-	elif draw_mode=="behind":
-		draw_mode="over"
-	elif draw_mode=="over":
-		draw_mode="regular"
-	_update_draw_mode()
-func _update_draw_mode():
-	drawing. set_draw_mode(draw_mode)
-	if draw_mode=="over":
-		draw_mode_button.set_text("draw over")
-	elif draw_mode=="behind":
-		draw_mode_button.set_text("draw behind")
-	else:
-		draw_mode_button.set_text("just draw")
-
-## RESIZE DRAWING (POPUP)
-var resize_mode: String="crop"
-func _on_resize_pressed():
-	_resize_dialogue()
-func _resize_dialogue():
-	resize_mode="crop"
-	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.title="Resize Scribble"
-	file_dialogue.dialog_autowrap=true
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_resize_dialogue_confirmed)
-	var _dialogue: Control=resize_dialogue.instantiate()
-	file_dialogue.add_child(_dialogue)
-	_dialogue.px.value=px
-	_dialogue.py.value=py
-	_dialogue.px.connect("value_changed",_on_resize_dialogue_px_changed)
-	_dialogue.py.connect("value_changed",_on_resize_dialogue_py_changed)
-	_dialogue.connect("scale_mode_changed",_on_resize_dialogue_resize_mode_changed)
-	file_dialogue.popup()
-	return file_dialogue
-## FROM DRAWING
-func _on_resize_dialogue_px_changed(input_px: float):## SIGNAL FROM DRAWING
-	px=int(input_px)
-func _on_resize_dialogue_py_changed(input_py: float):## SIGNAL FROM DRAWING
-	py=int(input_py)
-func _on_resize_dialogue_resize_mode_changed(input_mode: String):## SIGNAL FROM DRAWING
-	resize_mode=input_mode
-func _on_resize_dialogue_confirmed():
-	if resize_mode=="stretch":
-		drawing.rescale_drawing(px,py,Image.INTERPOLATE_NEAREST)
-	elif resize_mode=="crop":
-		drawing.resize_drawing(px,py)
-
-
-## BRUSH COLOR
-## brush color (as controlled here instead of drawing)
-var brush_color: Color=Color.BLACK
-func _on_brush_color_pressed():
-	_brush_color_dialogue()
-func _brush_color_dialogue():
-	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(320, 180))
-	file_dialogue.title="Pick Brush Color"
-	file_dialogue.dialog_autowrap=true
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_brush_color_dialogue_confirmed)
-	var _dialog: ColorPicker=ColorPicker.new()
-	_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed)
-	_dialog.color=brush_color
-	_dialog.deferred_mode=true
-	_dialog.edit_alpha=true
-	_dialog.can_add_swatches=false
-	_dialog.color_modes_visible=false
-	_dialog.hex_visible=false
-	_dialog.presets_visible=false
-	_dialog.sampler_visible=false
-	_dialog.sliders_visible=true
-	file_dialogue.add_child(_dialog)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
-	brush_color=input_color
-func _on_brush_color_dialogue_confirmed():
-	drawing.recolor_brush(brush_color)
-
-
-## HELP
-func _on_help_pressed():
-	_help_dialogue()
-func _help_dialogue():
-	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.title="Help"
-	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2): \
-	Make basic drawings without leaving the editor, useful for prototyping. \
-	Disclaimer: this plugin is buggy.  
 	
-	Controls:
-	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. \
-	Brush is indicated in top left corner, and scribble dimensions (in pixels) in top right.
-	
-	Buttons:
-	x: minimize/expand menu
-	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
-	help: show help
-	undo: undo last stroke (only 10 undos allowed)
-	clear: clear the scribble
-	resize: resize the scribble (choose new width and height in pixels, and resize mode)
-	just draw: draw normally, behind existing strokes or over existing strokes.
-	color: pick a new brush color
-	load: generate scribble from existing PNG file in res://.
-	save: save scribble to an existing or new PNG file in res://.
-	new: new scribble.
-	
-	Load/Save Options:
-	Use Node Texture: load/save node.texture from node selected in Scene View, if applicable**. 
-	Use Sheet Subregion: load/save subset of PNG file (useful for sprite sheets).
-	**node.texture must be ImageTexture or CompressedTexture2D, and have a PNG in resource_path.\
-	Saving scribble generates a new node.texture if it is empty.
-	
-	"""
-	file_dialogue.dialog_autowrap=true
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.popup()
-	return file_dialogue
-	
-## TESsT
+## 
 func _on_test_pressed():
 	pass
-	#_load_from_sheet_select_file_dialogue()# workds
-	#_save_from_sheet_select_file_dialogue()
-
-
-		
