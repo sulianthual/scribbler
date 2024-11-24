@@ -4,7 +4,12 @@ extends Control
 ## Scribbler: Scribble drawings in the editor
 ##
 
-
+## Path of file currently edited ("" for none)
+@export var edited_file: String="":
+	set(value):
+		edited_file=value
+		if edited_file_label:
+			edited_file_label.text=edited_file
 ## image width (pixels) (as controlled here instead of drawing)
 @export var px: int=256
 ## image height (pixels) (as controlled here instead of drawing)
@@ -28,6 +33,7 @@ extends Control
 ## drawing
 @onready var drawing: TextureRect=%drawing
 @onready var image_size_label: Label=%image_size
+@onready var edited_file_label: Label=%edited_file
 ## dock
 @onready var detach: Button=%detach# update image size
 @onready var hide_button: Button=%hide# update image size
@@ -275,6 +281,7 @@ func _on_brush_color_dialogue_confirmed():
 ## NEW DRAWING
 func _on_new_pressed():
 	drawing.new_drawing(px,py)
+	edited_file=""
 
 ###
 ## LOAD FROM FILE
@@ -324,6 +331,7 @@ func _on_load_dialogue_file_loaded(input_file: String):
 		_load_from_sheet_select_subset_dialogue(input_file)
 	else:
 		drawing.load_drawing(input_file)
+		edited_file=input_file
 func _load_node():## get from selected node in Editor SceneView
 	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
 	if _node_valid(_selected_node):
@@ -357,7 +365,9 @@ func _on_load_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# sub
 func _on_load_from_sheet_dialogue_confirmed():
 	if load_from_sheet_selected_file:
 		drawing.load_drawing_subset(load_from_sheet_selected_file, sheet_dialogue_input_subset)
+		edited_file=load_from_sheet_selected_file
 		load_from_sheet_selected_file=""
+		
 #########################################################################################
 ## SAVE TO FILE
 

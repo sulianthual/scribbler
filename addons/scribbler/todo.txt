@@ -9,4 +9,5 @@
 - add replace color: current color replaces all of color below cursor
 - test if works when exporting game
 - remove detach: can already make floating
+- improve error messages
 - publish
