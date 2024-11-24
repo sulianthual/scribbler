@@ -285,35 +285,9 @@ func _on_new_pressed():
 
 ###
 ## LOAD FROM FILE
-#var load_dialog: Control## TODO: dirty to hold this if popup closed, use signals
-var load_as_node: bool=false
 var load_as_sheet: bool=false
 func _on_load_pressed():
-	load_as_node=false
-	load_as_sheet=false
-	_loadpick_dialogue()
-func _loadpick_dialogue():
-	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(320, 180))
-	file_dialogue.title="Load Scribble"
-	file_dialogue.dialog_autowrap=true
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_loadpick_dialogue_confirmed)
-	var _dialogue: Control=load_dialogue.instantiate()
-	_dialogue.connect("as_node_changed",_on_loadpick_dialogue_as_node_changed)
-	_dialogue.connect("as_sheet_changed",_on_loadpick_dialogue_as_sheet_changed)
-	file_dialogue.add_child(_dialogue)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_loadpick_dialogue_as_node_changed(value: bool):
-	load_as_node=value
-func _on_loadpick_dialogue_as_sheet_changed(value: bool):
-	load_as_sheet=value
-func _on_loadpick_dialogue_confirmed():
-	if load_as_node:
-		_load_node()
-	else:
-		_load_dialogue()
+	_load_dialogue()
 func _load_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
@@ -327,22 +301,14 @@ func _load_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 func _on_load_dialogue_file_loaded(input_file: String):
+	load_selected(input_file)
+func load_selected(input_file: String):
 	if load_as_sheet:
 		_load_from_sheet_select_subset_dialogue(input_file)
 	else:
 		drawing.load_drawing(input_file)
 		edited_file=input_file
-func _load_node():## get from selected node in Editor SceneView
-	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
-	if _node_valid(_selected_node):
-		var _texture=_selected_node.texture
-		if _texture_valid(_texture):
-			if load_as_sheet:
-				_load_from_sheet_select_subset_dialogue(_texture.resource_path)
-			else:
-				drawing.load_drawing(_texture.resource_path)
-				#_load_dialogue().set_current_path(_texture.resource_path)# doesnt work for no reason
-### LOAD SCRIBBLE FROM SHEET
+## LOAD SCRIBBLE FROM SHEET
 var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
 var load_from_sheet_selected_file: String# pass selected file
 func _load_from_sheet_select_subset_dialogue(input_file: String):
@@ -363,7 +329,7 @@ func _load_from_sheet_select_subset_dialogue(input_file: String):
 func _on_load_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
 	sheet_dialogue_input_subset=input_subset
 func _on_load_from_sheet_dialogue_confirmed():
-	if load_from_sheet_selected_file:
+	if load_from_sheet_selected_file and ResourceLoader.exists(load_from_sheet_selected_file):
 		drawing.load_drawing_subset(load_from_sheet_selected_file, sheet_dialogue_input_subset)
 		edited_file=load_from_sheet_selected_file
 		load_from_sheet_selected_file=""
