@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=3 uid="uid://c1lrlu14gilxb"]
+
+[ext_resource type="Script" path="res://addons/scribbler/scribbler_load_dialog.gd" id="1_1k0cl"]
+
+[node name="load_dialogue" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1k0cl")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_right = 80.0
+offset_bottom = 31.0
+grow_horizontal = 2
+
+[node name="file" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/file"]
+layout_mode = 2
+text = "load from file in directory"
+
+[node name="from_file" type="Button" parent="VBoxContainer/file"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "yes"
+
+[node name="node" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/node"]
+layout_mode = 2
+text = "load from file of node texture"
+
+[node name="from_node" type="Button" parent="VBoxContainer/node"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "no"
+
+[node name="subregion" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/subregion"]
+layout_mode = 2
+text = "load a spritesheet subregion"
+
+[node name="load_sheet" type="Button" parent="VBoxContainer/subregion"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "no"

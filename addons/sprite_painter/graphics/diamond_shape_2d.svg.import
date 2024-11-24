@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvu6cpwymydsp"
-path="res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+uid="uid://drjoeyt7e6kwg"
+path="res://.godot/imported/diamond_shape_2d.svg-c7409b07122604b74671fded8f79cf9b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://icon.svg"
-dest_files=["res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"]
+source_file="res://addons/sprite_painter/graphics/diamond_shape_2d.svg"
+dest_files=["res://.godot/imported/diamond_shape_2d.svg-c7409b07122604b74671fded8f79cf9b.ctex"]
 
 [params]
 

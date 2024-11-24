@@ -1,24 +1,32 @@
-[gd_scene load_steps=5 format=3 uid="uid://j6n6a2bbxi3q"]
+[gd_scene load_steps=6 format=3 uid="uid://j6n6a2bbxi3q"]
 
 [ext_resource type="Texture2D" uid="uid://ssdg41ear40e" path="res://demo/background.png" id="1_cclwj"]
 [ext_resource type="Texture2D" uid="uid://b6rboh1w0xo2p" path="res://demo/player.png" id="2_vyfi7"]
 [ext_resource type="Texture2D" uid="uid://twuta6eb206t" path="res://demo/test.png" id="3_sc50a"]
 [ext_resource type="Texture2D" uid="uid://yuta0mt8a52t" path="res://demo/pirate.png" id="4_c03tx"]
+[ext_resource type="Texture2D" uid="uid://c61dxugy3i4gl" path="res://demo/sheet_32x32.png" id="5_wom0n"]
 
 [node name="Main" type="Node"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="player" type="Sprite2D" parent="."]
-position = Vector2(278, 138)
+position = Vector2(-271, 71)
 texture = ExtResource("2_vyfi7")
 
 [node name="background" type="Sprite2D" parent="."]
 texture = ExtResource("1_cclwj")
 
 [node name="test" type="Sprite2D" parent="."]
+position = Vector2(365, -11)
 texture = ExtResource("3_sc50a")
-region_enabled = true
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="pirate" type="Sprite2D" parent="."]
 texture = ExtResource("4_c03tx")
+
+[node name="empty" type="Sprite2D" parent="."]
+
+[node name="sheet" type="Sprite2D" parent="."]
+position = Vector2(-494, -167)
+scale = Vector2(8, 8)
+texture = ExtResource("5_wom0n")

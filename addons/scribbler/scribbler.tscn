@@ -1,8 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://cjo1xkdprrdcu"]
+[gd_scene load_steps=10 format=3 uid="uid://cjo1xkdprrdcu"]
 
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_drawing.gd" id="1_252d8"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_menu.gd" id="1_i8pdh"]
+[ext_resource type="PackedScene" uid="uid://c1lrlu14gilxb" path="res://addons/scribbler/scribbler_load_dialog.tscn" id="2_kd52g"]
 [ext_resource type="PackedScene" uid="uid://cl6vb28iyt4ed" path="res://addons/scribbler/scribbler_sheet_dialog.tscn" id="3_a7bbm"]
+[ext_resource type="PackedScene" uid="uid://duhonnrctesii" path="res://addons/scribbler/scribbler_save_dialog.tscn" id="3_sm0hq"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_canvas.gd" id="3_vlrdt"]
 [ext_resource type="PackedScene" uid="uid://csrs4ajsvdtjx" path="res://addons/scribbler/scribbler_resize_dialog.tscn" id="4_jpy6y"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_brush_indicator.gd" id="5_nmkps"]
@@ -28,6 +30,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_i8pdh")
+load_dialogue = ExtResource("2_kd52g")
+save_dialogue = ExtResource("3_sm0hq")
 resize_dialogue = ExtResource("4_jpy6y")
 sheet_dialogue = ExtResource("3_a7bbm")
 
@@ -153,20 +157,10 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "brush color"
 
-[node name="test" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "test"
-
 [node name="file_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 alignment = 1
-
-[node name="mode" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "edit files"
 
 [node name="load" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
 unique_name_in_owner = true
