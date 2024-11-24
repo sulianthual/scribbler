@@ -1,8 +1,7 @@
-- remove MODE: instead load and save windows decide the course of action more clearly
-- ability to do sprite sheets (load_from_sheet-> subdivision image, save_to_sheet->blit section)
+- load and save: works but very dirty with not all edge cases
+	->make a handle that persists between popups (one for each button) 
 - shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)
 - add replace color: current color replaces all of color below cursor
 - test if works when exporting game
+- remove detach: can already make floating
 - publish
-- not writing anymore wtf
-- remove detach: can already make floating lol

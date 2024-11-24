@@ -155,7 +155,7 @@ text = "just draw"
 [node name="brush_color" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "brush color"
+text = "color"
 
 [node name="file_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
 layout_mode = 2

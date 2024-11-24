@@ -12,15 +12,15 @@ extends Control
 @onready var preset_grid: GridContainer=%GridContainer
 
 ## multipliers and swap
-@onready var wx2: Button=%wx2
-@onready var hx2: Button=%hx2
-@onready var wx1p5: Button=%wx1p5
-@onready var hx1p5: Button=%hx1p5
+@onready var multby: Button=%multby
+@onready var dividby: Button=%dividby
+@onready var factx: SpinBox=%factx
+@onready var facty: SpinBox=%facty
 @onready var swap: Button=%swap
 
 enum SCALEMODE {STRETCH, CROP}
 signal scale_mode_changed(value: String)
-var scale_mode: SCALEMODE=SCALEMODE.STRETCH:
+var scale_mode: SCALEMODE=SCALEMODE.CROP:
 	set(value):
 		var prev_value: SCALEMODE=scale_mode
 		scale_mode=value
@@ -53,11 +53,16 @@ func update_scale_mode_button():
 		smode.text="mode: crop"
 
 func make_mults():
-	wx2.connect("pressed",multiply_pxpy.bind(2.0,1.0))
-	hx2.connect("pressed",multiply_pxpy.bind(1.0,2.0))
-	wx1p5.connect("pressed",multiply_pxpy.bind(1.5,1.0))
-	hx1p5.connect("pressed",multiply_pxpy.bind(1.0,1.5))
+	multby.connect("pressed",_on_multby_pressed)
+	dividby.connect("pressed",_on_dividby_pressed)
+	#dividby.connect("pressed",multiply_pxpy.bind(1.0,2.0))
+	#wx1p5.connect("pressed",multiply_pxpy.bind(1.5,1.0))
+	#hx1p5.connect("pressed",multiply_pxpy.bind(1.0,1.5))
 	swap.connect("pressed",swap_pxpy)
+func _on_multby_pressed():
+	multiply_pxpy(factx.value,facty.value)
+func _on_dividby_pressed():
+	multiply_pxpy(1.0/factx.value,1.0/facty.value)
 func multiply_pxpy(input_px_mult: float, input_py_mult: float):
 	px.value=px.value*input_px_mult
 	py.value=py.value*input_py_mult
@@ -77,6 +82,11 @@ func make_presets():
 	preset_list.append("128x128")
 	preset_list.append("256x256")
 	# med
+	preset_list.append("16x32")
+	preset_list.append("32x64")
+	preset_list.append("64x128")
+	preset_list.append("128x256")
+	preset_list.append("256x512")
 	#preset_list.append("512x512")
 	#preset_list.append("1024x1024")
 	# screens 16:9

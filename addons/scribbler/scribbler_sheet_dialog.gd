@@ -16,7 +16,9 @@ func _ready():
 	for i in [subx,suby,ix,iy]:
 		i.connect("value_changed",on_subset_changed)
 
-
+#func _input(event: InputEvent) -> void:
+	#if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		#pass
 ################################################
 ## CALLS
 
@@ -69,11 +71,11 @@ func update_grid():
 			img.set_pixel(i,img.get_height()-1, grid_color)# last
 		# selector (change color of grid)
 		for i in range(subset_rect_x,subset_rect_x+subset_rect_w-1):
-			for j in [subset_rect_y,subset_rect_y+subset_rect_h-1]:
-				img.set_pixel(i,j, grid_select_color)
+			img.set_pixel(i,subset_rect_y, grid_select_color)
+			img.set_pixel(i,subset_rect_y+subset_rect_h-1, grid_select_color)
 		for j in range(subset_rect_y,subset_rect_y+subset_rect_h-1):
-			for i in [subset_rect_x,subset_rect_x+subset_rect_w-1]:
-				img.set_pixel(i,j, grid_select_color)
+			img.set_pixel(subset_rect_x,j, grid_select_color)
+			img.set_pixel(subset_rect_x+subset_rect_w-1,j, grid_select_color)
 		# texture
 		var _texture: ImageTexture=ImageTexture.create_from_image(img)
 		grid_image.texture=_texture

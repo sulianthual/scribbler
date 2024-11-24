@@ -58,36 +58,42 @@ select_all_on_focus = true
 [node name="scale_mode" type="Button" parent="VBoxContainer/setup"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "mode: stretch"
+text = "mode: crop"
 
 [node name="modifiers" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
+[node name="factx" type="SpinBox" parent="VBoxContainer/modifiers"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+select_all_on_focus = true
+
+[node name="facty" type="SpinBox" parent="VBoxContainer/modifiers"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+select_all_on_focus = true
+
+[node name="multby" type="Button" parent="VBoxContainer/modifiers"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "multiply"
+
+[node name="dividby" type="Button" parent="VBoxContainer/modifiers"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "divide"
+
 [node name="swap" type="Button" parent="VBoxContainer/modifiers"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "swap"
-
-[node name="wx2" type="Button" parent="VBoxContainer/modifiers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "scale 2:1"
-
-[node name="hx2" type="Button" parent="VBoxContainer/modifiers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "scale 1:2"
-
-[node name="wx1p5" type="Button" parent="VBoxContainer/modifiers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "scale 1.5:1"
-
-[node name="hx1p5" type="Button" parent="VBoxContainer/modifiers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "scale 1:1.5"
 
 [node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
 unique_name_in_owner = true

@@ -12,10 +12,20 @@ func _ready() -> void:
 	from_node.connect("pressed",_on_from_node_pressed)
 	save_sheet.connect("pressed",_on_save_sheet_pressed)
 	
+var as_node: bool=false
 func _on_from_file_pressed():
-	pass
+	as_node=false
+	as_node_update()
 func _on_from_node_pressed():
-	pass
+	as_node=true
+	as_node_update()
+func as_node_update():
+	if as_node:
+		from_file.text="no"
+		from_node.text="yes"
+	else:
+		from_file.text="yes"
+		from_node.text="no"
 	
 var as_sheet: bool=false
 func _on_save_sheet_pressed():

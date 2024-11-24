@@ -156,6 +156,7 @@ func _on_new_pressed():
 ###
 ## LOAD FROM FILE
 var load_dialog: Control
+var load_as_sheet: bool=false
 func _on_load_pressed():
 	load_dialog=_loadpick_dialogue()
 func _loadpick_dialogue():
@@ -170,6 +171,7 @@ func _loadpick_dialogue():
 	file_dialogue.popup()
 	return _dialogue#file_dialogue
 func _on_loadpick_dialogue_confirmed():
+	load_as_sheet=load_dialog.as_sheet
 	if load_dialog.as_node:
 		_load_node()
 	else:
@@ -188,34 +190,26 @@ func _load_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 func _on_load_dialogue_file_loaded(input_file: String):
-	drawing.load_drawing(input_file)
+	if load_as_sheet:
+		_load_from_sheet_select_subset_dialogue(input_file)
+	else:
+		drawing.load_drawing(input_file)
 func _load_node():## get from selected node in Editor SceneView
 	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
 	if _node_valid(_selected_node):
 		var _texture=_selected_node.texture
 		if _texture_valid(_texture):
-			drawing.load_drawing(_texture.resource_path)
-			#_load_dialogue().set_current_path(_texture.resource_path)# doesnt work for no reason
-
+			if load_as_sheet:
+				_load_from_sheet_select_subset_dialogue(_texture.resource_path)
+			else:
+				drawing.load_drawing(_texture.resource_path)
+				#_load_dialogue().set_current_path(_texture.resource_path)# doesnt work for no reason
 ### LOAD SCRIBBLE FROM SHEET
 var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
 var load_from_sheet_selected_file: String# pass selected file
-func _load_from_sheet_select_file_dialogue():
-	var file_dialogue = EditorFileDialog.new()
-	file_dialogue.clear_filters()
-	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
-	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
-	file_dialogue.filters = ["*.png ; PNG File"]
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("file_selected", _on_load_from_sheet_select_file_file_selected)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_load_from_sheet_select_file_file_selected(input_file: String):
-	load_from_sheet_selected_file=input_file# keep for later dialogue
-	_load_from_sheet_select_subset_dialogue(input_file)
 func _load_from_sheet_select_subset_dialogue(input_file: String):
+	sheet_dialogue_input_subset=[1,1,1,1]
+	load_from_sheet_selected_file=input_file
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Select Sheet Subset"
@@ -237,13 +231,45 @@ func _on_load_from_sheet_dialogue_confirmed():
 #########################################################################################
 ## SAVE TO FILE
 
+
+
+
 enum MODE {FILE,NODE}
 var mode: MODE=MODE.FILE
+var save_dialog: Control
+var save_as_sheet: bool=false
 func _on_save_pressed():
-	if mode==MODE.FILE:
-		_save_dialogue()
-	elif mode==MODE.NODE:
+	save_dialog=_savepick_dialogue()
+func _savepick_dialogue():
+	var file_dialogue = AcceptDialog.new()
+	file_dialogue.set_size(Vector2(320, 180))
+	file_dialogue.title="Save Scribble"
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_savepick_dialogue_confirmed)
+	var _dialogue: Control=save_dialogue.instantiate()
+	file_dialogue.add_child(_dialogue)
+	file_dialogue.popup()
+	return _dialogue#file_dialogue
+func _on_savepick_dialogue_confirmed():
+	save_as_sheet=save_dialog.as_sheet
+	if save_dialog.as_node:
+		mode=MODE.FILE
 		_save_node()
+	else:
+		mode=MODE.NODE
+		_save_dialogue()
+	save_dialog=null
+
+func _save_node():## save to selected node in Editor SceneView
+	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
+	if _node_valid(_selected_node):
+		var _texture=_selected_node.texture
+		if _texture==null:# empty, fill in
+			_save_dialogue().set_current_file(_selected_node.name.to_lower()+".png")
+		else:# existing, use save dialogue
+			if _texture_valid(_texture):
+				_save_dialogue().set_current_path(_texture.resource_path)
 func _save_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
@@ -257,19 +283,12 @@ func _save_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 func _on_save_dialogue_file_selected(input_file: String):
-	drawing.save_drawing(input_file)
-	#drawing.save_drawing_subset(input_file, 2, 2, 1, 1)
-	_apply_saved_image_to_empty_node_texture(input_file)
-	_rescan_filesystem()
-func _save_node():## save to selected node in Editor SceneView
-	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
-	if _node_valid(_selected_node):
-		var _texture=_selected_node.texture
-		if _texture==null:# empty, fill in
-			_save_dialogue().set_current_file(_selected_node.name.to_lower()+".png")
-		else:# existing, use save dialogue
-			if _texture_valid(_texture):
-				_save_dialogue().set_current_path(_texture.resource_path)
+	if save_as_sheet:
+		_save_from_sheet_select_subset_dialogue(input_file)
+	else:
+		drawing.save_drawing(input_file)
+		_apply_saved_image_to_empty_node_texture(input_file)
+		_rescan_filesystem()
 func _apply_saved_image_to_empty_node_texture(input_file: String):
 	if mode==MODE.NODE:# if node selected has empty texture, update it with saved file
 		var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
@@ -281,28 +300,11 @@ func _apply_saved_image_to_empty_node_texture(input_file: String):
 				#-> Beware, for large image resource may not be written yet
 				if ResourceLoader.exists(input_file):
 					_selected_node.texture=ResourceLoader.load(input_file)
-
-
-
-
 ## SAVE SCRIBBLE TO SHEET
 var save_from_sheet_selected_file: String# pass selected file
-func _save_from_sheet_select_file_dialogue():
-	var file_dialogue = EditorFileDialog.new()
-	file_dialogue.clear_filters()
-	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_SAVE_FILE
-	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
-	file_dialogue.filters = ["*.png ; PNG File"]
-	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("file_selected", _on_save_from_sheet_select_file_file_selected)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_save_from_sheet_select_file_file_selected(input_file: String):
-	save_from_sheet_selected_file=input_file# keep for later dialogue
-	_save_from_sheet_select_subset_dialogue(input_file)
 func _save_from_sheet_select_subset_dialogue(input_file: String):
+	sheet_dialogue_input_subset=[1,1,1,1]
+	save_from_sheet_selected_file=input_file
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Select Sheet Subset"
@@ -318,11 +320,10 @@ func _save_from_sheet_select_subset_dialogue(input_file: String):
 func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
 	sheet_dialogue_input_subset=input_subset
 func _on_save_from_sheet_dialogue_confirmed():
-	#print("saving test")
 	if save_from_sheet_selected_file:
 		drawing.save_drawing_subset(save_from_sheet_selected_file,sheet_dialogue_input_subset)
-		## TODO: subset might not match source image correctly
 		save_from_sheet_selected_file=""
+		_apply_saved_image_to_empty_node_texture(save_from_sheet_selected_file)
 		_rescan_filesystem()
 
 
@@ -378,12 +379,13 @@ func _update_draw_mode():
 		draw_mode_button.set_text("just draw")
 
 ## RESIZE DRAWING (POPUP)
-var resize_mode: String="stretch"
+var resize_mode: String="crop"
 func _on_resize_pressed():
 	_resize_dialogue()
 func _resize_dialogue():
+	resize_mode="crop"
 	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(320, 180))
+	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Resize Scribble"
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)
@@ -450,32 +452,33 @@ func _help_dialogue():
 	var file_dialogue = AcceptDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Help"
-	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2):
+	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2): \
+	Make basic drawings without leaving the editor, useful for prototyping. \
+	Disclaimer: this plugin is buggy.  
 	
-	With Scribbler you make basic drawings without leaving the editor, ideal for prototyping. \
+	Controls:
 	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. \
 	Brush is indicated in top left corner, and scribble dimensions (in pixels) in top right.
 	
+	Buttons:
 	x: minimize/expand menu
 	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
 	help: show help
-	
 	undo: undo last stroke (only 10 undos allowed)
 	clear: clear the scribble
-	resize: resize the scribble (choose new width and height in pixels, and the mode)
-	
-	if DRAW==just draw: draw normally.
-	if DRAW==draw behind: draw behind existing strokes (noticeable if using a different brush color).
-	if DRAW==draw over: draw only over existing strokes (typically using a different brush color).
-	brush color: pick a new brush color
-	
-	if MODE==edit files: scribble loads from and saves to PNG files in res://.
-	if MODE==edit nodes: scribble loads from node selected in Scene View, from node.texture**.
-	   Saving scribble generates a new node.texture if it is empty.
-	   **Only if node.texture is ImageTexture or CompressedTexture2D, and has PNG in resource_path.
-	load: generate scribble from existing PNG file (see MODE).
-	save: save scribble to an existing or new PNG file (see MODE).
+	resize: resize the scribble (choose new width and height in pixels, and resize mode)
+	just draw: draw normally, behind existing strokes or over existing strokes.
+	color: pick a new brush color
+	load: generate scribble from existing PNG file in res://.
+	save: save scribble to an existing or new PNG file in res://.
 	new: new scribble.
+	
+	Load/Save Options:
+	Use Node Texture: load/save node.texture from node selected in Scene View, if applicable**. 
+	Use Sheet Subregion: load/save subset of PNG file (useful for sprite sheets).
+	**node.texture must be ImageTexture or CompressedTexture2D, and have a PNG in resource_path.\
+	Saving scribble generates a new node.texture if it is empty.
+	
 	"""
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)
