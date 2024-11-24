@@ -1,5 +1,9 @@
 - load and save: works but very dirty with not all edge cases
 	->make a handle that persists between popups (one for each button) 
+- do the drag and drop system: all possible edge cases (PNG files)
+	-> should hold the file.png of loaded so we just propose to overwrite it
+	-> ability to load as spritesheet by drag and drop (?)
+	-> or just load entire sheet, then select subregion
 - shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)
 - add replace color: current color replaces all of color below cursor
 - test if works when exporting game

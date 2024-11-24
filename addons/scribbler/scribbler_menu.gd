@@ -146,6 +146,7 @@ func _help_dialogue():
 	Controls:
 	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. \
 	Brush is indicated in top left corner, and scribble dimensions (in pixels) in top right.
+	Drag and drop files or textures to the window (PNG only).
 	
 	Buttons:
 	x: minimize/expand menu
@@ -277,10 +278,13 @@ func _on_new_pressed():
 
 ###
 ## LOAD FROM FILE
-var load_dialog: Control
+#var load_dialog: Control## TODO: dirty to hold this if popup closed, use signals
+var load_as_node: bool=false
 var load_as_sheet: bool=false
 func _on_load_pressed():
-	load_dialog=_loadpick_dialogue()
+	load_as_node=false
+	load_as_sheet=false
+	_loadpick_dialogue()
 func _loadpick_dialogue():
 	var file_dialogue = AcceptDialog.new()
 	file_dialogue.set_size(Vector2(320, 180))
@@ -289,16 +293,20 @@ func _loadpick_dialogue():
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.connect("confirmed",_on_loadpick_dialogue_confirmed)
 	var _dialogue: Control=load_dialogue.instantiate()
+	_dialogue.connect("as_node_changed",_on_loadpick_dialogue_as_node_changed)
+	_dialogue.connect("as_sheet_changed",_on_loadpick_dialogue_as_sheet_changed)
 	file_dialogue.add_child(_dialogue)
 	file_dialogue.popup()
-	return _dialogue#file_dialogue
+	return file_dialogue
+func _on_loadpick_dialogue_as_node_changed(value: bool):
+	load_as_node=value
+func _on_loadpick_dialogue_as_sheet_changed(value: bool):
+	load_as_sheet=value
 func _on_loadpick_dialogue_confirmed():
-	load_as_sheet=load_dialog.as_sheet
-	if load_dialog.as_node:
+	if load_as_node:
 		_load_node()
 	else:
 		_load_dialogue()
-	load_dialog=null
 func _load_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
@@ -355,10 +363,12 @@ func _on_load_from_sheet_dialogue_confirmed():
 
 enum MODE {FILE,NODE}
 var mode: MODE=MODE.FILE
-var save_dialog: Control
+var save_as_node: bool=false
 var save_as_sheet: bool=false
 func _on_save_pressed():
-	save_dialog=_savepick_dialogue()
+	save_as_node=false
+	save_as_sheet=false
+	_savepick_dialogue()
 func _savepick_dialogue():
 	var file_dialogue = AcceptDialog.new()
 	file_dialogue.set_size(Vector2(320, 180))
@@ -367,19 +377,22 @@ func _savepick_dialogue():
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.connect("confirmed",_on_savepick_dialogue_confirmed)
 	var _dialogue: Control=save_dialogue.instantiate()
+	_dialogue.connect("as_node_changed",_on_savepick_dialogue_as_node_changed)
+	_dialogue.connect("as_sheet_changed",_on_savepick_dialogue_as_sheet_changed)
 	file_dialogue.add_child(_dialogue)
 	file_dialogue.popup()
-	return _dialogue#file_dialogue
+	return file_dialogue
+func _on_savepick_dialogue_as_node_changed(value: bool):
+	save_as_node=value
+func _on_savepick_dialogue_as_sheet_changed(value: bool):
+	save_as_sheet=value
 func _on_savepick_dialogue_confirmed():
-	save_as_sheet=save_dialog.as_sheet
-	if save_dialog.as_node:
+	if save_as_node:
 		mode=MODE.FILE
 		_save_node()
 	else:
 		mode=MODE.NODE
 		_save_dialogue()
-	save_dialog=null
-
 func _save_node():## save to selected node in Editor SceneView
 	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
 	if _node_valid(_selected_node):
