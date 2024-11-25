@@ -43,6 +43,7 @@ extends Control
 @onready var new: Button = %new# new drawing
 @onready var load: Button = %load# load drawing
 @onready var save: Button = %save# save drawing
+@onready var as_sheet_button: Button = %as_sheet# save drawing
 ## edit
 @onready var undo: Button=%undo# update image size
 @onready var clear: Button = %clear# clear drawing (same as new drawing)
@@ -55,6 +56,7 @@ extends Control
 
 func _ready():
 	## drawer
+	drawing.connect("data_dropped",_on_drawing_data_dropped)
 	drawing.connect("px_changed",_on_drawing_px_changed)
 	drawing.connect("py_changed",_on_drawing_py_changed)
 	drawing.connect("mouse_entered",drawing.activate)
@@ -65,6 +67,7 @@ func _ready():
 	new.connect("pressed",_on_new_pressed)
 	save.connect("pressed",_on_save_pressed)
 	load.connect("pressed",_on_load_pressed)
+	as_sheet_button.connect("pressed",_on_as_sheet_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
 	detach.connect("pressed",_on_detach_pressed)
@@ -78,6 +81,7 @@ func _ready():
 	_update_draw_mode()
 	_update_hiding_buttons()
 	_update_image_size_label()
+	_update_as_sheet_button()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
@@ -96,6 +100,9 @@ func _on_drawing_py_changed(input_py: int):## SIGNAL FROM DRAWING
 func _update_image_size_label():
 	image_size_label.text=str(px)+"x"+str(py)
 	
+func _on_drawing_data_dropped(_filename: String):
+	if ResourceLoader.exists(_filename):
+		load_selected(_filename)
 ################################################################
 ## MENU
 
@@ -278,6 +285,16 @@ func _on_brush_color_dialogue_confirmed():
 ################################################################
 ## FILE
 
+## USE SHEETS OR NOT
+var as_sheet: bool=false# use sheet for loading/saving
+func _on_as_sheet_pressed():
+	as_sheet=not as_sheet
+	_update_as_sheet_button()
+func _update_as_sheet_button():
+	if as_sheet:
+		as_sheet_button.text="sheet: on"
+	else:
+		as_sheet_button.text="sheet: off"
 ## NEW DRAWING
 func _on_new_pressed():
 	drawing.new_drawing(px,py)
@@ -285,7 +302,7 @@ func _on_new_pressed():
 
 ###
 ## LOAD FROM FILE
-var load_as_sheet: bool=false
+
 func _on_load_pressed():
 	_load_dialogue()
 func _load_dialogue():
@@ -303,7 +320,7 @@ func _load_dialogue():
 func _on_load_dialogue_file_loaded(input_file: String):
 	load_selected(input_file)
 func load_selected(input_file: String):
-	if load_as_sheet:
+	if as_sheet:
 		_load_from_sheet_select_subset_dialogue(input_file)
 	else:
 		drawing.load_drawing(input_file)

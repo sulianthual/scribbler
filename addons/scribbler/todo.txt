@@ -5,6 +5,8 @@
 	-> also show current file in drawing window above dimensions
 	-> ability to load as spritesheet by drag and drop (?)
 	-> or just load entire sheet, then select subregion
+- sheet: keep full image (source_image) in menu, and img in drawing is subregion
+	->sheet button picks subregion of sheet to edit
 - shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)
 - add replace color: current color replaces all of color below cursor
 - test if works when exporting game

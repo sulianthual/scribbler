@@ -57,9 +57,32 @@ func _postready():
 	pass
 
 
+###############################################################################
+## DROP DATA 
+## Rq: drawing node must drop data/ as it is the one having mouse control
 
+func _can_drop_data(position, data):
+	#print("_can_drop_data: ",data)
+	if typeof(data) == TYPE_DICTIONARY:
+		if data.type=="files" and data.files[0].get_extension()=="png":
+			return true
+		if data.type=="resource" and data.resource.resource_path and data.resource.resource_path.get_extension()=="png":
+			return true
+	return false
+	
+signal data_dropped(value: String)# return the png file
+func _drop_data(position, data):
+	#print("_drop_data: ",data)
+	if typeof(data) == TYPE_DICTIONARY:
+		if data.type=="files" and data.files[0].get_extension()=="png":
+			#load_drawing(data.files[0])# if PNG
+			data_dropped.emit(data.files[0])# let menu handle loading
+		elif data.type=="resource" and data.resource.resource_path and data.resource.resource_path.get_extension()=="png":
+			#load_drawing(data.resource.resource_path)
+			data_dropped.emit(data.resource.resource_path)
 
-
+#func _get_drag_data(at_position):
+	#return ImageTexture.create_from_image(img)# ->not working
 ###############################################################################
 ## FILES
 

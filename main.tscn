@@ -27,7 +27,6 @@ animations = [{
 
 [node name="player" type="Sprite2D" parent="."]
 position = Vector2(-271, 71)
-texture = ExtResource("2_vyfi7")
 
 [node name="background" type="Sprite2D" parent="."]
 texture = ExtResource("1_cclwj")
