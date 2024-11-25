@@ -1,6 +1,3 @@
-- drag from to other texture?
-- right click: undo, and eraser as mode
-- shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)?
-- add replace color: current color replaces all of color below cursor
+- small buttons for pen, eraser, bucket (and maybe draw over/draw behind)
 - test if works when exporting game
 - publish

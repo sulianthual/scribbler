@@ -48,8 +48,13 @@ extends Control
 ## edit
 @onready var clear: Button = %clear# clear drawing (same as new drawing)
 @onready var resize: Button=%resize# update image size
-## drawing settings
-@onready var draw_mode_button: Button=%draw_mode
+## drawing tools
+@onready var pen_button: Button=%pen
+@onready var pen_black_button: Button=%pen_black
+@onready var eraser_button: Button=%eraser
+@onready var bucket_button: Button=%bucket
+@onready var pen_behind_button: Button=%pen_behind
+@onready var pen_over_button: Button=%pen_over
 @onready var brush_color_button: Button=%brush_color
 ## test
 #@onready var test: Button=%test
@@ -71,7 +76,12 @@ func _ready():
 	help.connect("pressed",_on_help_pressed)
 	detach.connect("pressed",_on_detach_pressed)
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
-	draw_mode_button.connect("pressed",_on_draw_mode_pressed)
+	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
+	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
+	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
+	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
+	pen_over_button.connect("pressed",_on_draw_mode_pressed.bind("pen_over"))
+	pen_behind_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behind"))
 	hide_button.connect("pressed",_on_hide_pressed)
 	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
 	#test.connect("pressed",_on_test_pressed)
@@ -81,6 +91,7 @@ func _ready():
 	_update_hiding_buttons()
 	_update_image_size_label()
 	update_detach_button()
+	make_brush_color()
 	## deferred
 	_postready.call_deferred()
 	
@@ -113,7 +124,8 @@ func _on_hide_pressed():
 	_update_hiding_buttons()
 func _update_hiding_buttons():
 	# removed detach
-	for i in [new,clear,save,load,resize,help,brush_color_button,draw_mode_button,as_sheet_button,drag]:
+	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
+	pen_black_button,pen_button,eraser_button,bucket_button,pen_over_button,pen_behind_button,brush_color_button]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -171,12 +183,20 @@ func _help_dialogue():
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
 	Drag the edited image (must be saved on disk) from "drag file" then drop it to any texture to apply it.
 		
+	Tools:
+	black pen: paint with separate black pen (good for doing outlines)
+	pen: paint with color pen
+	eraser: erase
+	bucket: bucket fill
+	paint behind: paint only behind existing strokes.
+	paint over non-black: paint only over existing strokes, excluding black (good for filling within outlines).
+	pen behind existing strokes or over existing strokes.
+	pen color: pick a new pen color
+	
 	Buttons:
 	drag file: Drag the PNG file saved on disk.
 	detach: detach the Scribbler dock to a popup window. 
 	x: minimize/expand menu
-	pen: cycle drawing with pen, eraser, pen behind existing strokes or over existing strokes.
-	brush color: pick a new brush color
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
@@ -184,7 +204,6 @@ func _help_dialogue():
 	save: save scribble to an existing or new PNG file in res://.
 	new: new scribble.
 	help: show help
-	
 	
 	Warnings:
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin).
@@ -244,34 +263,32 @@ func _on_resize_dialogue_confirmed():
 ## CHANGE DRAW MODE
 ## Draw mode (must match drawing.gd)
 var draw_mode: String="regular"
-func _on_draw_mode_pressed():
-	if draw_mode=="regular":
-		draw_mode="behind"
-	elif draw_mode=="behind":
-		draw_mode="over"
-	elif draw_mode=="over":
-		draw_mode="eraser"
-	elif draw_mode=="eraser":
-		draw_mode="bucket"
-	elif draw_mode=="bucket":
+func _on_draw_mode_pressed(input_tool: String):
+	if input_tool=="pen_black":
+		draw_mode="pen"
+		drawing.recolor_brush(Color.BLACK)
+	elif input_tool=="pen":
 		draw_mode="regular"
+		drawing.recolor_brush(brush_color)
+	elif input_tool=="eraser":
+		draw_mode="eraser"
+	elif input_tool=="bucket":
+		draw_mode="bucket"
+	elif input_tool=="pen_behind":
+		draw_mode="behind"
+	elif input_tool=="pen_over":
+		draw_mode="over"
 	_update_draw_mode()
 func _update_draw_mode():
-	drawing. set_draw_mode(draw_mode)
-	if draw_mode=="over":
-		draw_mode_button.set_text("draw over")
-	elif draw_mode=="behind":
-		draw_mode_button.set_text("draw behind")
-	elif draw_mode=="eraser":
-		draw_mode_button.set_text("eraser")
-	elif draw_mode=="bucket":
-		draw_mode_button.set_text("bucket")
-	else:
-		draw_mode_button.set_text("pen")
+	drawing.set_draw_mode(draw_mode)
+
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
 var brush_color: Color=Color.BLACK
+func make_brush_color():
+	drawing.recolor_brush(brush_color)
+	update_brush_color()
 func _on_brush_color_pressed():
 	_brush_color_dialogue()
 func _brush_color_dialogue():
@@ -297,8 +314,12 @@ func _brush_color_dialogue():
 	return file_dialogue
 func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
 	brush_color=input_color
+	update_brush_color()
 func _on_brush_color_dialogue_confirmed():
-	drawing.recolor_brush(brush_color)
+	drawing.recolor_brush(brush_color)# already in set get
+func update_brush_color():
+	if brush_color_button:
+		brush_color_button.modulate=brush_color
 	
 ################################################################
 ## FILE
@@ -307,11 +328,6 @@ func _on_brush_color_dialogue_confirmed():
 var as_sheet: bool=false# use sheet for loading/saving
 func _on_as_sheet_toggled(toggle_on: bool):
 	as_sheet=toggle_on
-#func _update_as_sheet_button():
-	#if as_sheet:
-		#as_sheet_button.text="sheet: on"
-	#else:
-		#as_sheet_button.text="sheet: off"
 ## NEW DRAWING
 func _on_new_pressed():
 	drawing.new_drawing(px,py)
@@ -446,8 +462,3 @@ func _texture_valid(input_texture: Texture2D):
 
 ################################################################
 ################################################################
-
-	
-## 
-func _on_test_pressed():
-	pass

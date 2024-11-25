@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cb05bmpvrlqr1"
-path="res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+uid="uid://dmtwcy1t5n0l0"
+path="res://.godot/imported/scribbler_pen_behind.svg-c3377cb0c3fbcdc4089877f532ce7cc7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://icon.svg"
-dest_files=["res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"]
+source_file="res://addons/scribbler/icons/scribbler_pen_behind.svg"
+dest_files=["res://.godot/imported/scribbler_pen_behind.svg-c3377cb0c3fbcdc4089877f532ce7cc7.ctex"]
 
 [params]
 

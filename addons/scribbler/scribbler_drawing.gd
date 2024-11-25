@@ -36,6 +36,7 @@ const brush_resize_rate: float=1.03# rate of increase/decrease of brush size
 var brush_img_base: Image=Image.new()# base brush
 var brush_img: Image=Image.new()# image for brush
 var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
+var black_pen_img: Image=Image.new()# image for black pen (brush_img with black)
 var brush_scaling: float=1.0# brush scaling respective to size start
 var brush_color: Color=Color.BLACK# Brush color (at ready)
 const brush_line_step_ratio: float=0.25# draw line skiping brush_size*ratio (high=performance gain but possible gaps)
@@ -258,6 +259,7 @@ func resize_brush(input_brush_scaling: float):## CALLS FROM SCRIBBLER
 	brush_scaling_changed.emit()
 	recolor_brush(brush_color)
 	eraser_from_brush()
+	black_pen_from_brush()
 
 func recolor_brush(input_color: Color):
 	brush_color=input_color
@@ -268,6 +270,9 @@ func recolor_brush(input_color: Color):
 func eraser_from_brush():
 	eraser_img.copy_from(brush_img)
 	eraser_img.fill(Color.TRANSPARENT)
+
+func black_pen_from_brush():## Rq: not used in Scribble Menu
+	black_pen_img=_swap_color_nontransparent(brush_img,Color.BLACK)
 	
 
 ###############################################################################
@@ -306,32 +311,44 @@ var draw_over: bool=false# draw over existing
 var draw_behind: bool=false# draw behind existing
 var draw_erase: bool=false# erase instead of drawing
 var draw_bucket: bool=false# do the bucket fill
+var draw_blackpen: bool=false# draw with a separate black pen
 func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 	if input_draw_mode=="regular":
 		draw_over=false
 		draw_behind=false
 		draw_erase=false
 		draw_bucket=false
+		draw_blackpen=false
+	elif input_draw_mode=="black_pen":
+		draw_over=false
+		draw_behind=false
+		draw_erase=false
+		draw_bucket=false
+		draw_blackpen=true
 	elif input_draw_mode=="over":
 		draw_over=true
 		draw_behind=false
 		draw_erase=false
 		draw_bucket=false
+		draw_blackpen=false
 	elif input_draw_mode=="behind":
 		draw_over=false
 		draw_behind=true
 		draw_erase=false
 		draw_bucket=false
+		draw_blackpen=false
 	elif input_draw_mode=="eraser":
 		draw_over=false
 		draw_behind=false
 		draw_erase=true
 		draw_bucket=false
+		draw_blackpen=false
 	elif input_draw_mode=="bucket":
 		draw_over=false
 		draw_behind=false
 		draw_erase=false
 		draw_bucket=true
+		draw_blackpen=false
 
 ## INPUTS
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
@@ -404,11 +421,14 @@ func _draw_point():
 				elif draw_over:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
+					_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
 					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_erase:
 					img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_bucket:
 					flood_fill(ix+float(px)/2,iy+float(py/2))# beware will not work if not line_fill
+				elif draw_blackpen:
+					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				else:
 					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 			_last_ix=ix# record last drawn point position (as int!)
@@ -435,11 +455,14 @@ func _draw_point():
 					elif draw_over:
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
 						var _mask: Image=img.get_region(_region)
+						_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
 						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_erase:
 						img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_bucket:
 						pass
+					elif draw_blackpen:
+						img.blend_rect(black_pen_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					else:
 						img.blend_rect(brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 			_last_ix=ix# record last drawn point position (as int!)
