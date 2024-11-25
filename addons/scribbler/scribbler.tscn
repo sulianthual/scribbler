@@ -141,69 +141,71 @@ layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="scribbler_menu/VBoxContainer/button_container"]
 layout_mode = 2
+size_flags_horizontal = 4
 
 [node name="mode_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
 alignment = 1
 
 [node name="hide" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "x
 "
 
 [node name="detach" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "detach dock
 "
 
-[node name="help" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
+[node name="undo" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "help"
+size_flags_horizontal = 3
+text = "undo"
+
+[node name="brush_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="draw_mode" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "just draw"
+
+[node name="brush_color" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "brush color"
 
 [node name="edit_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
 alignment = 1
-
-[node name="undo" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "undo"
 
 [node name="clear" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "clear"
 
 [node name="resize" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "resize
 "
 
 [node name="as_sheet" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "sheet: off"
-
-[node name="brush_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-alignment = 1
-
-[node name="draw_mode" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "just draw"
-
-[node name="brush_color" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "color"
+size_flags_horizontal = 3
+toggle_mode = true
+text = "sheet"
 
 [node name="file_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
 layout_mode = 2
@@ -213,14 +215,23 @@ alignment = 1
 [node name="load" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "load"
 
 [node name="save" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "save"
 
 [node name="new" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "new"
+
+[node name="help" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "help"

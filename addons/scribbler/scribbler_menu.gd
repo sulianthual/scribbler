@@ -64,7 +64,6 @@ func _ready():
 	new.connect("pressed",_on_new_pressed)
 	save.connect("pressed",_on_save_pressed)
 	load.connect("pressed",_on_load_pressed)
-	as_sheet_button.connect("pressed",_on_as_sheet_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
 	detach.connect("pressed",_on_detach_pressed)
@@ -72,13 +71,13 @@ func _ready():
 	draw_mode_button.connect("pressed",_on_draw_mode_pressed)
 	undo.connect("pressed",_on_undo_pressed)
 	hide_button.connect("pressed",_on_hide_pressed)
+	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
 	#test.connect("pressed",_on_test_pressed)
 	## others
 	#_update_mode()
 	_update_draw_mode()
 	_update_hiding_buttons()
 	_update_image_size_label()
-	_update_as_sheet_button()
 	## deferred
 	_postready.call_deferred()
 func _postready()->void:
@@ -109,7 +108,7 @@ func _on_hide_pressed():
 	hiding_buttons=not hiding_buttons
 	_update_hiding_buttons()
 func _update_hiding_buttons():
-	for i in [new,clear,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo]:
+	for i in [new,clear,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo,as_sheet_button]:
 		i.visible=not hiding_buttons
 
 ## DETACH MENU (POPUP)
@@ -150,14 +149,15 @@ func _help_dialogue():
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Help"
 	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2): \
-	Make basic drawings without leaving the editor, useful for prototyping. \
-	Disclaimer: this plugin is buggy.  
+	Make basic drawings without leaving the editor, useful for prototyping.
 	
 	Controls:
-	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel. \
-	Brush is indicated in top left corner, and scribble dimensions (in pixels) in top right.
-	Drag and drop files or textures to the window (PNG only).
+	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel.
+	Brush is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
+	Drag and Drop (awesome!):
+	Drag and drop any file or texture to the window to load and edit their image (must be a PNG).
+		
 	Buttons:
 	x: minimize/expand menu
 	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
@@ -170,13 +170,11 @@ func _help_dialogue():
 	load: generate scribble from existing PNG file in res://.
 	save: save scribble to an existing or new PNG file in res://.
 	new: new scribble.
+	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
 	
-	Load/Save Options:
-	Use Node Texture: load/save node.texture from node selected in Scene View, if applicable**. 
-	Use Sheet Subregion: load/save subset of PNG file (useful for sprite sheets).
-	**node.texture must be ImageTexture or CompressedTexture2D, and have a PNG in resource_path.\
-	Saving scribble generates a new node.texture if it is empty.
-	
+	Notes:
+	You will get many warnings "Loaded resource as image file", its normal just ignore them.
+	The plugin may be buggy or inefficient for large files (I dunno), use with caution if editing nice assets.
 	"""
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)
@@ -286,14 +284,13 @@ func _on_brush_color_dialogue_confirmed():
 
 ## USE SHEETS OR NOT
 var as_sheet: bool=false# use sheet for loading/saving
-func _on_as_sheet_pressed():
-	as_sheet=not as_sheet
-	_update_as_sheet_button()
-func _update_as_sheet_button():
-	if as_sheet:
-		as_sheet_button.text="sheet: on"
-	else:
-		as_sheet_button.text="sheet: off"
+func _on_as_sheet_toggled(toggle_on: bool):
+	as_sheet=toggle_on
+#func _update_as_sheet_button():
+	#if as_sheet:
+		#as_sheet_button.text="sheet: on"
+	#else:
+		#as_sheet_button.text="sheet: off"
 ## NEW DRAWING
 func _on_new_pressed():
 	drawing.new_drawing(px,py)
