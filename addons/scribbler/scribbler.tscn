@@ -148,11 +148,11 @@ size_flags_horizontal = 4
 layout_mode = 2
 alignment = 1
 
-[node name="undo" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
+[node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-text = "undo"
+text = "drag file"
+script = ExtResource("8_4phrr")
 
 [node name="detach" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
@@ -167,12 +167,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "x
 "
-
-[node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "drag file"
-script = ExtResource("8_4phrr")
 
 [node name="brush_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
 layout_mode = 2

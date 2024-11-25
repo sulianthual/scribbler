@@ -46,7 +46,6 @@ extends Control
 @onready var save: Button = %save# save drawing
 @onready var as_sheet_button: Button = %as_sheet# save drawing
 ## edit
-@onready var undo: Button=%undo# update image size
 @onready var clear: Button = %clear# clear drawing (same as new drawing)
 @onready var resize: Button=%resize# update image size
 ## drawing settings
@@ -73,7 +72,6 @@ func _ready():
 	detach.connect("pressed",_on_detach_pressed)
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
 	draw_mode_button.connect("pressed",_on_draw_mode_pressed)
-	undo.connect("pressed",_on_undo_pressed)
 	hide_button.connect("pressed",_on_hide_pressed)
 	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
 	#test.connect("pressed",_on_test_pressed)
@@ -115,7 +113,7 @@ func _on_hide_pressed():
 	_update_hiding_buttons()
 func _update_hiding_buttons():
 	# removed detach
-	for i in [new,clear,save,load,resize,help,brush_color_button,draw_mode_button,undo,as_sheet_button]:
+	for i in [new,clear,save,load,resize,help,brush_color_button,draw_mode_button,as_sheet_button,drag]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -166,7 +164,7 @@ func _help_dialogue():
 	Make basic drawings without leaving the editor, useful for prototyping.
 	
 	Drawing Area:
-	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel.
+	Draw with left mouse, Undo with right mouse, Change brush size with mouse wheel.
 	Brush is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Drag and Drop:
@@ -181,7 +179,7 @@ func _help_dialogue():
 	undo: undo last stroke (only 10 undos allowed)
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
-	just draw: draw normally, behind existing strokes or over existing strokes.
+	draw button: draw with pen, eraser, behind existing strokes or over existing strokes.
 	color: pick a new brush color
 	load: generate scribble from existing PNG file in res://.
 	save: save scribble to an existing or new PNG file in res://.
@@ -201,8 +199,6 @@ func _help_dialogue():
 
 ################################################################
 ## DRAWING AND BRUSH
-func _on_undo_pressed():
-	drawing.undo()
 	
 ## CLEAR DRAWING
 func _on_clear_pressed():
@@ -254,6 +250,8 @@ func _on_draw_mode_pressed():
 	elif draw_mode=="behind":
 		draw_mode="over"
 	elif draw_mode=="over":
+		draw_mode="eraser"
+	elif draw_mode=="eraser":
 		draw_mode="regular"
 	_update_draw_mode()
 func _update_draw_mode():
@@ -262,8 +260,10 @@ func _update_draw_mode():
 		draw_mode_button.set_text("draw over")
 	elif draw_mode=="behind":
 		draw_mode_button.set_text("draw behind")
+	elif draw_mode=="eraser":
+		draw_mode_button.set_text("eraser")
 	else:
-		draw_mode_button.set_text("just draw")
+		draw_mode_button.set_text("pen")
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
