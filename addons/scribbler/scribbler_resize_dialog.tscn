@@ -19,6 +19,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="mode" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="scale_mode" type="Button" parent="VBoxContainer/mode"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "mode: crop from center"
+
 [node name="setup" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 alignment = 1
@@ -55,14 +65,19 @@ value = 256.0
 rounded = true
 select_all_on_focus = true
 
-[node name="scale_mode" type="Button" parent="VBoxContainer/setup"]
+[node name="ratio" type="Label" parent="VBoxContainer/setup"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "mode: crop"
+text = "sss"
 
 [node name="modifiers" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 alignment = 1
+
+[node name="multby" type="Button" parent="VBoxContainer/modifiers"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "multiply"
 
 [node name="factx" type="SpinBox" parent="VBoxContainer/modifiers"]
 unique_name_in_owner = true
@@ -79,11 +94,6 @@ min_value = 1.0
 value = 1.0
 rounded = true
 select_all_on_focus = true
-
-[node name="multby" type="Button" parent="VBoxContainer/modifiers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "multiply"
 
 [node name="dividby" type="Button" parent="VBoxContainer/modifiers"]
 unique_name_in_owner = true

@@ -194,11 +194,11 @@ func _on_clear_pressed():
 	drawing.clear_drawing()
 
 ## RESIZE DRAWING (POPUP)
-var resize_mode: String="crop"
+var resize_mode: String="crop_centered"
 func _on_resize_pressed():
 	_resize_dialogue()
 func _resize_dialogue():
-	resize_mode="crop"
+	resize_mode="crop_centered"
 	var file_dialogue = AcceptDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Resize Scribble"
@@ -224,8 +224,10 @@ func _on_resize_dialogue_resize_mode_changed(input_mode: String):## SIGNAL FROM 
 func _on_resize_dialogue_confirmed():
 	if resize_mode=="stretch":
 		drawing.rescale_drawing(px,py,Image.INTERPOLATE_NEAREST)
-	elif resize_mode=="crop":
-		drawing.resize_drawing(px,py)
+	elif resize_mode=="crop_centered":
+		drawing.crop_drawing_centered(px,py)
+	elif resize_mode=="crop_cornered":
+		drawing.crop_drawing_cornered(px,py)
 
 
 ## CHANGE DRAW MODE

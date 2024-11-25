@@ -175,7 +175,7 @@ func clear_drawing():
 	img.fill(back_color)
 	texture_from_img()
 	
-func resize_drawing(input_px: int,input_py: int):# crop mode
+func crop_drawing_centered(input_px: int,input_py: int):# crop to/expand from drawing center
 	save_img_to_undo_history()#-> save to history
 	var _last_img: Image=Image.new()# make image copy and blend to it
 	_last_img.copy_from(img)
@@ -189,6 +189,20 @@ func resize_drawing(input_px: int,input_py: int):# crop mode
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
 
+func crop_drawing_cornered(input_px: int,input_py: int):# crop to/expand from drawing top-left corner
+	save_img_to_undo_history()#-> save to history
+	var _last_img: Image=Image.new()# make image copy and blend to it
+	_last_img.copy_from(img)
+	px=input_px
+	py=input_py
+	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
+	img.convert(Image.FORMAT_RGBA8)
+	img.fill(back_color)
+	var ix: int=0#
+	var iy: int=0#
+	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
+	texture_from_img()
+	
 func rescale_drawing(input_px: int,input_py: int, interpolation_mode: Image.Interpolation):# stretch mode
 	save_img_to_undo_history()#-> save to history
 	px=input_px

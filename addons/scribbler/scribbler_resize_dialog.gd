@@ -7,6 +7,7 @@ extends Control
 @onready var px: SpinBox=%px
 @onready var py: SpinBox=%py
 @onready var smode: Button=%scale_mode
+@onready var ratio: Label=%ratio# info on the ratio
 
 ## preset buttons
 @onready var preset_grid: GridContainer=%GridContainer
@@ -18,39 +19,60 @@ extends Control
 @onready var facty: SpinBox=%facty
 @onready var swap: Button=%swap
 
-enum SCALEMODE {STRETCH, CROP}
+enum SCALEMODE {STRETCH, CROP_CENTERED,CROP_CORNERED}
 signal scale_mode_changed(value: String)
-var scale_mode: SCALEMODE=SCALEMODE.CROP:
+var scale_mode: SCALEMODE=SCALEMODE.CROP_CENTERED:
 	set(value):
 		var prev_value: SCALEMODE=scale_mode
 		scale_mode=value
 		if prev_value!=value:
 			if scale_mode==SCALEMODE.STRETCH:
 				scale_mode_changed.emit("stretch")
-			elif scale_mode==SCALEMODE.CROP:
-				scale_mode_changed.emit("crop")
+			elif scale_mode==SCALEMODE.CROP_CENTERED:
+				scale_mode_changed.emit("crop_centered")
+			elif scale_mode==SCALEMODE.CROP_CORNERED:
+				scale_mode_changed.emit("crop_cornered")
 
 func _ready():
 	make_mults()
 	make_presets()
 	make_scale_mode()
+	update_ratio()
+	px.connect("value_changed",_on_any_pxpy_changed)
+	py.connect("value_changed",_on_any_pxpy_changed)
 	
+func _on_any_pxpy_changed(value: float):
+	update_ratio()
+func update_ratio():
+	var _text: String
+	var _rounding: float=0.01
+	if px.value>py.value:
+		_text="ratio "+str(round(px.value/py.value/_rounding)*_rounding)+":1"
+	elif px.value<py.value:
+		_text="ratio 1:"+str(round(py.value/px.value/_rounding)*_rounding)
+	else:
+		_text="ratio 1:1"
+	ratio.text=_text
 func make_scale_mode():
 	smode.connect("pressed",change_scale_mode)
 	update_scale_mode_button()
 	
 signal resize_mode_changed(value:String)
 func change_scale_mode():
-	if scale_mode==SCALEMODE.STRETCH:
-		scale_mode=SCALEMODE.CROP
-	elif scale_mode==SCALEMODE.CROP:
+	if scale_mode==SCALEMODE.CROP_CENTERED:
+		scale_mode=SCALEMODE.CROP_CORNERED
+	elif scale_mode==SCALEMODE.CROP_CORNERED:
 		scale_mode=SCALEMODE.STRETCH
+	elif scale_mode==SCALEMODE.STRETCH:
+		scale_mode=SCALEMODE.CROP_CENTERED
 	update_scale_mode_button()
 func update_scale_mode_button():
 	if scale_mode==SCALEMODE.STRETCH:
-		smode.text="mode: stretch"
-	elif scale_mode==SCALEMODE.CROP:
-		smode.text="mode: crop"
+		smode.text="mode: stretch image"
+	elif scale_mode==SCALEMODE.CROP_CENTERED:
+		smode.text="mode: crop from center"
+	elif scale_mode==SCALEMODE.CROP_CORNERED:
+		smode.text="mode: crop from corner"
 
 func make_mults():
 	multby.connect("pressed",_on_multby_pressed)
