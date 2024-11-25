@@ -132,19 +132,27 @@ func load_drawing_subset(filename_: String, input_subset: Array[int]):## CALLS F
 		clear_undo_history()#-> clears all previous!
 
 func save_drawing_subset(filename_: String,input_subset: Array[int]):## CALLS FROM SCRIBBLER, subset=subx,suby,ix,iy
-	if FileAccess.file_exists(filename_):
+	var subx: int=input_subset[0]
+	var suby: int=input_subset[1]
+	var ix: int=input_subset[2]
+	var iy: int=input_subset[3]
+	if FileAccess.file_exists(filename_):# overwrite an existing file editing a subset
 		var source_img: Image=Image.new()
 		source_img.convert(Image.FORMAT_RGBA8)
 		source_img.load(filename_)
-		var subx: int=input_subset[0]
-		var suby: int=input_subset[1]
-		var ix: int=input_subset[2]
-		var iy: int=input_subset[3]
 		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
 		var img_rect: Rect2i=Rect2i(0,0,img.get_width(),img.get_height())
 		source_img.blit_rect(img,img_rect,subset_rect.position)
 		source_img.save_png(filename_)
-
+	else: # make a new file (transparent) and edit a subset	
+		var source_img: Image=Image.create(px*subx,py*suby,false, Image.FORMAT_RGBA8)
+		source_img.convert(Image.FORMAT_RGBA8)
+		source_img.fill(Color.TRANSPARENT)
+		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
+		var img_rect: Rect2i=Rect2i(0,0,img.get_width(),img.get_height())
+		source_img.blit_rect(img,img_rect,subset_rect.position)
+		source_img.save_png(filename_)
+		
 func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:int)->Rect2i:#->determine subset
 	# ix,iy are the coordinates and start at 1,1
 	var subset_rect_w: int=roundi(source_img.get_width()/subx)
@@ -153,6 +161,8 @@ func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:in
 	var subset_rect_y: int=subset_rect_h*clamp(iy-1,0,suby-1)
 	var subset_rect: Rect2i=Rect2i(subset_rect_x,subset_rect_y,subset_rect_w,subset_rect_h)
 	return subset_rect
+
+	
 ###############################################################################
 ## IMAGE AND TEXTURE
 

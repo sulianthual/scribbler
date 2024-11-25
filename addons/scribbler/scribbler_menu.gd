@@ -337,7 +337,7 @@ func _load_from_sheet_select_subset_dialogue(input_file: String):
 	_dialogue.connect("subset_changed",_on_load_from_sheet_dialogue_subset_changed)
 	file_dialogue.add_child(_dialogue)
 	_dialogue.set_subset(sheet_dialogue_input_subset)
-	_dialogue.make_source_image(input_file)
+	_dialogue.make(input_file,null)# make with null edited image
 	file_dialogue.popup()
 	return file_dialogue
 func _on_load_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
@@ -391,8 +391,7 @@ func _save_from_sheet_select_subset_dialogue(input_file: String):
 	_dialogue.connect("subset_changed",_on_save_from_sheet_dialogue_subset_changed)
 	file_dialogue.add_child(_dialogue)
 	_dialogue.set_subset(sheet_dialogue_input_subset)
-	_dialogue.make_source_image(input_file)
-	_dialogue.make_edited_image(drawing.get_image())
+	_dialogue.make(input_file,drawing.get_image())# make with edited image
 	file_dialogue.popup()
 	return file_dialogue
 func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy

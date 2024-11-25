@@ -18,6 +18,8 @@ signal subset_changed(value: Array[int])# array subx,suby,ix,iy
 var px: int# dimensions pixel of source image
 var py: int
 var edited_image: Image# edited image to overlay (for saving subset region)
+var make_from_edited: bool=false# source_image is determined as multiples of edited image
+# -> if saving a new source_image with edited image filling only a subregion
 
 func _ready():
 	for i in [subx,suby,ix,iy]:
@@ -27,15 +29,41 @@ func _ready():
 ################################################
 ## CALLS
 
+func on_subset_changed(input_value: float):# from any of subx,suby,ix,iy
+	if ix.value>subx.value:
+		ix.value=subx.value
+	if iy.value>suby.value:
+		iy.value=suby.value
+	#
+	var _array: Array[int]=[subx.value,suby.value,ix.value,iy.value]
+	subset_changed.emit(_array)
+	if make_from_edited:
+		make_empty_source_image_from_edited()
+	update_grid()# if/elif above will retrigger subset_changed and this
+	update_region_size()
+		
 func set_subset(input_subset: Array[int]):# subx,suby,ix,iy## CALLS SCRIBBLER OR SELF
 	subx.value=input_subset[0]
 	suby.value=input_subset[1]
 	ix.value=input_subset[2]
 	iy.value=input_subset[3]
 	update_region_size()
+	if make_from_edited:
+		make_empty_source_image_from_edited()
 	
+func make(source_image_filename: String, input_edited_image: Image):
+	make_edited_image(input_edited_image)# order of execution!
+	make_source_image(source_image_filename)
+func make_edited_image(input_image: Image):# must be called BEFORE making source image
+	if input_image:
+		edited_image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
+		edited_image.convert(Image.FORMAT_RGBA8)
+		edited_image.fill(Color.WHITE)# background to hide below
+		edited_image.blend_rect(input_image,Rect2i(0,0,input_image.get_width(),input_image.get_height()),Vector2(0,0))
+
 func make_source_image(filename_: String):## CALLS from scribbler
-	if FileAccess.file_exists(filename_):
+	if FileAccess.file_exists(filename_):# File exists: loading or saving over existing image
+		make_from_edited=false
 		var img: Image=Image.new()
 		img.load(filename_)
 		img.convert(Image.FORMAT_RGBA8)
@@ -47,13 +75,27 @@ func make_source_image(filename_: String):## CALLS from scribbler
 		image_label.text=filename_
 		update_grid()
 		update_region_size()
+	else:# File does not exist: saving a new source_image where edited image fills a portion
+		make_from_edited=true
+		make_empty_source_image_from_edited()
+		image_label.text=filename_
 
-func make_edited_image(input_image: Image):
-	edited_image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
-	edited_image.convert(Image.FORMAT_RGBA8)
-	edited_image.fill(Color.WHITE)# background to hide below
-	edited_image.blend_rect(input_image,Rect2i(0,0,input_image.get_width(),input_image.get_height()),Vector2(0,0))
+func make_empty_source_image_from_edited():
+	if edited_image:
+		px=edited_image.get_width()*subx.value
+		py=edited_image.get_height()*suby.value
+	else:
+		px=subx.value
+		py=suby.value
+	var img: Image=Image.create(px,py,false, Image.FORMAT_RGBA8)
+	img.convert(Image.FORMAT_RGBA8)
+	img.fill(Color.TRANSPARENT)
+	image_size.text=str(px)+"x"+str(py)
+	var _texture: ImageTexture=ImageTexture.create_from_image(img)
+	source_image.texture=_texture
 	update_grid()
+	update_region_size()
+
 ################################################
 ## METHODS
 
@@ -79,22 +121,6 @@ func _input(event: InputEvent) -> void:
 			set_subset([subx.value,suby.value,ic+1,jc+1])
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
-
-
-
-
-func on_subset_changed(input_value: float):# from any of subx,suby,ix,iy
-	if ix.value>subx.value:
-		ix.value=subx.value
-	elif iy.value>suby.value:
-		iy.value=suby.value
-	else:
-		var _array: Array[int]=[subx.value,suby.value,ix.value,iy.value]
-		subset_changed.emit(_array)
-		update_grid()# if/elif above will retrigger subset_changed and this
-		update_region_size()
-	
-
 
 var grid_color: Color=Color.BLACK
 var grid_select_color: Color=Color.RED
