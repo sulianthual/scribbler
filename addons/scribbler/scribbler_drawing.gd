@@ -208,36 +208,6 @@ func rescale_drawing(input_px: int,input_py: int, interpolation_mode: Image.Inte
 	texture_from_img()
 
 
-func _swap_color(input_image: Image,source_color: Color, new_color: Color):
-	var _new_img: Image=Image.new()
-	_new_img.convert(Image.FORMAT_RGBA8)
-	_new_img.copy_from(input_image)
-	for _iy in _new_img.get_height():
-		for _ix in _new_img.get_width():
-			if _new_img.get_pixel(_ix, _iy) == source_color:
-				_new_img.set_pixel(_ix, _iy, new_color)
-	return _new_img
-
-## swap anythin that ISNT transparent with new_color
-func _swap_color_nontransparent(input_image: Image,new_color: Color):
-	var _new_img: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
-	_new_img.convert(Image.FORMAT_RGBA8)
-	_new_img.fill(Color.TRANSPARENT)
-	var _cfill: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
-	_cfill.convert(Image.FORMAT_RGBA8)
-	_cfill.fill(new_color)
-	_new_img.blit_rect_mask(_cfill,input_image,Rect2(0,0,input_image.get_width(),input_image.get_height()),Vector2(0,0))
-	return _new_img
-
-## swap transparent and visible (transparent becomes white)->for making masks
-func _swap_transparent(input_image: Image)->Image:
-	var _new_img: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
-	_new_img.convert(Image.FORMAT_RGBA8)
-	_new_img.copy_from(input_image)
-	_new_img=_swap_color_nontransparent(_new_img,Color.RED)
-	_new_img=_swap_color(_new_img,Color.TRANSPARENT, Color.WHITE)
-	_new_img=_swap_color(_new_img,Color.RED, Color.TRANSPARENT)
-	return _new_img
 ###############################################################################
 ## BRUSH AND ERASER
 
@@ -274,7 +244,51 @@ func eraser_from_brush():
 func black_pen_from_brush():## Rq: not used in Scribble Menu
 	black_pen_img=_swap_color_nontransparent(brush_img,Color.BLACK)
 	
+## swap one color with another
+func _swap_color(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			if _new_img.get_pixel(_ix, _iy) == source_color:
+				_new_img.set_pixel(_ix, _iy, new_color)
+	return _new_img
 
+## swap anything that isnt source color with new_color
+func _swap_notcolor(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			if _new_img.get_pixel(_ix, _iy) != source_color:
+				_new_img.set_pixel(_ix, _iy, new_color)
+	return _new_img
+	
+## swap anythin that ISNT transparent with new_color
+func _swap_color_nontransparent(input_image: Image,new_color: Color):
+	var _new_img: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.fill(Color.TRANSPARENT)
+	var _cfill: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
+	_cfill.convert(Image.FORMAT_RGBA8)
+	_cfill.fill(new_color)
+	_new_img.blit_rect_mask(_cfill,input_image,Rect2(0,0,input_image.get_width(),input_image.get_height()),Vector2(0,0))
+	return _new_img
+	
+
+
+## swap transparent and visible (transparent becomes white)->for making masks
+func _swap_transparent(input_image: Image)->Image:
+	var _new_img: Image=Image.create(input_image.get_width(),input_image.get_height(),false, Image.FORMAT_RGBA8)
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	_new_img=_swap_color_nontransparent(_new_img,Color.RED)
+	_new_img=_swap_color(_new_img,Color.TRANSPARENT, Color.WHITE)
+	_new_img=_swap_color(_new_img,Color.RED, Color.TRANSPARENT)
+	return _new_img
+	
 ###############################################################################
 ## DRAWING
 
@@ -313,7 +327,6 @@ var draw_erase: bool=false# erase instead of drawing
 var draw_bucket: bool=false# do the bucket fill
 var draw_blackpen: bool=false# draw with a separate black pen
 var draw_behindblack: bool=false# draw on anything but black
-var draw_overfirst: bool=false# draw only over color under brush when starting stroke
 func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 	if input_draw_mode=="regular":
 		draw_over=false
@@ -322,15 +335,13 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_bucket=false
 		draw_blackpen=false
 		draw_behindblack=false
-		draw_overfirst=false
-	elif input_draw_mode=="black_pen":
+	elif input_draw_mode=="pen_black":
 		draw_over=false
 		draw_behind=false
 		draw_erase=false
 		draw_bucket=false
 		draw_blackpen=true
 		draw_behindblack=false
-		draw_overfirst=false
 	elif input_draw_mode=="behindblack":
 		draw_over=false
 		draw_behind=false
@@ -338,7 +349,6 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_bucket=false
 		draw_blackpen=false
 		draw_behindblack=true
-		draw_overfirst=false
 	elif input_draw_mode=="over":
 		draw_over=true
 		draw_behind=false
@@ -346,7 +356,6 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_bucket=false
 		draw_blackpen=false
 		draw_behindblack=false
-		draw_overfirst=false
 	elif input_draw_mode=="behind":
 		draw_over=false
 		draw_behind=true
@@ -354,7 +363,6 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_bucket=false
 		draw_blackpen=false
 		draw_behindblack=false
-		draw_overfirst=false
 	elif input_draw_mode=="eraser":
 		draw_over=false
 		draw_behind=false
@@ -362,7 +370,6 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_bucket=false
 		draw_blackpen=false
 		draw_behindblack=false
-		draw_overfirst=false
 	elif input_draw_mode=="bucket":
 		draw_over=false
 		draw_behind=false
@@ -370,15 +377,7 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_bucket=true
 		draw_blackpen=false
 		draw_behindblack=false
-		draw_overfirst=false
-	elif input_draw_mode=="over_first":
-		draw_over=false
-		draw_behind=false
-		draw_erase=false
-		draw_bucket=false
-		draw_blackpen=false
-		draw_behindblack=false
-		draw_overfirst=true
+
 
 ## INPUTS
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
@@ -421,6 +420,7 @@ var _last_ix: float# record last ix drawn for line filling (as float for accurac
 var _last_iy: float# record last ix drawn for line filling
 var _rect: Rect2# area of drawing rectangle (important)
 var color_at_first_point: Color# color of pixel under brush at first point
+var not_color_at_first_point: Color# any color that isnt color at first point
 func _draw_point():
 	var _mouse_pos: Vector2=get_global_mouse_position()
 	# determine drawing rectangle (must control for margins)
@@ -445,6 +445,7 @@ func _draw_point():
 			var offx: float=-float(brush_size)/2+float(px)/2# precompute
 			var offy: float=-float(brush_size)/2+float(py)/2
 			color_at_first_point=img.get_pixel(ix+float(px)/2,iy+float(py/2))
+			not_color_at_first_point=color_at_first_point.inverted()
 			if _drawing:
 				if draw_behind:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
@@ -454,12 +455,6 @@ func _draw_point():
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
 					_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
-					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
-				elif draw_overfirst:
-					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
-					var _mask: Image=img.get_region(_region)
-					_mask=_swap_color(_mask,Color.TRANSPARENT,Color.WHITE)# assume first color not white
-					_mask=_swap_color(_mask,color_at_first_point,Color.TRANSPARENT)# assume first color not white
 					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_behindblack:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
@@ -501,14 +496,6 @@ func _draw_point():
 						var _mask: Image=img.get_region(_region)
 						#_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
 						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
-						
-					elif draw_overfirst:
-						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
-						var _mask: Image=img.get_region(_region)
-						_mask=_swap_color(_mask,Color.TRANSPARENT,Color.WHITE)# assume first color not white
-						_mask=_swap_color(_mask,color_at_first_point,Color.TRANSPARENT)# assume first color not white
-						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
-						
 					elif draw_behindblack:
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
 						var _mask: Image=img.get_region(_region)# not optimized, should not reload mask constantly whatever

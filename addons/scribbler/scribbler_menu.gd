@@ -54,7 +54,6 @@ extends Control
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
-@onready var pen_overfirst_button: Button=%pen_overfirst# over first color only
 @onready var brush_color_button: Button=%brush_color
 ## test
 #@onready var test: Button=%test
@@ -78,7 +77,6 @@ func _ready():
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
 	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
 	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
-	pen_overfirst_button.connect("pressed",_on_draw_mode_pressed.bind("pen_overfirst"))
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
 	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behindblack"))
@@ -87,17 +85,19 @@ func _ready():
 	#test.connect("pressed",_on_test_pressed)
 	## others
 	#_update_mode()
-	_update_draw_mode()
 	_update_hiding_buttons()
 	_update_image_size_label()
 	update_detach_button()
 	make_brush_color()
+	_update_draw_mode()
+	
 	## deferred
 	_postready.call_deferred()
 	
 func _postready()->void:
 	parent_container=get_parent()# must know own parent to be able to detach
 	drawing.new_drawing(px,py)
+
 
 ################################################################
 ## DRAWING WINDOW
@@ -125,7 +125,7 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	# removed detach
 	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
-	pen_black_button,pen_button,pen_overfirst_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button]:
+	pen_black_button,pen_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -262,10 +262,10 @@ func _on_resize_dialogue_confirmed():
 #############################################################################################3
 ## TOOLS
 ## Draw mode (must match drawing.gd)
-var draw_mode: String="regular"
+var draw_mode: String="pen_black"
 func _on_draw_mode_pressed(input_tool: String):
 	if input_tool=="pen_black":
-		draw_mode="black_pen"
+		draw_mode="pen_black"
 		#drawing.recolor_brush(Color.BLACK)
 	elif input_tool=="pen":
 		draw_mode="regular"
@@ -276,8 +276,6 @@ func _on_draw_mode_pressed(input_tool: String):
 		draw_mode="bucket"
 	elif input_tool=="pen_behindblack":
 		draw_mode="behindblack"
-	elif input_tool=="pen_overfirst":
-		draw_mode="over_first"
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
@@ -285,7 +283,7 @@ func _update_draw_mode():
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
-var brush_color: Color=Color.BLACK
+var brush_color: Color=Color.WHITE
 var _brush_color_dialogue_color_selected: Color# may or may not apply
 func make_brush_color():
 	drawing.recolor_brush(brush_color)

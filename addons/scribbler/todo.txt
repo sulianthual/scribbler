@@ -1,3 +1,6 @@
 - small buttons for pen, eraser, bucket (and maybe draw over/draw behind)
 - test if works when exporting game
 - publish
+- start with brush color=white, and black pen
+- row of colors to"save" them
+- black pen has separate brush size
