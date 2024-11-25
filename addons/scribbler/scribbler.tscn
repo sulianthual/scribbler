@@ -11,7 +11,6 @@
 [ext_resource type="Texture2D" uid="uid://gqaej1qyluko" path="res://addons/scribbler/icons/scribbler_pen_black.svg" id="8_l8g4e"]
 [ext_resource type="Texture2D" uid="uid://wwtv4k638iyp" path="res://addons/scribbler/icons/scribbler_eraser.svg" id="9_yjipa"]
 [ext_resource type="Texture2D" uid="uid://ddyk1uemqtyc4" path="res://addons/scribbler/icons/scribbler_bucket.svg" id="10_6h7th"]
-[ext_resource type="Texture2D" uid="uid://dmtwcy1t5n0l0" path="res://addons/scribbler/icons/scribbler_pen_behind.svg" id="11_neot6"]
 [ext_resource type="Texture2D" uid="uid://fr42c52hofd" path="res://addons/scribbler/icons/scribbler_pen_over.svg" id="12_pu1ru"]
 
 [sub_resource type="Image" id="Image_olfin"]
@@ -55,6 +54,9 @@ image = SubResource("Image_ag54d")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r3yn6"]
 bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hqi5c"]
+bg_color = Color(0.455817, 0.455817, 0.455817, 1)
 
 [node name="Scribbler" type="Control"]
 layout_mode = 3
@@ -163,6 +165,11 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("8_l8g4e")
 
+[node name="pen_behindblack" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_icons/icon = ExtResource("12_pu1ru")
+
 [node name="pen" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -177,16 +184,6 @@ theme_override_icons/icon = ExtResource("9_yjipa")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("10_6h7th")
-
-[node name="pen_behind" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_icons/icon = ExtResource("11_neot6")
-
-[node name="pen_over" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_icons/icon = ExtResource("12_pu1ru")
 
 [node name="brush_color" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
 unique_name_in_owner = true
@@ -254,22 +251,25 @@ text = "help"
 layout_mode = 2
 alignment = 1
 
-[node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "drag file"
-script = ExtResource("8_4phrr")
-
 [node name="detach" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
 text = "detach"
+
+[node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "drag file"
+script = ExtResource("8_4phrr")
 
 [node name="hide" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
 text = "x
 "

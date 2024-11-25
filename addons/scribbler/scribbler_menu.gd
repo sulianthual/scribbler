@@ -53,8 +53,8 @@ extends Control
 @onready var pen_black_button: Button=%pen_black
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
-@onready var pen_behind_button: Button=%pen_behind
-@onready var pen_over_button: Button=%pen_over
+@onready var pen_behindblack_button: Button=%pen_behindblack# behind black
+#@onready var pen_over_button: Button=%pen_over# over anyt
 @onready var brush_color_button: Button=%brush_color
 ## test
 #@onready var test: Button=%test
@@ -80,8 +80,7 @@ func _ready():
 	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
-	pen_over_button.connect("pressed",_on_draw_mode_pressed.bind("pen_over"))
-	pen_behind_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behind"))
+	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behindblack"))
 	hide_button.connect("pressed",_on_hide_pressed)
 	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
 	#test.connect("pressed",_on_test_pressed)
@@ -125,7 +124,7 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	# removed detach
 	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
-	pen_black_button,pen_button,eraser_button,bucket_button,pen_over_button,pen_behind_button,brush_color_button]:
+	pen_black_button,pen_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -146,6 +145,7 @@ func _detach_dialogue():
 	file_dialogue.connect("close_requested",_reatach_dialogue)
 	#file_dialogue.set_flag(Window.Flags.FLAG_POPUP,true)
 	#file_dialogue.set_flag(Window.Flags.FLAG_BORDERLESS,true)
+	file_dialogue.set_mode(Window.MODE_MAXIMIZED)
 	file_dialogue.title="Scribbler"
 	file_dialogue.keep_title_visible=false
 	parent_container.remove_child(self)
@@ -183,15 +183,13 @@ func _help_dialogue():
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
 	Drag the edited image (must be saved on disk) from "drag file" then drop it to any texture to apply it.
 		
-	Tools:
-	black pen: paint with separate black pen (good for doing outlines)
-	pen: paint with color pen
+	Tools (tailored towards drawing black outlines+filling):
+	black pen: draw with dedicated black pen
+	brush behind black: paint with color but not over black strokes
+	brush: paint with color
 	eraser: erase
 	bucket: bucket fill
-	paint behind: paint only behind existing strokes.
-	paint over non-black: paint only over existing strokes, excluding black (good for filling within outlines).
-	pen behind existing strokes or over existing strokes.
-	pen color: pick a new pen color
+	color: pick a new brush color
 	
 	Buttons:
 	drag file: Drag the PNG file saved on disk.
@@ -259,25 +257,23 @@ func _on_resize_dialogue_confirmed():
 	elif resize_mode=="crop_cornered":
 		drawing.crop_drawing_cornered(px,py)
 
-
-## CHANGE DRAW MODE
+#############################################################################################3
+## TOOLS
 ## Draw mode (must match drawing.gd)
 var draw_mode: String="regular"
 func _on_draw_mode_pressed(input_tool: String):
 	if input_tool=="pen_black":
-		draw_mode="pen"
-		drawing.recolor_brush(Color.BLACK)
+		draw_mode="black_pen"
+		#drawing.recolor_brush(Color.BLACK)
 	elif input_tool=="pen":
 		draw_mode="regular"
-		drawing.recolor_brush(brush_color)
+		#drawing.recolor_brush(brush_color)
 	elif input_tool=="eraser":
 		draw_mode="eraser"
 	elif input_tool=="bucket":
 		draw_mode="bucket"
-	elif input_tool=="pen_behind":
-		draw_mode="behind"
-	elif input_tool=="pen_over":
-		draw_mode="over"
+	elif input_tool=="pen_behindblack":
+		draw_mode="behindblack"
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
@@ -286,13 +282,17 @@ func _update_draw_mode():
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
 var brush_color: Color=Color.BLACK
+var _brush_color_dialogue_color_selected: Color# may or may not apply
 func make_brush_color():
 	drawing.recolor_brush(brush_color)
 	update_brush_color()
+func update_brush_color():
+	if brush_color_button:
+		brush_color_button.modulate=brush_color
 func _on_brush_color_pressed():
 	_brush_color_dialogue()
 func _brush_color_dialogue():
-	var file_dialogue = AcceptDialog.new()
+	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(320, 180))
 	file_dialogue.title="Pick Brush Color"
 	file_dialogue.dialog_autowrap=true
@@ -307,19 +307,19 @@ func _brush_color_dialogue():
 	_dialog.color_modes_visible=false
 	_dialog.hex_visible=false
 	_dialog.presets_visible=false
-	_dialog.sampler_visible=false
+	_dialog.sampler_visible=true
 	_dialog.sliders_visible=true
 	file_dialogue.add_child(_dialog)
 	file_dialogue.popup()
 	return file_dialogue
 func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
-	brush_color=input_color
-	update_brush_color()
+	_brush_color_dialogue_color_selected=input_color
 func _on_brush_color_dialogue_confirmed():
-	drawing.recolor_brush(brush_color)# already in set get
-func update_brush_color():
-	if brush_color_button:
-		brush_color_button.modulate=brush_color
+	if _brush_color_dialogue_color_selected:
+		brush_color=_brush_color_dialogue_color_selected
+		drawing.recolor_brush(brush_color)# already in set get
+		update_brush_color()
+
 	
 ################################################################
 ## FILE
