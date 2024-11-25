@@ -10,6 +10,8 @@ extends Control
 		edited_file=value
 		if edited_file_label:
 			edited_file_label.text=edited_file
+		if drag:
+			drag.set_filename(edited_file)
 ## image width (pixels) (as controlled here instead of drawing)
 @export var px: int=256
 ## image height (pixels) (as controlled here instead of drawing)
@@ -31,6 +33,8 @@ extends Control
 @onready var drawing: TextureRect=%drawing
 @onready var image_size_label: Label=%image_size
 @onready var edited_file_label: Label=%edited_file
+## drop
+@onready var drag: Button=%drag
 ## dock
 @onready var detach: Button=%detach# update image size
 @onready var hide_button: Button=%hide# update image size
@@ -78,8 +82,10 @@ func _ready():
 	_update_draw_mode()
 	_update_hiding_buttons()
 	_update_image_size_label()
+	update_detach_button()
 	## deferred
 	_postready.call_deferred()
+	
 func _postready()->void:
 	parent_container=get_parent()# must know own parent to be able to detach
 	drawing.new_drawing(px,py)
@@ -108,19 +114,22 @@ func _on_hide_pressed():
 	hiding_buttons=not hiding_buttons
 	_update_hiding_buttons()
 func _update_hiding_buttons():
-	for i in [new,clear,save,load,resize,help,detach,brush_color_button,draw_mode_button,undo,as_sheet_button]:
+	# removed detach
+	for i in [new,clear,save,load,resize,help,brush_color_button,draw_mode_button,undo,as_sheet_button]:
 		i.visible=not hiding_buttons
+	detach.visible=not hiding_buttons and can_detach
 
 ## DETACH MENU (POPUP)
 var detached: bool=false# dock starts detached or not
+var can_detach: bool=true# MAY INTERFERE WITH MAKE FLOATING
 func _on_detach_pressed():
-	if not detached:
+	if can_detach and not detached:
 		_detach_dialogue()
 	else:
 		_reatach_dialogue()
 func _detach_dialogue():
 	detached=true
-	detach.text="attach dock"
+	update_detach_button()
 	var file_dialogue = Window.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	EditorInterface.popup_dialog_centered(file_dialogue)
@@ -135,11 +144,16 @@ func _detach_dialogue():
 	return file_dialogue
 func _reatach_dialogue():
 	detached=false
-	detach.text="detach dock"
+	update_detach_button()
 	var _window: Window=get_parent()
 	_window.remove_child(self)
 	parent_container.add_child(self)
 	_window.queue_free()
+func update_detach_button():
+	if detached:
+		detach.text="attach"
+	else:
+		detach.text="detach"
 	
 ## HELP
 func _on_help_pressed():
@@ -154,9 +168,8 @@ func _help_dialogue():
 	Controls:
 	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel.
 	Brush is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
-	
-	Drag and Drop (awesome!):
 	Drag and drop any file or texture to the window to load and edit their image (must be a PNG).
+	You can make the dock floating for more drawing space.
 		
 	Buttons:
 	x: minimize/expand menu
@@ -172,7 +185,8 @@ func _help_dialogue():
 	new: new scribble.
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
 	
-	Notes:
+	Warnings:
+	Do not "make floating" the dock if already detached (may close plugin).
 	You will get many warnings "Loaded resource as image file", its normal just ignore them.
 	The plugin may be buggy or inefficient for large files (I dunno), use with caution if editing nice assets.
 	"""

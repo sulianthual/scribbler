@@ -80,10 +80,6 @@ func _drop_data(position, data):
 		elif data.type=="resource" and data.resource.resource_path and data.resource.resource_path.get_extension()=="png":
 			#load_drawing(data.resource.resource_path)
 			data_dropped.emit(data.resource.resource_path)
-
-#func _get_drag_data(at_position):
-	#var _data: CompressedTexture2D=load("res://demo/pirate.png")
-	#return _data
 ###############################################################################
 ## FILES
 

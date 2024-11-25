@@ -1,15 +1,5 @@
-- load and save: works but very dirty with not all edge cases
-	->make a handle that persists between popups (one for each button) 
-- do the drag and drop system: all possible edge cases (PNG files)
-	-> should hold the file.png of loaded so we just propose to overwrite it
-	-> also show current file in drawing window above dimensions
-	-> ability to load as spritesheet by drag and drop (?)
-	-> or just load entire sheet, then select subregion
-- sheet: keep full image (source_image) in menu, and img in drawing is subregion
-	->sheet button picks subregion of sheet to edit
-- shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)
+- drag from to other texture?
+- shortcuts to add sprite2D, animatedsprite2D to scenetree (dedicated popup)?
 - add replace color: current color replaces all of color below cursor
 - test if works when exporting game
-- remove detach: can already make floating
-- improve error messages
 - publish
