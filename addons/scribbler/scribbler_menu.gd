@@ -54,7 +54,7 @@ extends Control
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
-#@onready var pen_over_button: Button=%pen_over# over anyt
+@onready var pen_overfirst_button: Button=%pen_overfirst# over first color only
 @onready var brush_color_button: Button=%brush_color
 ## test
 #@onready var test: Button=%test
@@ -78,6 +78,7 @@ func _ready():
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
 	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
 	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
+	pen_overfirst_button.connect("pressed",_on_draw_mode_pressed.bind("pen_overfirst"))
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
 	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behindblack"))
@@ -124,7 +125,7 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	# removed detach
 	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
-	pen_black_button,pen_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button]:
+	pen_black_button,pen_button,pen_overfirst_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -186,6 +187,7 @@ func _help_dialogue():
 	Tools (tailored towards drawing black outlines+filling):
 	black pen: draw with dedicated black pen
 	brush behind black: paint with color but not over black strokes
+	brush single color: paint only the color under pen when starting stroke (WIP!)
 	brush: paint with color
 	eraser: erase
 	bucket: bucket fill
@@ -274,6 +276,8 @@ func _on_draw_mode_pressed(input_tool: String):
 		draw_mode="bucket"
 	elif input_tool=="pen_behindblack":
 		draw_mode="behindblack"
+	elif input_tool=="pen_overfirst":
+		draw_mode="over_first"
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
