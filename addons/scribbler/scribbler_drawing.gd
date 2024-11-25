@@ -299,30 +299,39 @@ func undo():## CALLS FROM SCRIBBLER
 func clear_undo_history():
 	undo_imgs=[]
 	save_img_to_undo_history()
-	print("clear history: ",len(undo_imgs))
 
 	
 ## MODE
 var draw_over: bool=false# draw over existing 
 var draw_behind: bool=false# draw behind existing
 var draw_erase: bool=false# erase instead of drawing
+var draw_bucket: bool=false# do the bucket fill
 func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 	if input_draw_mode=="regular":
 		draw_over=false
 		draw_behind=false
 		draw_erase=false
+		draw_bucket=false
 	elif input_draw_mode=="over":
 		draw_over=true
 		draw_behind=false
 		draw_erase=false
+		draw_bucket=false
 	elif input_draw_mode=="behind":
 		draw_over=false
 		draw_behind=true
 		draw_erase=false
+		draw_bucket=false
 	elif input_draw_mode=="eraser":
 		draw_over=false
 		draw_behind=false
 		draw_erase=true
+		draw_bucket=false
+	elif input_draw_mode=="bucket":
+		draw_over=false
+		draw_behind=false
+		draw_erase=false
+		draw_bucket=true
 
 ## INPUTS
 var _drawing: bool=false# is drawing (within drawing area, Left Mouse Pressed)
@@ -398,6 +407,8 @@ func _draw_point():
 					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_erase:
 					img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				elif draw_bucket:
+					flood_fill(ix+float(px)/2,iy+float(py/2))# beware will not work if not line_fill
 				else:
 					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 			_last_ix=ix# record last drawn point position (as int!)
@@ -427,6 +438,8 @@ func _draw_point():
 						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_erase:
 						img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_bucket:
+						pass
 					else:
 						img.blend_rect(brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 			_last_ix=ix# record last drawn point position (as int!)
@@ -440,6 +453,33 @@ func _draw_point():
 
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
+	
+## Bucket (from Draw anywhere plugin)
+func flood_fill(ix:int, iy:int):# ix,iy: which pixel to start on
+	var target_color: Color=img.get_pixel(ix,iy)
+	var replacement_color: Color=brush_color
+	var width=img.get_width()
+	var height=img.get_height()
+	#if img.get_pixel(ix,iy) != target_color:
+		#return
+	var stack:Array[Vector2i] = [Vector2i(ix,iy)]
+	var max_iterations: int=px*py
+	var iterations: int=0
+	while iterations<max_iterations and not stack.is_empty():
+		var _pos: Vector2i=stack.pop_back()
+		if _pos.x < 0 or _pos.x >px-1 or _pos.y < 0 or _pos.y >py-1 or img.get_pixel(_pos.x, _pos.y) != target_color:
+			continue
+		img.set_pixel(_pos.x,_pos.y,replacement_color)
+		stack.append(_pos+Vector2i(1,0))
+		stack.append(_pos+Vector2i(-1,0))
+		stack.append(_pos+Vector2i(0,1))
+		stack.append(_pos+Vector2i(0,-1))
+		iterations+=1
+	texture.update(img)
+	#save_img_to_undo_history()# done elsewhere
+	
+		
+		
 ###############################################################################
 ## CALLS (from Scribbler)
 

@@ -167,24 +167,24 @@ func _help_dialogue():
 	Draw with left mouse, Undo with right mouse, Change brush size with mouse wheel.
 	Brush is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
-	Drag and Drop:
-	Drag any file or texture (with a PNG) and drop it in the window to load and edit it.
-	Drag the edited image (as saved on disk) from "drag file" then drop it to any texture to apply it.
+	Drag and Drop (awesome!):
+	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
+	Drag the edited image (must be saved on disk) from "drag file" then drop it to any texture to apply it.
 		
 	Buttons:
-	x: minimize/expand menu
-	detach: detach the Scribbler dock to a popup window. 
 	drag file: Drag the PNG file saved on disk.
-	help: show help
-	undo: undo last stroke (only 10 undos allowed)
+	detach: detach the Scribbler dock to a popup window. 
+	x: minimize/expand menu
+	pen: cycle drawing with pen, eraser, pen behind existing strokes or over existing strokes.
+	brush color: pick a new brush color
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
-	draw button: draw with pen, eraser, behind existing strokes or over existing strokes.
-	color: pick a new brush color
+	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
 	load: generate scribble from existing PNG file in res://.
 	save: save scribble to an existing or new PNG file in res://.
 	new: new scribble.
-	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
+	help: show help
+	
 	
 	Warnings:
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin).
@@ -252,6 +252,8 @@ func _on_draw_mode_pressed():
 	elif draw_mode=="over":
 		draw_mode="eraser"
 	elif draw_mode=="eraser":
+		draw_mode="bucket"
+	elif draw_mode=="bucket":
 		draw_mode="regular"
 	_update_draw_mode()
 func _update_draw_mode():
@@ -262,6 +264,8 @@ func _update_draw_mode():
 		draw_mode_button.set_text("draw behind")
 	elif draw_mode=="eraser":
 		draw_mode_button.set_text("eraser")
+	elif draw_mode=="bucket":
+		draw_mode_button.set_text("bucket")
 	else:
 		draw_mode_button.set_text("pen")
 
