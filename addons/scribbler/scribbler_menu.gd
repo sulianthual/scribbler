@@ -15,10 +15,7 @@ extends Control
 ## image height (pixels) (as controlled here instead of drawing)
 @export var py: int=256
 
-## Dialogue Control scene for load
-@export var load_dialogue: PackedScene
-## Dialogue Control scene for save
-@export var save_dialogue: PackedScene
+
 ## Dialogue Control scene for resizing
 @export var resize_dialogue: PackedScene
 ## Dialogue Control scene for sheet 
@@ -354,47 +351,13 @@ func _on_load_from_sheet_dialogue_confirmed():
 #########################################################################################
 ## SAVE TO FILE
 
-enum MODE {FILE,NODE}
-var mode: MODE=MODE.FILE
-var save_as_node: bool=false
-var save_as_sheet: bool=false
+
 func _on_save_pressed():
-	save_as_node=false
-	save_as_sheet=false
-	_savepick_dialogue()
-func _savepick_dialogue():
-	var file_dialogue = AcceptDialog.new()
-	file_dialogue.set_size(Vector2(320, 180))
-	file_dialogue.title="Save Scribble"
-	file_dialogue.dialog_autowrap=true
-	EditorInterface.popup_dialog_centered(file_dialogue)
-	file_dialogue.connect("confirmed",_on_savepick_dialogue_confirmed)
-	var _dialogue: Control=save_dialogue.instantiate()
-	_dialogue.connect("as_node_changed",_on_savepick_dialogue_as_node_changed)
-	_dialogue.connect("as_sheet_changed",_on_savepick_dialogue_as_sheet_changed)
-	file_dialogue.add_child(_dialogue)
-	file_dialogue.popup()
-	return file_dialogue
-func _on_savepick_dialogue_as_node_changed(value: bool):
-	save_as_node=value
-func _on_savepick_dialogue_as_sheet_changed(value: bool):
-	save_as_sheet=value
-func _on_savepick_dialogue_confirmed():
-	if save_as_node:
-		mode=MODE.FILE
-		_save_node()
+	if edited_file:
+		_save_dialogue().set_current_path(edited_file)
 	else:
-		mode=MODE.NODE
 		_save_dialogue()
-func _save_node():## save to selected node in Editor SceneView
-	var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
-	if _node_valid(_selected_node):
-		var _texture=_selected_node.texture
-		if _texture==null:# empty, fill in
-			_save_dialogue().set_current_file(_selected_node.name.to_lower()+".png")
-		else:# existing, use save dialogue
-			if _texture_valid(_texture):
-				_save_dialogue().set_current_path(_texture.resource_path)
+
 func _save_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
@@ -408,23 +371,12 @@ func _save_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 func _on_save_dialogue_file_selected(input_file: String):
-	if save_as_sheet:
+	if as_sheet:
 		_save_from_sheet_select_subset_dialogue(input_file)
 	else:
 		drawing.save_drawing(input_file)
-		_apply_saved_image_to_empty_node_texture(input_file)
+		edited_file=input_file
 		_rescan_filesystem()
-func _apply_saved_image_to_empty_node_texture(input_file: String):
-	if mode==MODE.NODE:# if node selected has empty texture, update it with saved file
-		var _selected_node:Node=EditorInterface.get_selection().get_selected_nodes()[0]
-		if _node_valid(_selected_node):
-			var _texture=_selected_node.texture
-			if _texture==null:# empty, fill in
-				#await get_tree().create_timer(0.5, false, false, true).timeout# wait to make sure resource is written
-				await EditorInterface.get_resource_filesystem().filesystem_changed# wait for update in filesystem
-				#-> Beware, for large image resource may not be written yet
-				if ResourceLoader.exists(input_file):
-					_selected_node.texture=ResourceLoader.load(input_file)
 ## SAVE SCRIBBLE TO SHEET
 var save_from_sheet_selected_file: String# pass selected file
 func _save_from_sheet_select_subset_dialogue(input_file: String):
@@ -440,6 +392,7 @@ func _save_from_sheet_select_subset_dialogue(input_file: String):
 	file_dialogue.add_child(_dialogue)
 	_dialogue.set_subset(sheet_dialogue_input_subset)
 	_dialogue.make_source_image(input_file)
+	_dialogue.make_edited_image(drawing.get_image())
 	file_dialogue.popup()
 	return file_dialogue
 func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
@@ -447,8 +400,8 @@ func _on_save_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# sub
 func _on_save_from_sheet_dialogue_confirmed():
 	if save_from_sheet_selected_file:
 		drawing.save_drawing_subset(save_from_sheet_selected_file,sheet_dialogue_input_subset)
+		edited_file=save_from_sheet_selected_file
 		save_from_sheet_selected_file=""
-		_apply_saved_image_to_empty_node_texture(save_from_sheet_selected_file)
 		_rescan_filesystem()
 
 

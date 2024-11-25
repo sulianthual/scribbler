@@ -82,7 +82,8 @@ func _drop_data(position, data):
 			data_dropped.emit(data.resource.resource_path)
 
 #func _get_drag_data(at_position):
-	#return ImageTexture.create_from_image(img)# ->not working
+	#var _data: CompressedTexture2D=load("res://demo/pirate.png")
+	#return _data
 ###############################################################################
 ## FILES
 
@@ -411,7 +412,8 @@ func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector
 
 func get_texture()->ImageTexture:
 	return texture
-
+func get_image()->Image:
+	return img
 func activate():
 	active=true
 
