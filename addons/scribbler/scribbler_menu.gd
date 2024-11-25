@@ -165,15 +165,18 @@ func _help_dialogue():
 	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2): \
 	Make basic drawings without leaving the editor, useful for prototyping.
 	
-	Controls:
+	Drawing Area:
 	Draw with left mouse, Erase with right mouse, Change brush size with mouse wheel.
 	Brush is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
-	Drag and drop any file or texture to the window to load and edit their image (must be a PNG).
-	You can make the dock floating for more drawing space.
+	
+	Drag and Drop:
+	Drag any file or texture (with a PNG) and drop it in the window to load and edit it.
+	Drag the edited image (as saved on disk) from "drag file" then drop it to any texture to apply it.
 		
 	Buttons:
 	x: minimize/expand menu
-	detach dock: detach the Scribbler dock to a popup window. attach dock to reattach.
+	detach: detach the Scribbler dock to a popup window. 
+	drag file: Drag the PNG file saved on disk.
 	help: show help
 	undo: undo last stroke (only 10 undos allowed)
 	clear: clear the scribble
@@ -186,7 +189,7 @@ func _help_dialogue():
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
 	
 	Warnings:
-	Do not "make floating" the dock if already detached (may close plugin).
+	Do not "Make Floating" the Scribbler dock if detached (may close plugin).
 	You will get many warnings "Loaded resource as image file", its normal just ignore them.
 	The plugin may be buggy or inefficient for large files (I dunno), use with caution if editing nice assets.
 	"""

@@ -6,7 +6,7 @@ extends Button
 
 var drag_filename: String=""# data to be dragged
  
-func _get_drag_data(at_position):
+func _get_drag_data(at_position: Vector2):
 	if drag_filename and ResourceLoader.exists(drag_filename):
 		var _dict: Dictionary={}
 		_dict["type"]="files"

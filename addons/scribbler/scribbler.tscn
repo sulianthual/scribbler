@@ -171,7 +171,7 @@ text = "x
 [node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "copy"
+text = "drag file"
 script = ExtResource("8_4phrr")
 
 [node name="brush_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
