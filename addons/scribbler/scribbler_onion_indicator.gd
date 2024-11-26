@@ -43,8 +43,27 @@ func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls f
 		var suby: int=input_subset[1]
 		var ix: int=input_subset[2]
 		var iy: int=input_subset[3]
-		print("add onion from sheet...")
+		var source_img: Image=Image.new()
+		source_img.convert(Image.FORMAT_RGBA8)
+		source_img.load(filename_)
+		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
+		var _img: Image=Image.new()
+		_img.convert(Image.FORMAT_RGBA8)
+		_img=source_img.get_region(subset_rect)
+		_img=_make_transparent(_img,0.5)
+		var _img_rect: Rect2i=Rect2i(0,0,_img.get_width(),_img.get_height())
+		img.blend_rect(_img,_img_rect,Vector2(0,0))
+		texture_from_img()
 
+func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:int)->Rect2i:#->determine subset
+	# ix,iy are the coordinates and start at 1,1
+	var subset_rect_w: int=roundi(source_img.get_width()/subx)
+	var subset_rect_h: int=roundi(source_img.get_height()/suby)
+	var subset_rect_x: int=subset_rect_w*clamp(ix-1,0,subx-1)
+	var subset_rect_y: int=subset_rect_h*clamp(iy-1,0,suby-1)
+	var subset_rect: Rect2i=Rect2i(subset_rect_x,subset_rect_y,subset_rect_w,subset_rect_h)
+	return subset_rect
+	
 func on_px_changed(input_px:int):
 	px=input_px
 	clear_canvas()
