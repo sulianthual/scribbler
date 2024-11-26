@@ -252,7 +252,7 @@ func _help_dialogue():
 	Drag and Drop (awesome!):
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
 	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
-	Drag any file or texture (with a PNG) to "o" to load it as onion skin.
+	Drag any file or texture (with a PNG) to "o" to load it as onion skinning. 
 		
 	Tools (tailored towards drawing black outlines+filling):
 	black pen: draw with dedicated black pen (with dedicated pen size and color)
@@ -266,7 +266,7 @@ func _help_dialogue():
 	Buttons:
 	+/-: detach the Scribbler dock to a popup window. 
 	x: minimize/expand menu
-	o: drop onion skin images (including from copy button). Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
+	o: drop onion skinning images (including from copy button). Onion skinnings appear as semi-transparent and are non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
