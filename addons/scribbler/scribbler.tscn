@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cjo1xkdprrdcu"]
+[gd_scene load_steps=23 format=3 uid="uid://cjo1xkdprrdcu"]
 
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_drawing.gd" id="1_252d8"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_menu.gd" id="1_i8pdh"]
@@ -9,9 +9,10 @@
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_drag.gd" id="8_4phrr"]
 [ext_resource type="Texture2D" uid="uid://cdp48jlwyw1gu" path="res://addons/scribbler/icons/scribbler_pen.svg" id="8_7xc82"]
 [ext_resource type="Texture2D" uid="uid://gqaej1qyluko" path="res://addons/scribbler/icons/scribbler_pen_black.svg" id="8_l8g4e"]
+[ext_resource type="Texture2D" uid="uid://djscmjvrvvahw" path="res://addons/scribbler/icons/scribbler_pen_behindblack.svg" id="8_wouog"]
 [ext_resource type="Texture2D" uid="uid://wwtv4k638iyp" path="res://addons/scribbler/icons/scribbler_eraser.svg" id="9_yjipa"]
 [ext_resource type="Texture2D" uid="uid://ddyk1uemqtyc4" path="res://addons/scribbler/icons/scribbler_bucket.svg" id="10_6h7th"]
-[ext_resource type="Texture2D" uid="uid://fr42c52hofd" path="res://addons/scribbler/icons/scribbler_pen_over.svg" id="12_pu1ru"]
+[ext_resource type="Texture2D" uid="uid://cgfjd6s8xk78j" path="res://addons/scribbler/icons/scribbler_pen_overfirst.svg" id="10_iajvc"]
 
 [sub_resource type="Image" id="Image_rghe6"]
 data = {
@@ -178,13 +179,19 @@ theme_override_icons/icon = ExtResource("8_l8g4e")
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_icons/icon = ExtResource("12_pu1ru")
+theme_override_icons/icon = ExtResource("8_wouog")
 
 [node name="pen" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_icons/icon = ExtResource("8_7xc82")
+
+[node name="pen_overfirst" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_icons/icon = ExtResource("10_iajvc")
 
 [node name="eraser" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true

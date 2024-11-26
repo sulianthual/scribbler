@@ -50,6 +50,7 @@ extends Control
 @onready var resize: Button=%resize# update image size
 ## drawing tools
 @onready var pen_button: Button=%pen
+@onready var pen_overfirst_button: Button=%pen_overfirst
 @onready var pen_black_button: Button=%pen_black
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
@@ -92,10 +93,11 @@ func _ready():
 
 
 	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
+	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behindblack"))
+	pen_overfirst_button.connect("pressed",_on_draw_mode_pressed.bind("pen_overfirst"))
 	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
-	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behindblack"))
 	hide_button.connect("pressed",_on_hide_pressed)
 	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
 	#
@@ -326,17 +328,21 @@ func _on_draw_mode_pressed(input_tool: String):
 		draw_mode="pen_black"
 		drawing.resize_brush(pen_black_brush_scaling)
 	elif input_tool=="pen":# color pen
-		#draw_mode="regular"
+		draw_mode="regular"
+		drawing.resize_brush(pen_color_brush_scaling)
+	elif input_tool=="pen_overfirst":# color pen
+		draw_mode="regular"
 		draw_mode="overfirst"
 		drawing.resize_brush(pen_color_brush_scaling)
-	elif input_tool=="eraser":
-		draw_mode="eraser"
-	elif input_tool=="bucket":
-		draw_mode="bucket"
 		#draw_mode="bucketbrush"# this is actually very costly for large images
 	elif input_tool=="pen_behindblack":
 		draw_mode="behindblack"
 		drawing.resize_brush(pen_color_brush_scaling)
+	elif input_tool=="eraser":
+		draw_mode="eraser"
+		drawing.resize_brush(pen_color_brush_scaling)
+	elif input_tool=="bucket":
+		draw_mode="bucket"
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
@@ -442,6 +448,8 @@ func _on_load_dialogue_file_loaded(input_file: String):
 	load_selected(input_file)
 func load_selected(input_file: String):
 	if as_sheet:
+		if input_file!=edited_file:
+			reset_sheet()
 		_load_from_sheet_select_subset_dialogue(input_file)
 	else:
 		drawing.load_drawing(input_file)
@@ -449,8 +457,9 @@ func load_selected(input_file: String):
 ## LOAD SCRIBBLE FROM SHEET
 var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
 var load_from_sheet_selected_file: String# pass selected file
-func _load_from_sheet_select_subset_dialogue(input_file: String):
+func reset_sheet():
 	sheet_dialogue_input_subset=[1,1,1,1]
+func _load_from_sheet_select_subset_dialogue(input_file: String):
 	load_from_sheet_selected_file=input_file
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
@@ -504,7 +513,6 @@ func _on_save_dialogue_file_selected(input_file: String):
 ## SAVE SCRIBBLE TO SHEET
 var save_from_sheet_selected_file: String# pass selected file
 func _save_from_sheet_select_subset_dialogue(input_file: String):
-	sheet_dialogue_input_subset=[1,1,1,1]
 	save_from_sheet_selected_file=input_file
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))

@@ -1,7 +1,8 @@
-- right click on color buttons to edit individually
+- sheet: remember subregion except load/new
+- extra row of tools when expanded
+- drawing enum of drawing modes
 - brush dithering-> add
 - onion drop: add image to background
-- less UI! too cramped. use shortcuts?-> nah
+- add settings button? with sheet, grid, onion..., resize
 - add grid
-- test if works when exporting game
 - publish
