@@ -44,10 +44,11 @@ extends Control
 @onready var new: Button = %new# new drawing
 @onready var load: Button = %load# load drawing
 @onready var save: Button = %save# save drawing
-@onready var as_sheet_button: Button = %as_sheet# save drawing
 ## edit
+#@onready var onion_drop: Button = %onion_drop
 @onready var clear: Button = %clear# clear drawing (same as new drawing)
 @onready var resize: Button=%resize# update image size
+@onready var as_sheet_button: Button = %as_sheet# save drawing
 ## drawing tools
 @onready var pen_button: Button=%pen
 @onready var pen_overfirstbehindblack_button: Button=%pen_overfirstbehindblack
@@ -223,9 +224,9 @@ func _reatach_dialogue():
 	_window.queue_free()
 func update_detach_button():
 	if detached:
-		detach.text="o"
+		detach.text="-"
 	else:
-		detach.text="o"
+		detach.text="+"
 	
 ## HELP
 func _on_help_pressed():
@@ -244,6 +245,7 @@ func _help_dialogue():
 	Drag and Drop (awesome!):
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
 	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
+	Drag any file or texture (with a PNG) to "o" to load it as onion skin.
 		
 	Tools (tailored towards drawing black outlines+filling):
 	black pen: draw with dedicated black pen (with dedicated pen size and color)
@@ -255,8 +257,9 @@ func _help_dialogue():
 	colors: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse).
 	
 	Buttons:
-	o: detach the Scribbler dock to a popup window. 
+	+/-: detach the Scribbler dock to a popup window. 
 	x: minimize/expand menu
+	o: drop onion skin images (including from copy button). Right click: clear all onions. Onion images appear as semi-transparent behind drawing.
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
@@ -278,7 +281,7 @@ func _help_dialogue():
 
 
 ################################################################
-## DRAWING AND BRUSH
+## EDIT
 	
 ## CLEAR DRAWING
 func _on_clear_pressed():
@@ -319,6 +322,7 @@ func _on_resize_dialogue_confirmed():
 		drawing.crop_drawing_centered(px,py)
 	elif resize_mode=="crop_cornered":
 		drawing.crop_drawing_cornered(px,py)
+
 
 #############################################################################################3
 ## DRAWING TOOLS

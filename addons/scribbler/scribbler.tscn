@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://cjo1xkdprrdcu"]
+[gd_scene load_steps=25 format=3 uid="uid://cjo1xkdprrdcu"]
 
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_drawing.gd" id="1_252d8"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_menu.gd" id="1_i8pdh"]
@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://wwtv4k638iyp" path="res://addons/scribbler/icons/scribbler_eraser.svg" id="9_yjipa"]
 [ext_resource type="Texture2D" uid="uid://ddyk1uemqtyc4" path="res://addons/scribbler/icons/scribbler_bucket.svg" id="10_6h7th"]
 [ext_resource type="Texture2D" uid="uid://dlhsnb6qwbjo6" path="res://addons/scribbler/icons/scribbler_pen_overfirstbehindblack.svg" id="10_mul26"]
+[ext_resource type="Script" path="res://addons/scribbler/scribbler_onion_drop.gd" id="14_74on1"]
 
 [sub_resource type="Image" id="Image_q8me1"]
 data = {
@@ -125,7 +126,7 @@ layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 4
+stretch_mode = 5
 script = ExtResource("7_7c1y5")
 
 [node name="drawing" type="TextureRect" parent="scribbler_menu/VBoxContainer/drawing_container"]
@@ -309,6 +310,15 @@ unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
+[node name="onion_drop" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row" node_paths=PackedStringArray("onion_indicator")]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
+button_mask = 2
+text = "o"
+script = ExtResource("14_74on1")
+onion_indicator = NodePath("../../../../drawing_container/onion_indicator")
+
 [node name="clear" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -334,13 +344,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "help"
-
-[node name="onion" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-text = "onion"
 
 [node name="file_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/column"]
 unique_name_in_owner = true
@@ -379,7 +382,7 @@ custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
-text = "o"
+text = "+"
 
 [node name="row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container"]
 unique_name_in_owner = true

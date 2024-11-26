@@ -22,23 +22,47 @@ func _postready():
 	px=drawing.px
 	py=drawing.py
 	#img=load("res://demo/head.png")## TEST
-	update_canvas()
+	clear_canvas()
+	
+	
+func add_onion(filename_: String):
+	if ResourceLoader.exists(filename_):
+		var _img: Image=Image.new()
+		_img.load(filename_)
+		_img.convert(Image.FORMAT_RGBA8)
+		_img=_make_transparent(_img,0.5)
+		var _img_rect: Rect2i=Rect2i(0,0,_img.get_width(),_img.get_height())
+		img.blend_rect(_img,_img_rect,Vector2(0,0))
+		texture_from_img()
+func clear_onions():
+	clear_canvas()
 func on_px_changed(input_px:int):
 	px=input_px
-	update_canvas()
+	clear_canvas()
 func on_py_changed(input_py:int):
 	py=input_py
-	update_canvas()
-func update_canvas():
-	pass
-	#img=Image.create(px,py,false, Image.FORMAT_RGBA8)
-	#img.convert(Image.FORMAT_RGBA8)
-	#img.fill(back_color)
+	clear_canvas()
+func clear_canvas():
+	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
+	img.convert(Image.FORMAT_RGBA8)
+	img.fill(back_color)
 	#if drawing.draw_mode==drawing.DRAW_MODES.PENBLACK:
 		#img.blend_rect(drawing.black_pen_img,Rect2(0,0,drawing.black_pen_img.get_width(),drawing.black_pen_img.get_height()),Vector2(0,0))
 	#else:
 		#img.blend_rect(drawing.brush_img,Rect2(0,0,drawing.brush_img.get_width(),drawing.brush_img.get_height()),Vector2(0,0))
-	#texture_from_img()
+	texture_from_img()
 func texture_from_img():# update displayed texture from image
 	var _texture: ImageTexture=ImageTexture.create_from_image(img)
 	texture=_texture
+
+## swap anything that isnt source color with new_color
+func _make_transparent(input_image: Image, factor: float):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			var _col: Color=_new_img.get_pixel(_ix, _iy)
+			_col.a=clamp(_col.a*factor,0,1)
+			_new_img.set_pixel(_ix, _iy, _col)
+	return _new_img

@@ -1,6 +1,6 @@
 
-- onion drop: add image to background
-- add settings button? with sheet, grid, onion..., resize
+- onion drop: -> if sheet on, do it to
+-> add indicator (text) in image saying "onions on" if on
 - grid-> add maybe
 - brush dithering-> add maybe
 - publish
