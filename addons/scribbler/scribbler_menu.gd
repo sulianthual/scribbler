@@ -463,15 +463,18 @@ func _on_new_pressed():
 ## LOAD FROM FILE
 
 func _on_load_pressed():
-	_load_dialogue()
+	if edited_file:
+		_load_dialogue().set_current_path(edited_file)
+	else:
+		_load_dialogue()
 func _load_dialogue():
-	var file_dialogue = EditorFileDialog.new()
+	var file_dialogue = FileDialog.new()
 	file_dialogue.clear_filters()
 	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
 	file_dialogue.filters = ["*.png ; PNG File"]
 	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
+	#file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.connect("file_selected", _on_load_dialogue_file_loaded)
 	file_dialogue.popup()

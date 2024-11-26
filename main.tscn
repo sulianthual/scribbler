@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://j6n6a2bbxi3q"]
+[gd_scene load_steps=13 format=3 uid="uid://j6n6a2bbxi3q"]
 
 [ext_resource type="Texture2D" uid="uid://dnclbip4tdhc8" path="res://demo/background.png" id="1_04l00"]
 [ext_resource type="Texture2D" uid="uid://cnyfmwo5gwhhb" path="res://demo/skeleton.png" id="1_xh3yc"]
@@ -7,6 +7,42 @@
 [ext_resource type="Texture2D" uid="uid://d12bt7n5s01bp" path="res://demo/sun.png" id="4_lsjm0"]
 [ext_resource type="Texture2D" uid="uid://biov5skdaf4pf" path="res://demo/cloud.png" id="5_elmx4"]
 [ext_resource type="Texture2D" uid="uid://7jb0qsx5c2wp" path="res://demo/player.png" id="6_qngjf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1dc37"]
+atlas = ExtResource("1_xh3yc")
+region = Rect2(0, 0, 128, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_axf0j"]
+atlas = ExtResource("1_xh3yc")
+region = Rect2(128, 0, 128, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yux56"]
+atlas = ExtResource("1_xh3yc")
+region = Rect2(256, 0, 128, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qptlq"]
+atlas = ExtResource("1_xh3yc")
+region = Rect2(384, 0, 128, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qg6rv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1dc37")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_axf0j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yux56")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qptlq")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [node name="Main" type="Node"]
 
@@ -35,7 +71,8 @@ texture = ExtResource("5_elmx4")
 position = Vector2(165, 141)
 texture = ExtResource("6_qngjf")
 
-[node name="skeleton" type="Sprite2D" parent="."]
-position = Vector2(359, 111)
-texture = ExtResource("1_xh3yc")
-hframes = 4
+[node name="skeleton" type="AnimatedSprite2D" parent="."]
+position = Vector2(354, 113)
+sprite_frames = SubResource("SpriteFrames_qg6rv")
+autoplay = "default"
+frame_progress = 0.00092674

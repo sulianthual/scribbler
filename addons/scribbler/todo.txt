@@ -1,6 +1,5 @@
 
 - onion drop: pick color when adding onion?
--> button: left mouse toggle onion visible, right mouse erase (use mouse_entered etc)
 -> add indicator (text) in image saying "onions on" if on
 -> add event messages when doing something (optional)
 -> round the gray buttons, maybe x and + have different colors
