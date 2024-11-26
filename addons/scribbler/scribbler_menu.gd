@@ -54,6 +54,13 @@ extends Control
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
+## colors
+@onready var brush_color_1: Button = %brush_color1
+@onready var brush_color_2: Button = %brush_color2
+@onready var brush_color_3: Button = %brush_color3
+@onready var brush_color_4: Button = %brush_color4
+@onready var brush_color_5: Button = %brush_color5
+
 @onready var brush_color_button: Button=%brush_color
 ## containers
 @onready var row: HBoxContainer = %row
@@ -81,6 +88,11 @@ func _ready():
 	resize.connect("pressed",_on_resize_pressed)
 	help.connect("pressed",_on_help_pressed)
 	detach.connect("pressed",_on_detach_pressed)
+	brush_color_1.connect("pressed",_on_brush_color_i_pressed.bind(0))
+	brush_color_2.connect("pressed",_on_brush_color_i_pressed.bind(1))
+	brush_color_3.connect("pressed",_on_brush_color_i_pressed.bind(2))
+	brush_color_4.connect("pressed",_on_brush_color_i_pressed.bind(3))
+	brush_color_5.connect("pressed",_on_brush_color_i_pressed.bind(4))
 	brush_color_button.connect("pressed",_on_brush_color_pressed)
 	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
 	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
@@ -132,7 +144,8 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	# removed detach
 	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
-	pen_black_button,pen_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button]:
+	pen_black_button,pen_button,eraser_button,bucket_button,pen_behindblack_button,brush_color_button,\
+	brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -146,9 +159,9 @@ func _on_detach_pressed():
 		_reatach_dialogue()
 func _detach_dialogue():
 	## column to row
-	for i in [brush_row,edit_row,file_row]:
-		i.get_parent().remove_child(i)
-		row.add_child(i)
+	#for i in [brush_row,edit_row,file_row]:
+		#i.get_parent().remove_child(i)
+		#row.add_child(i)
 	detached=true
 	update_detach_button()
 	var file_dialogue = Window.new()
@@ -166,9 +179,9 @@ func _detach_dialogue():
 	return file_dialogue
 func _reatach_dialogue():
 	## column to row
-	for i in [brush_row,edit_row,file_row]:
-		i.get_parent().remove_child(i)
-		column.add_child(i)
+	#for i in [brush_row,edit_row,file_row]:
+		#i.get_parent().remove_child(i)
+		#column.add_child(i)
 	detached=false
 	update_detach_button()
 	var _window: Window=get_parent()
@@ -274,7 +287,7 @@ func _on_resize_dialogue_confirmed():
 		drawing.crop_drawing_cornered(px,py)
 
 #############################################################################################3
-## TOOLS
+## DRAWING TOOLS
 ## Draw mode (must match drawing.gd)
 var draw_mode: String="pen_black"
 func _on_draw_mode_pressed(input_tool: String):
@@ -298,43 +311,48 @@ func _update_draw_mode():
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
 var brush_color: Color=Color.WHITE
-var _brush_color_dialogue_color_selected: Color# may or may not apply
-func make_brush_color():
+var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE]# may or may not apply
+func _on_brush_color_i_pressed(index: int):
+	brush_color=brush_colors[index]
 	drawing.recolor_brush(brush_color)
+
+func make_brush_color():# choose all the colors
 	update_brush_color()
 func update_brush_color():
-	if brush_color_button:
-		brush_color_button.modulate=brush_color
+	var ic: int=0
+	for i in [brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5]:
+		i.modulate=brush_colors[ic]
+		ic+=1
 func _on_brush_color_pressed():
 	_brush_color_dialogue()
 func _brush_color_dialogue():
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(320, 180))
 	file_dialogue.title="Pick Brush Color"
-	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.connect("confirmed",_on_brush_color_dialogue_confirmed)
-	var _dialog: ColorPicker=ColorPicker.new()
-	_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed)
-	_dialog.color=brush_color
-	_dialog.deferred_mode=true
-	_dialog.edit_alpha=true
-	_dialog.can_add_swatches=false
-	_dialog.color_modes_visible=false
-	_dialog.hex_visible=false
-	_dialog.presets_visible=false
-	_dialog.sampler_visible=true
-	_dialog.sliders_visible=true
-	file_dialogue.add_child(_dialog)
+	var _hbox: HBoxContainer=HBoxContainer.new()
+	file_dialogue.add_child(_hbox)
+	for i in range(5):
+		var _dialog: ColorPicker=ColorPicker.new()
+		_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed.bind(i))
+		_dialog.color=brush_color
+		_dialog.picker_shape=ColorPicker.SHAPE_VHS_CIRCLE
+		_dialog.deferred_mode=true
+		_dialog.edit_alpha=true
+		_dialog.can_add_swatches=false
+		_dialog.color_modes_visible=false
+		_dialog.hex_visible=false
+		_dialog.presets_visible=false
+		_dialog.sampler_visible=true
+		_dialog.sliders_visible=true
+		_hbox.add_child(_dialog)
 	file_dialogue.popup()
 	return file_dialogue
-func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM DIALOGUE
-	_brush_color_dialogue_color_selected=input_color
+func _on_brush_color_dialogue_color_changed(input_color: Color, index: int):## SIGNAL FROM DIALOGUE
+	brush_colors[index]=input_color
 func _on_brush_color_dialogue_confirmed():
-	if _brush_color_dialogue_color_selected:
-		brush_color=_brush_color_dialogue_color_selected
-		drawing.recolor_brush(brush_color)
-		update_brush_color()
+	update_brush_color()
 
 	
 ################################################################

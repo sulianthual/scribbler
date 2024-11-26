@@ -1,5 +1,4 @@
 - black pen has separate brush size
-- row of colors to"save" them
 - onion drop: add image to background
 - test if works when exporting game
 - publish
