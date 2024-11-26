@@ -1,3 +1,4 @@
+- right click on color buttons to edit individually
 - brush dithering-> add
 - onion drop: add image to background
 - less UI! too cramped. use shortcuts?-> nah
