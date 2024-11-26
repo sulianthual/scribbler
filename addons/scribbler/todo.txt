@@ -1,5 +1,6 @@
 
 - onion drop: -> if sheet on, do it to
+-> button: left mouse toggle onion visible, right mouse erase (use mouse_entered etc)
 -> add indicator (text) in image saying "onions on" if on
 - grid-> add maybe
 - brush dithering-> add maybe
