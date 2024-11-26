@@ -6,13 +6,34 @@ extends Button
 
 func _ready() -> void:
 	connect("pressed",on_pressed)
+	connect("mouse_entered",on_mouse_entered)
+	connect("mouse_exited",on_mouse_exited)
 
 signal clear_onions
+signal toggle_onions_visibilty
 func on_pressed():
-	clear_onions.emit()
+	toggle_onions_visibilty.emit()
 	#if onion_indicator:
 		#onion_indicator.clear_onions()
-		
+var is_hovered: bool=false		
+func on_mouse_entered():
+	is_hovered=true
+func on_mouse_exited():
+	is_hovered=false
+	rmouse_pressed=false
+
+var rmouse_pressed: bool=false
+func _input(event):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		if event.pressed:# UNDO
+			if not rmouse_pressed and is_hovered:
+				clear_onions.emit()
+			rmouse_pressed=true
+		else:
+			rmouse_pressed=false
+
+
+	
 func _can_drop_data(position, data):
 	#print("_can_drop_data: ",data)
 	if typeof(data) == TYPE_DICTIONARY:

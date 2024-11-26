@@ -339,7 +339,6 @@ func _input(event):
 			else:
 				#print("rmouse released")
 				undo_pressed=false
-
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 			if event.pressed:# PICK A COLOR
 				#print("midmouse pressed")

@@ -90,6 +90,7 @@ func _ready():
 	## onion
 	onion_drop.connect("data_dropped",on_onion_drop_data_dropped)
 	onion_drop.connect("clear_onions",on_onion_drop_clear_onions)
+	onion_drop.connect("toggle_onions_visibilty",on_onion_drop_toggle_onions_visibility)
 	## utils
 	detach.connect("pressed",_on_detach_pressed)
 	hide_button.connect("pressed",_on_hide_pressed)
@@ -265,7 +266,7 @@ func _help_dialogue():
 	Buttons:
 	+/-: detach the Scribbler dock to a popup window. 
 	x: minimize/expand menu
-	o: drop onion skin images (including from copy button). Right click: clear all onions. Onion images appear as semi-transparent behind drawing.
+	o: drop onion skin images (including from copy button). Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
@@ -573,12 +574,15 @@ func _on_save_from_sheet_dialogue_confirmed():
 
 func on_onion_drop_clear_onions():## signal from onion_drop
 	onion_indicator.clear_onions()
+func on_onion_drop_toggle_onions_visibility():
+	onion_indicator.visible=not onion_indicator.visible
 	
 func on_onion_drop_data_dropped(filename_: String):## signal from onion_drop
 	if as_sheet:
 		_load_onion_from_sheet_select_subset_dialogue(filename_)
 	else:
 		onion_indicator.add_onion(filename_)
+		onion_indicator.visible=true
 
 
 ## LOAD SCRIBBLE FROM SHEET
@@ -605,6 +609,7 @@ func _on_load_onion_from_sheet_dialogue_subset_changed(input_subset: Array[int])
 func _on_load_onion_from_sheet_dialogue_confirmed():
 	if load_onion_from_sheet_selected_file:
 		onion_indicator.add_onion_from_sheet(load_onion_from_sheet_selected_file, sheet_dialogue_input_subset)
+		onion_indicator.visible=true
 		load_onion_from_sheet_selected_file=""
 		
 ################################################################
