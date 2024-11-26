@@ -1,6 +1,6 @@
-- black pen has separate brush size
+- brush dithering-> add
 - onion drop: add image to background
+- less UI! too cramped. use shortcuts?-> nah
+- add grid
 - test if works when exporting game
 - publish
-- rows go horizontally on expand
-- add grid

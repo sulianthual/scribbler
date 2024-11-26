@@ -1,29 +1,41 @@
-[gd_scene load_steps=2 format=3 uid="uid://j6n6a2bbxi3q"]
+[gd_scene load_steps=8 format=3 uid="uid://j6n6a2bbxi3q"]
 
+[ext_resource type="Texture2D" uid="uid://dnclbip4tdhc8" path="res://demo/background.png" id="1_04l00"]
 [ext_resource type="Texture2D" uid="uid://cnyfmwo5gwhhb" path="res://demo/skeleton.png" id="1_xh3yc"]
+[ext_resource type="Texture2D" uid="uid://b8d5v6jw2viid" path="res://demo/tree.png" id="2_pbjqy"]
+[ext_resource type="Texture2D" uid="uid://by1n2017jijwm" path="res://demo/house.png" id="3_6gpfw"]
+[ext_resource type="Texture2D" uid="uid://d12bt7n5s01bp" path="res://demo/sun.png" id="4_lsjm0"]
+[ext_resource type="Texture2D" uid="uid://biov5skdaf4pf" path="res://demo/cloud.png" id="5_elmx4"]
+[ext_resource type="Texture2D" uid="uid://7jb0qsx5c2wp" path="res://demo/player.png" id="6_qngjf"]
 
 [node name="Main" type="Node"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="background" type="Sprite2D" parent="."]
-position = Vector2(-271, 71)
+texture = ExtResource("1_04l00")
 
 [node name="tree" type="Sprite2D" parent="."]
-position = Vector2(-271, 71)
+position = Vector2(-467, 39)
+texture = ExtResource("2_pbjqy")
 
 [node name="house" type="Sprite2D" parent="."]
-position = Vector2(-271, 71)
+position = Vector2(-127, 70)
+texture = ExtResource("3_6gpfw")
 
 [node name="sun" type="Sprite2D" parent="."]
-position = Vector2(-271, 71)
+position = Vector2(43, -221)
+texture = ExtResource("4_lsjm0")
 
 [node name="cloud" type="Sprite2D" parent="."]
-position = Vector2(-271, 71)
+position = Vector2(-299, -130)
+texture = ExtResource("5_elmx4")
 
 [node name="player" type="Sprite2D" parent="."]
-position = Vector2(-271, 71)
+position = Vector2(165, 141)
+texture = ExtResource("6_qngjf")
 
 [node name="skeleton" type="Sprite2D" parent="."]
-position = Vector2(-374, 115)
+position = Vector2(359, 111)
 texture = ExtResource("1_xh3yc")
+hframes = 4

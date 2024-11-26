@@ -79,6 +79,7 @@ func _ready():
 	drawing.connect("py_changed",_on_drawing_py_changed)
 	drawing.connect("mouse_entered",drawing.activate)
 	drawing.connect("mouse_exited",drawing.deactivate)
+	drawing.connect("brush_scaling_changed",on_drawing_brush_scaling_changed)
 	## buttons
 	#mode_button.connect("pressed",_on_mode_pressed)
 	clear.connect("pressed",_on_clear_pressed)
@@ -116,6 +117,7 @@ func _ready():
 func _postready()->void:
 	parent_container=get_parent()# must know own parent to be able to detach
 	drawing.new_drawing(px,py)
+	on_drawing_brush_scaling_changed()
 
 
 ################################################################
@@ -190,9 +192,9 @@ func _reatach_dialogue():
 	_window.queue_free()
 func update_detach_button():
 	if detached:
-		detach.text="w"
+		detach.text="o"
 	else:
-		detach.text="w"
+		detach.text="o"
 	
 ## HELP
 func _on_help_pressed():
@@ -205,23 +207,24 @@ func _help_dialogue():
 	Make basic drawings without leaving the editor, useful for prototyping.
 	
 	Drawing Area:
-	Draw with left mouse, Undo with right mouse, Change brush size with mouse wheel.
-	Brush is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
+	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel.
+	Pen size/color is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Drag and Drop (awesome!):
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
-	Drag the edited image (must be saved on disk) from "drag file" then drop it to any texture to apply it.
+	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
 		
 	Tools (tailored towards drawing black outlines+filling):
 	black pen: draw with dedicated black pen
 	brush behind black: paint with color but not over black strokes
-	brush: paint with color
+	color pen: draw with color, only of color detected at stroke start (for filling)
 	eraser: erase
-	bucket: bucket fill
-	color: pick a new brush color
+	bucket brush: draw over bucket fill area (equivalent to bucket fill for large brush)
+	-> use bucket brush with Transparent color to erase
+	c: choose 5 placeholder colors for the color pen
 	
 	Buttons:
-	drag file: Drag the PNG file saved on disk.
+	copy: Drag the PNG file saved on disk.
 	detach: detach the Scribbler dock to a popup window. 
 	x: minimize/expand menu
 	clear: clear the scribble
@@ -293,25 +296,39 @@ var draw_mode: String="pen_black"
 func _on_draw_mode_pressed(input_tool: String):
 	if input_tool=="pen_black":
 		draw_mode="pen_black"
-		#drawing.recolor_brush(Color.BLACK)
-	elif input_tool=="pen":
-		draw_mode="regular"
-		#drawing.recolor_brush(brush_color)
+		drawing.resize_brush(pen_black_brush_scaling)
+	elif input_tool=="pen":# color pen
+		#draw_mode="regular"
+		draw_mode="overfirst"
+		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="eraser":
 		draw_mode="eraser"
 	elif input_tool=="bucket":
 		draw_mode="bucket"
+		#draw_mode="bucketbrush"# this is actually very costly for large images
 	elif input_tool=="pen_behindblack":
 		draw_mode="behindblack"
+		drawing.resize_brush(pen_color_brush_scaling)
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
+
+## BRUSH SIZE
+## we track separately brush size for black pen or color pen
+var pen_black_brush_scaling: float=1.0
+var pen_color_brush_scaling: float=1.0
+#brush_scaling_changed.emit()
+func on_drawing_brush_scaling_changed():
+	if draw_mode=="pen_black":
+		pen_black_brush_scaling=drawing.brush_scaling
+	elif draw_mode=="regular" or draw_mode=="behindblack":
+		pen_color_brush_scaling=drawing.brush_scaling
 
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
 var brush_color: Color=Color.WHITE
-var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE]# may or may not apply
+var brush_colors: Array[Color]=[Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1),Color(0.4,0.4,0.4,1),Color(0.2,0.2,0.2,1)]# may or may not apply
 func _on_brush_color_i_pressed(index: int):
 	brush_color=brush_colors[index]
 	drawing.recolor_brush(brush_color)
@@ -336,7 +353,7 @@ func _brush_color_dialogue():
 	for i in range(5):
 		var _dialog: ColorPicker=ColorPicker.new()
 		_dialog.connect("color_changed",_on_brush_color_dialogue_color_changed.bind(i))
-		_dialog.color=brush_color
+		_dialog.color=brush_colors[i]
 		_dialog.picker_shape=ColorPicker.SHAPE_VHS_CIRCLE
 		_dialog.deferred_mode=true
 		_dialog.edit_alpha=true
