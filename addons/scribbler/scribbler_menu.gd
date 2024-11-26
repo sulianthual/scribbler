@@ -434,6 +434,7 @@ func _on_brush_color_i_dialogue_confirmed():
 	#brush_colors[index]=input_color
 ## BRUSH COLOR FROM DRAWING COLOR PICKER
 func on_drawing_color_picked(input_color: Color):
+	print('color picked')
 	#print("color picked:",input_color)
 	#if input_color!=Color.BLACK:# only change last color in row
 	last_brush_color_button_pressed_index=len(brush_colors)-1
@@ -464,11 +465,11 @@ func _on_new_pressed():
 
 func _on_load_pressed():
 	if edited_file:
-		_load_dialogue().set_current_path(edited_file)
+		_load_dialogue().set_current_path(edited_file)# doesnt display name
 	else:
 		_load_dialogue()
 func _load_dialogue():
-	var file_dialogue = FileDialog.new()
+	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
 	file_dialogue.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
@@ -533,7 +534,7 @@ func _save_dialogue():
 	file_dialogue.access = EditorFileDialog.ACCESS_RESOURCES
 	file_dialogue.filters = ["*.png ; PNG File"]
 	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
+	#file_dialogue.set_display_mode(EditorFileDialog.DisplayMode.DISPLAY_LIST)
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.connect("file_selected", _on_save_dialogue_file_selected)
 	file_dialogue.popup()

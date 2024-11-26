@@ -649,6 +649,8 @@ func activate():
 func deactivate():
 	active=false
 	_drawing=false
+	pick_pressed=false
+	undo_pressed=false
 
 
 ###############################################################################

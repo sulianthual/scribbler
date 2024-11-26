@@ -75,4 +75,4 @@ texture = ExtResource("6_qngjf")
 position = Vector2(354, 113)
 sprite_frames = SubResource("SpriteFrames_qg6rv")
 autoplay = "default"
-frame_progress = 0.00092674
+frame_progress = 0.0197158
