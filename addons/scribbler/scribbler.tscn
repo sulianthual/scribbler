@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cjo1xkdprrdcu"]
+[gd_scene load_steps=24 format=3 uid="uid://cjo1xkdprrdcu"]
 
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_drawing.gd" id="1_252d8"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_menu.gd" id="1_i8pdh"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_canvas.gd" id="3_vlrdt"]
 [ext_resource type="PackedScene" uid="uid://csrs4ajsvdtjx" path="res://addons/scribbler/scribbler_resize_dialog.tscn" id="4_jpy6y"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_brush_indicator.gd" id="5_nmkps"]
+[ext_resource type="Script" path="res://addons/scribbler/scribbler_onion_indicator.gd" id="7_7c1y5"]
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_drag.gd" id="8_4phrr"]
 [ext_resource type="Texture2D" uid="uid://cdp48jlwyw1gu" path="res://addons/scribbler/icons/scribbler_pen.svg" id="8_7xc82"]
 [ext_resource type="Texture2D" uid="uid://gqaej1qyluko" path="res://addons/scribbler/icons/scribbler_pen_black.svg" id="8_l8g4e"]
@@ -118,6 +119,15 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_2itqs")
 
+[node name="onion_indicator" type="TextureRect" parent="scribbler_menu/VBoxContainer/drawing_container"]
+texture_filter = 1
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 4
+script = ExtResource("7_7c1y5")
+
 [node name="drawing" type="TextureRect" parent="scribbler_menu/VBoxContainer/drawing_container"]
 unique_name_in_owner = true
 texture_filter = 1
@@ -175,17 +185,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_icons/icon = ExtResource("8_l8g4e")
 
-[node name="pen_behindblack" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_icons/icon = ExtResource("8_wouog")
-
 [node name="pen" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_icons/icon = ExtResource("8_7xc82")
+
+[node name="pen_behindblack" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_icons/icon = ExtResource("8_wouog")
 
 [node name="pen_overfirstbehindblack" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
@@ -224,6 +234,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")
@@ -233,6 +244,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")
@@ -243,6 +255,7 @@ modulate = Color(0.8, 0.8, 0.8, 1)
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")
@@ -253,6 +266,7 @@ modulate = Color(0.6, 0.6, 0.6, 1)
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")
@@ -263,6 +277,7 @@ modulate = Color(0.4, 0.4, 0.4, 1)
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")
@@ -273,6 +288,7 @@ modulate = Color(0.2, 0.2, 0.2, 1)
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")
@@ -283,6 +299,7 @@ modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 theme_override_styles/hover = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gf2ld")
 theme_override_styles/normal = SubResource("StyleBoxFlat_gf2ld")

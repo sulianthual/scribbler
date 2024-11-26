@@ -1,6 +1,6 @@
-- drawing enum of drawing modes
-- brush dithering-> add
+
 - onion drop: add image to background
 - add settings button? with sheet, grid, onion..., resize
-- add grid
+- grid-> add maybe
+- brush dithering-> add maybe
 - publish

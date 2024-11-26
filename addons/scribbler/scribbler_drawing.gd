@@ -38,7 +38,7 @@ var brush_img: Image=Image.new()# image for brush
 var eraser_img: Image=Image.new()# image for eraser (brush_img with transparency inverted)
 var black_pen_img: Image=Image.new()# image for black pen (brush_img with black)
 var brush_scaling: float=1.0# brush scaling respective to size start
-var brush_color: Color=Color.BLACK# Brush color (at ready)
+var brush_color: Color=Color.WHITE# Brush color (at ready)
 const brush_line_step_ratio: float=0.25# draw line skiping brush_size*ratio (high=performance gain but possible gaps)
 var brush_size: int# brush size tracked (for maths): Brush needs to be square!
 # Logic
@@ -304,8 +304,6 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_mode=DRAW_MODES.BUCKET
 	elif input_draw_mode=="bucketbrush":
 		draw_mode=DRAW_MODES.BUCKETBRUSH# too costly!
-
-
 	draw_mode_changed.emit()
 
 
@@ -318,10 +316,11 @@ var _drawing: bool=false:# is drawing (within drawing area, Left Mouse Pressed)
 
 var _first_point: bool=false# is drawing first point (no line-fill)
 var undo_pressed: bool=false# undo pressed (just first click)
+var pick_pressed: bool=false# pick pressed (just first click)
 func _input(event):
 	if active:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
+			if event.pressed:# DRAW
 				#print("pressed")
 				_drawing=true
 				_first_point=true
@@ -331,7 +330,7 @@ func _input(event):
 				_drawing=false
 				save_img_to_undo_history()
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
-			if event.pressed:
+			if event.pressed:# UNDO
 				#print("rmouse pressed")
 				_drawing=false
 				if not undo_pressed:
@@ -340,6 +339,17 @@ func _input(event):
 			else:
 				#print("rmouse released")
 				undo_pressed=false
+
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
+			if event.pressed:# PICK A COLOR
+				#print("midmouse pressed")
+				_drawing=false
+				if not pick_pressed:
+					pick_pressed=true
+					pick_color()
+			else:
+				#print("midmouse released")
+				pick_pressed=false
 		elif event is InputEventMouseMotion:
 			mouse_position_changed.emit()
 			if not _first_point and _drawing:
@@ -350,6 +360,34 @@ func _input(event):
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:
 			resize_brush(clamp(brush_scaling/brush_resize_rate,brush_size_min,brush_size_max))
 			#_drawing=false# no, can be useful to combine
+
+## PICK COLOR
+signal color_picked(value: Color)
+func pick_color():
+	var _mouse_pos: Vector2=get_global_mouse_position()
+	# determine drawing rectangle (must control for margins)
+	var _rectm: Rect2=get_global_rect()# drawable rectangle +potential margins
+	var _rectc: Vector2=_rectm.get_center()# center
+	var _rects: Vector2=_rectm.size# size
+	var _rectr: float=float(px)/float(py)/float(_rectm.size[0])*float(_rectm.size[1])# ratio
+	#var _rect: Rect2=_rectm
+	if _rectr<1.0:# has width margins
+		_rect=rect_from_centered_rect(Rect2(_rectc,Vector2(_rects[0]*_rectr,_rects[1])))
+	elif _rectr>1.0:# has height margins
+		_rect=rect_from_centered_rect(Rect2(_rectc,Vector2(_rects[0],_rects[1]/_rectr)))
+	else:# no margins
+		_rect=_rectm
+	# draw
+	if _rect.has_point(_mouse_pos):
+		var _diff: Vector2=_mouse_pos-_rect.get_center()# viewport global coords (pixels)
+		var ix: float=_diff[0]/float(_rect.size[0])*float(px)# convert to image coords (pixels)
+		var iy: float=_diff[1]/float(_rect.size[1])*float(py)# as float for refined positining
+		var offr: Rect2=Rect2(0,0,brush_size,brush_size)
+		var offx: float=-float(brush_size)/2+float(px)/2# precompute
+		var offy: float=-float(brush_size)/2+float(py)/2
+		var _color_picked: Color=img.get_pixel(ix+float(px)/2,iy+float(py/2))
+		color_picked.emit(_color_picked)# we let scribble menu handle picking, as it connects to buttons
+
 ## DRAW
 var _last_ix: float# record last ix drawn for line filling (as float for accuracy)
 var _last_iy: float# record last ix drawn for line filling

@@ -82,6 +82,7 @@ func _ready():
 	drawing.connect("mouse_entered",drawing.activate)
 	drawing.connect("mouse_exited",drawing.deactivate)
 	drawing.connect("brush_scaling_changed",on_drawing_brush_scaling_changed)
+	drawing.connect("color_picked",on_drawing_color_picked)
 	## utils
 	detach.connect("pressed",_on_detach_pressed)
 	hide_button.connect("pressed",_on_hide_pressed)
@@ -237,34 +238,33 @@ func _help_dialogue():
 	Make basic drawings without leaving the editor, useful for prototyping.
 	
 	Drawing Area:
-	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel.
-	Pen size/color is indicated in top left corner, scribble dimensions (in pixels) in top right, and filename (if any) in bottom.
+	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Pick pen color with middle mouse. \
+	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Drag and Drop (awesome!):
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
 	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
 		
 	Tools (tailored towards drawing black outlines+filling):
-	black pen: draw with dedicated black pen (with separate pen size)
-	color pen behind black: paint with color but not over black strokes
-	color pen: paint with color
-	color pen: draw with color, only of color detected at stroke start (for filling)
+	black pen: draw with dedicated black pen (with dedicated pen size and color)
+	color pen: draw with color
+	color pen alt1: draw with color behind black strokes
+	color pen alt2: draw with color behind black strokes and only over starting color
 	eraser: erase
-	bucket brush: draw over bucket fill area (equivalent to bucket fill for large brush)
-	-> use bucket brush with Transparent color to erase
-	colors: left click to apply to color pen, right click to pick color
+	bucket: bucket fill (use with transparent color to erase)
+	colors: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse).
 	
 	Buttons:
-	copy: Drag the PNG file saved on disk.
-	detach: detach the Scribbler dock to a popup window. 
+	o: detach the Scribbler dock to a popup window. 
 	x: minimize/expand menu
 	clear: clear the scribble
 	resize: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
+	help: this help menu.
+	copy: Drag the PNG file saved on disk.
 	load: generate scribble from existing PNG file in res://.
 	save: save scribble to an existing or new PNG file in res://.
 	new: new scribble.
-	help: show help
 	
 	Warnings:
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin).
@@ -368,16 +368,22 @@ func on_drawing_brush_scaling_changed():
 var brush_color: Color=Color.WHITE
 var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1)\
 ,Color(0.4,0.4,0.4,1),Color(0.2,0.2,0.2,1),Color(1,1,1,0)]
+@onready var brush_buttons: Array[Button]=[brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]
+var last_brush_color_button_pressed_index: int=0# last button selected
 func make_brush_color():# choose all the colors
 	update_brush_color_buttons()
+	
 func update_brush_color_buttons():
 	var ic: int=0
-	for i in [brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]:
+	for i in brush_buttons:
 		i.modulate=brush_colors[ic]
 		ic+=1
 func _on_brush_color_i_pressed(index: int):# left click
+	last_brush_color_button_pressed_index=index
 	brush_color=brush_colors[index]
 	drawing.recolor_brush(brush_color)
+	#if draw_mode in ["penblack","eraser"]:
+		#_on_draw_mode_pressed("pen")
 var brush_color_i_hovered: int=-1# -1 if none
 func _on_brush_color_i_mouse_entered(index: int):
 	#print("entered: ",index)
@@ -388,7 +394,6 @@ func _on_brush_color_i_mouse_exited(index: int):
 func brush_color_i_pick_color():# right clicked
 	if brush_color_i_hovered!=-1:
 		_brush_color_i_dialogue(brush_color_i_hovered)
-
 func _brush_color_i_dialogue(index: int):
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(320, 180))
@@ -411,10 +416,20 @@ func _brush_color_i_dialogue(index: int):
 	file_dialogue.popup()
 	return file_dialogue
 func _on_brush_color_i_dialogue_color_changed(input_color: Color, index: int):## SIGNAL FROM DIALOGUE
+	last_brush_color_button_pressed_index=index
 	brush_colors[index]=input_color
 func _on_brush_color_i_dialogue_confirmed():
 	update_brush_color_buttons()
 	#brush_colors[index]=input_color
+## BRUSH COLOR FROM DRAWING COLOR PICKER
+func on_drawing_color_picked(input_color: Color):
+	#print("color picked:",input_color)
+	#if input_color!=Color.BLACK:# only change last color in row
+	last_brush_color_button_pressed_index=len(brush_colors)-1
+	brush_colors[-1]=input_color
+	brush_color=brush_colors[-1]
+	drawing.recolor_brush(brush_color)
+	update_brush_color_buttons()
 
 
 
