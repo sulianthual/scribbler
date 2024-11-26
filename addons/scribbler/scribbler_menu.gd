@@ -35,6 +35,9 @@ extends Control
 @onready var edited_file_label: Label=%edited_file
 ## drop
 @onready var drag: Button=%drag
+## on
+@onready var onion_drop: Button = %onion_drop
+@onready var onion_indicator: TextureRect = %onion_indicator
 ## dock
 @onready var detach: Button=%detach# update image size
 @onready var hide_button: Button=%hide# update image size
@@ -84,6 +87,9 @@ func _ready():
 	drawing.connect("mouse_exited",drawing.deactivate)
 	drawing.connect("brush_scaling_changed",on_drawing_brush_scaling_changed)
 	drawing.connect("color_picked",on_drawing_color_picked)
+	## onion
+	onion_drop.connect("data_dropped",on_onion_drop_data_dropped)
+	onion_drop.connect("clear_onions",on_onion_drop_clear_onions)
 	## utils
 	detach.connect("pressed",_on_detach_pressed)
 	hide_button.connect("pressed",_on_hide_pressed)
@@ -177,7 +183,7 @@ func _on_hide_pressed():
 	_update_hiding_buttons()
 func _update_hiding_buttons():
 	# removed detach
-	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
+	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,onion_drop,\
 	pen_button,pen_black_button,pen_behindblack_button,pen_overfirstbehindblack_button,eraser_button,bucket_button,\
 	brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]:
 		i.visible=not hiding_buttons
@@ -560,7 +566,47 @@ func _on_save_from_sheet_dialogue_confirmed():
 		save_from_sheet_selected_file=""
 		_rescan_filesystem()
 
+	
+################################################################
+################################################################
+## ONIONS
 
+func on_onion_drop_clear_onions():## signal from onion_drop
+	onion_indicator.clear_onions()
+	
+func on_onion_drop_data_dropped(filename_: String):## signal from onion_drop
+	if as_sheet:
+		_load_onion_from_sheet_select_subset_dialogue(filename_)
+	else:
+		onion_indicator.add_onion(filename_)
+
+
+## LOAD SCRIBBLE FROM SHEET
+#var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
+var load_onion_from_sheet_selected_file: String# pass selected file
+#func reset_sheet():
+	#sheet_dialogue_input_subset=[1,1,1,1]
+func _load_onion_from_sheet_select_subset_dialogue(input_file: String):
+	load_onion_from_sheet_selected_file=input_file
+	var file_dialogue = ConfirmationDialog.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	file_dialogue.title="Select Sheet Subset"
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_load_onion_from_sheet_dialogue_confirmed)
+	var _dialogue: Control=sheet_dialogue.instantiate()
+	_dialogue.connect("subset_changed",_on_load_onion_from_sheet_dialogue_subset_changed)
+	file_dialogue.add_child(_dialogue)
+	_dialogue.set_subset(sheet_dialogue_input_subset)
+	_dialogue.make(input_file,null)# make with null edited image
+	file_dialogue.popup()
+	return file_dialogue
+func _on_load_onion_from_sheet_dialogue_subset_changed(input_subset: Array[int]):# subx,suby,ix,iy
+	sheet_dialogue_input_subset=input_subset
+func _on_load_onion_from_sheet_dialogue_confirmed():
+	if load_onion_from_sheet_selected_file:
+		onion_indicator.add_onion_from_sheet(load_onion_from_sheet_selected_file, sheet_dialogue_input_subset)
+		load_onion_from_sheet_selected_file=""
+		
 ################################################################
 ################################################################
 

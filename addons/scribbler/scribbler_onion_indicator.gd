@@ -24,8 +24,10 @@ func _postready():
 	#img=load("res://demo/head.png")## TEST
 	clear_canvas()
 	
+func clear_onions():## calls from Scribbler
+	clear_canvas()
 	
-func add_onion(filename_: String):
+func add_onion(filename_: String):## Calls from scribbler
 	if ResourceLoader.exists(filename_):
 		var _img: Image=Image.new()
 		_img.load(filename_)
@@ -34,8 +36,15 @@ func add_onion(filename_: String):
 		var _img_rect: Rect2i=Rect2i(0,0,_img.get_width(),_img.get_height())
 		img.blend_rect(_img,_img_rect,Vector2(0,0))
 		texture_from_img()
-func clear_onions():
-	clear_canvas()
+		
+func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls from scribbler
+	if ResourceLoader.exists(filename_):
+		var subx: int=input_subset[0]
+		var suby: int=input_subset[1]
+		var ix: int=input_subset[2]
+		var iy: int=input_subset[3]
+		print("add onion from sheet...")
+
 func on_px_changed(input_px:int):
 	px=input_px
 	clear_canvas()

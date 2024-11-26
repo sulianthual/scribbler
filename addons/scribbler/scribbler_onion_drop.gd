@@ -6,9 +6,13 @@ extends Button
 
 func _ready() -> void:
 	connect("pressed",on_pressed)
+
+signal clear_onions
 func on_pressed():
-	if onion_indicator:
-		onion_indicator.clear_onions()
+	clear_onions.emit()
+	#if onion_indicator:
+		#onion_indicator.clear_onions()
+		
 func _can_drop_data(position, data):
 	#print("_can_drop_data: ",data)
 	if typeof(data) == TYPE_DICTIONARY:
@@ -24,10 +28,10 @@ func _drop_data(position, data):
 	#print("_drop_data: ",data)
 	if typeof(data) == TYPE_DICTIONARY:
 		if data.type=="files" and data.files[0].get_extension()=="png":
-			#data_dropped.emit(data.files[0])# let menu handle loading
-			if onion_indicator:
-				onion_indicator.add_onion(data.files[0])
+			data_dropped.emit(data.files[0])# let menu handle loading
+			#if onion_indicator:
+				#onion_indicator.add_onion(data.files[0])
 		elif data.type=="resource" and data.resource.resource_path and data.resource.resource_path.get_extension()=="png":
-			#data_dropped.emit(data.resource.resource_path)
-			if onion_indicator:
-				onion_indicator.add_onion(data.resource.resource_path)
+			data_dropped.emit(data.resource.resource_path)
+			#if onion_indicator:
+				#onion_indicator.add_onion(data.resource.resource_path)

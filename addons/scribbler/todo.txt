@@ -1,7 +1,10 @@
 
-- onion drop: -> if sheet on, do it to
+- onion drop: -> if sheet on, do it to (must go through scribble menu)
 -> button: left mouse toggle onion visible, right mouse erase (use mouse_entered etc)
 -> add indicator (text) in image saying "onions on" if on
+-> add event messages when doing something (optional)
+-> round the gray buttons, maybe x and + have different colors
+- merge sheet/size into options-> + add grid, background color
 - grid-> add maybe
 - brush dithering-> add maybe
 - publish
