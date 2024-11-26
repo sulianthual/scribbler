@@ -62,6 +62,7 @@ extends Control
 @onready var brush_color_4: Button = %brush_color4
 @onready var brush_color_5: Button = %brush_color5
 @onready var brush_color_6: Button = %brush_color6
+@onready var brush_color_7: Button = %brush_color7
 #@onready var brush_color_button: Button=%brush_color# deprecated
 ## containers
 @onready var row: HBoxContainer = %row
@@ -109,18 +110,21 @@ func _ready():
 	brush_color_4.connect("pressed",_on_brush_color_i_pressed.bind(3))
 	brush_color_5.connect("pressed",_on_brush_color_i_pressed.bind(4))
 	brush_color_6.connect("pressed",_on_brush_color_i_pressed.bind(5))
+	brush_color_7.connect("pressed",_on_brush_color_i_pressed.bind(6))
 	brush_color_1.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(0))
 	brush_color_2.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(1))
 	brush_color_3.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(2))
 	brush_color_4.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(3))
 	brush_color_5.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(4))
 	brush_color_6.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(5))
+	brush_color_7.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(6))
 	brush_color_1.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(0))
 	brush_color_2.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(1))
 	brush_color_3.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(2))
 	brush_color_4.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(3))
 	brush_color_5.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(4))
 	brush_color_6.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(5))
+	brush_color_7.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(6))
 	#test.connect("pressed",_on_test_pressed)
 	## others
 	#_update_mode()
@@ -155,7 +159,7 @@ func _on_drawing_data_dropped(_filename: String):
 	if ResourceLoader.exists(_filename):
 		load_selected(_filename)
 ################################################################
-## MENU
+## MENU 
 
 ## MENU INPUTS
 ## some button (e.g. colors) can be right clicked
@@ -175,9 +179,9 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	# removed detach
 	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
-	pen_black_button,pen_button,eraser_button,bucket_button,\
+	pen_black_button,pen_button,pen_overfirst_button,eraser_button,bucket_button,\
 	pen_behindblack_button,\
-	brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6]:
+	brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
@@ -245,8 +249,9 @@ func _help_dialogue():
 	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
 		
 	Tools (tailored towards drawing black outlines+filling):
-	black pen: draw with dedicated black pen
-	brush behind black: paint with color but not over black strokes
+	black pen: draw with dedicated black pen (with separate pen size)
+	color pen behind black: paint with color but not over black strokes
+	color pen: paint with color
 	color pen: draw with color, only of color detected at stroke start (for filling)
 	eraser: erase
 	bucket brush: draw over bucket fill area (equivalent to bucket fill for large brush)
@@ -362,13 +367,13 @@ func on_drawing_brush_scaling_changed():
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
 var brush_color: Color=Color.WHITE
-var brush_colors: Array[Color]=[Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1)\
+var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1)\
 ,Color(0.4,0.4,0.4,1),Color(0.2,0.2,0.2,1),Color(1,1,1,0)]
 func make_brush_color():# choose all the colors
 	update_brush_color_buttons()
 func update_brush_color_buttons():
 	var ic: int=0
-	for i in [brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6]:
+	for i in [brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]:
 		i.modulate=brush_colors[ic]
 		ic+=1
 func _on_brush_color_i_pressed(index: int):# left click
@@ -416,15 +421,17 @@ func _on_brush_color_i_dialogue_confirmed():
 
 
 ################################################################
-## FILE
+## FILES
 
 ## USE SHEETS OR NOT
 var as_sheet: bool=false# use sheet for loading/saving
 func _on_as_sheet_toggled(toggle_on: bool):
 	as_sheet=toggle_on
+
 ## NEW DRAWING
 func _on_new_pressed():
 	drawing.new_drawing(px,py)
+	reset_sheet()
 	edited_file=""
 
 ###
