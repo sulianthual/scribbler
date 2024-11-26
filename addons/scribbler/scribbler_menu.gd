@@ -50,7 +50,7 @@ extends Control
 @onready var resize: Button=%resize# update image size
 ## drawing tools
 @onready var pen_button: Button=%pen
-@onready var pen_overfirst_button: Button=%pen_overfirst
+@onready var pen_overfirstbehindblack_button: Button=%pen_overfirstbehindblack
 @onready var pen_black_button: Button=%pen_black
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
@@ -82,27 +82,26 @@ func _ready():
 	drawing.connect("mouse_entered",drawing.activate)
 	drawing.connect("mouse_exited",drawing.deactivate)
 	drawing.connect("brush_scaling_changed",on_drawing_brush_scaling_changed)
-	## buttons
-	#mode_button.connect("pressed",_on_mode_pressed)
+	## utils
+	detach.connect("pressed",_on_detach_pressed)
+	hide_button.connect("pressed",_on_hide_pressed)
+	help.connect("pressed",_on_help_pressed)
+	## edit buttons
 	clear.connect("pressed",_on_clear_pressed)
+	resize.connect("pressed",_on_resize_pressed)
+	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
+	## files
 	new.connect("pressed",_on_new_pressed)
 	save.connect("pressed",_on_save_pressed)
 	load.connect("pressed",_on_load_pressed)
-	resize.connect("pressed",_on_resize_pressed)
-	help.connect("pressed",_on_help_pressed)
-	detach.connect("pressed",_on_detach_pressed)
-
-
+	## tools
+	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("penblack"))
 	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
-	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("pen_behindblack"))
-	pen_overfirst_button.connect("pressed",_on_draw_mode_pressed.bind("pen_overfirst"))
-	pen_black_button.connect("pressed",_on_draw_mode_pressed.bind("pen_black"))
+	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("penbehindblack"))
+	pen_overfirstbehindblack_button.connect("pressed",_on_draw_mode_pressed.bind("penoverfirstbehindblack"))
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
-	hide_button.connect("pressed",_on_hide_pressed)
-	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
-	#
-	# colors
+	## colors
 	#brush_color_button.connect("pressed",_on_brush_color_pressed)# deprecated
 	brush_color_1.connect("pressed",_on_brush_color_i_pressed.bind(0))
 	brush_color_2.connect("pressed",_on_brush_color_i_pressed.bind(1))
@@ -125,9 +124,7 @@ func _ready():
 	brush_color_5.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(4))
 	brush_color_6.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(5))
 	brush_color_7.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(6))
-	#test.connect("pressed",_on_test_pressed)
 	## others
-	#_update_mode()
 	_update_hiding_buttons()
 	_update_image_size_label()
 	update_detach_button()
@@ -179,8 +176,7 @@ func _on_hide_pressed():
 func _update_hiding_buttons():
 	# removed detach
 	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,\
-	pen_black_button,pen_button,pen_overfirst_button,eraser_button,bucket_button,\
-	pen_behindblack_button,\
+	pen_button,pen_black_button,pen_behindblack_button,pen_overfirstbehindblack_button,eraser_button,bucket_button,\
 	brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]:
 		i.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
@@ -327,27 +323,30 @@ func _on_resize_dialogue_confirmed():
 #############################################################################################3
 ## DRAWING TOOLS
 ## Draw mode (must match drawing.gd)
-var draw_mode: String="pen_black"
+var draw_mode: String="penblack"
 func _on_draw_mode_pressed(input_tool: String):
-	if input_tool=="pen_black":
-		draw_mode="pen_black"
+	if input_tool=="pen":# color pen
+		draw_mode="pen"
+	elif input_tool=="penblack":
+		draw_mode="penblack"
 		drawing.resize_brush(pen_black_brush_scaling)
-	elif input_tool=="pen":# color pen
-		draw_mode="regular"
 		drawing.resize_brush(pen_color_brush_scaling)
-	elif input_tool=="pen_overfirst":# color pen
-		draw_mode="regular"
-		draw_mode="overfirst"
+	elif input_tool=="penoverfirst":# color pen
+		draw_mode="penoverfirst"
 		drawing.resize_brush(pen_color_brush_scaling)
-		#draw_mode="bucketbrush"# this is actually very costly for large images
-	elif input_tool=="pen_behindblack":
-		draw_mode="behindblack"
+	elif input_tool=="penoverfirstbehindblack":# color pen
+		draw_mode="penoverfirstbehindblack"
+		drawing.resize_brush(pen_color_brush_scaling)
+	elif input_tool=="penbehindblack":
+		draw_mode="penbehindblack"
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="eraser":
 		draw_mode="eraser"
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="bucket":
 		draw_mode="bucket"
+	elif input_tool=="bucketbrush":
+		draw_mode="bucketbrush"
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
