@@ -55,6 +55,13 @@ extends Control
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
 @onready var brush_color_button: Button=%brush_color
+## containers
+@onready var row: HBoxContainer = %row
+@onready var column: VBoxContainer = %column
+@onready var brush_row: HBoxContainer = %brush_row
+@onready var edit_row:HBoxContainer = %edit_row
+@onready var file_row: HBoxContainer = %file_row
+
 ## test
 #@onready var test: Button=%test
 
@@ -138,6 +145,10 @@ func _on_detach_pressed():
 	else:
 		_reatach_dialogue()
 func _detach_dialogue():
+	## column to row
+	for i in [brush_row,edit_row,file_row]:
+		i.get_parent().remove_child(i)
+		row.add_child(i)
 	detached=true
 	update_detach_button()
 	var file_dialogue = Window.new()
@@ -154,6 +165,10 @@ func _detach_dialogue():
 	file_dialogue.popup()
 	return file_dialogue
 func _reatach_dialogue():
+	## column to row
+	for i in [brush_row,edit_row,file_row]:
+		i.get_parent().remove_child(i)
+		column.add_child(i)
 	detached=false
 	update_detach_button()
 	var _window: Window=get_parent()
@@ -162,9 +177,9 @@ func _reatach_dialogue():
 	_window.queue_free()
 func update_detach_button():
 	if detached:
-		detach.text="attach"
+		detach.text="w"
 	else:
-		detach.text="detach"
+		detach.text="w"
 	
 ## HELP
 func _on_help_pressed():
@@ -187,7 +202,6 @@ func _help_dialogue():
 	Tools (tailored towards drawing black outlines+filling):
 	black pen: draw with dedicated black pen
 	brush behind black: paint with color but not over black strokes
-	brush single color: paint only the color under pen when starting stroke (WIP!)
 	brush: paint with color
 	eraser: erase
 	bucket: bucket fill
@@ -319,7 +333,7 @@ func _on_brush_color_dialogue_color_changed(input_color: Color):## SIGNAL FROM D
 func _on_brush_color_dialogue_confirmed():
 	if _brush_color_dialogue_color_selected:
 		brush_color=_brush_color_dialogue_color_selected
-		drawing.recolor_brush(brush_color)# already in set get
+		drawing.recolor_brush(brush_color)
 		update_brush_color()
 
 	

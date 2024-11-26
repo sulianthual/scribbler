@@ -1,6 +1,7 @@
-- small buttons for pen, eraser, bucket (and maybe draw over/draw behind)
+- black pen has separate brush size
+- row of colors to"save" them
+- onion drop: add image to background
 - test if works when exporting game
 - publish
-- start with brush color=white, and black pen
-- row of colors to"save" them
-- black pen has separate brush size
+- rows go horizontally on expand
+- add grid

@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://j6n6a2bbxi3q"]
+[gd_scene load_steps=2 format=3 uid="uid://j6n6a2bbxi3q"]
+
+[ext_resource type="Texture2D" uid="uid://cnyfmwo5gwhhb" path="res://demo/skeleton.png" id="1_xh3yc"]
 
 [node name="Main" type="Node"]
 
@@ -21,3 +23,7 @@ position = Vector2(-271, 71)
 
 [node name="player" type="Sprite2D" parent="."]
 position = Vector2(-271, 71)
+
+[node name="skeleton" type="Sprite2D" parent="."]
+position = Vector2(-374, 115)
+texture = ExtResource("1_xh3yc")

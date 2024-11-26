@@ -152,43 +152,46 @@ horizontal_alignment = 1
 [node name="button_container" type="MarginContainer" parent="scribbler_menu/VBoxContainer"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="scribbler_menu/VBoxContainer/button_container"]
+[node name="column" type="VBoxContainer" parent="scribbler_menu/VBoxContainer/button_container"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 2
 
-[node name="brush_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
+[node name="brush_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/column"]
+unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="pen_black" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+[node name="pen_black" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("8_l8g4e")
 
-[node name="pen_behindblack" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+[node name="pen_behindblack" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("12_pu1ru")
 
-[node name="pen" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+[node name="pen" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("8_7xc82")
 
-[node name="eraser" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+[node name="eraser" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("9_yjipa")
 
-[node name="bucket" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+[node name="bucket" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_icons/icon = ExtResource("10_6h7th")
 
-[node name="brush_color" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/brush_row"]
+[node name="brush_color" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/brush_row"]
 unique_name_in_owner = true
 modulate = Color(0, 0, 0, 1)
-custom_minimum_size = Vector2(30, 0)
+custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxFlat_r3yn6")
@@ -196,81 +199,85 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_r3yn6")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_r3yn6")
 theme_override_styles/normal = SubResource("StyleBoxFlat_r3yn6")
 
-[node name="edit_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
+[node name="edit_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/column"]
+unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="clear" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
+[node name="clear" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "clear"
 
-[node name="resize" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
+[node name="resize" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "resize
 "
 
-[node name="as_sheet" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/edit_row"]
+[node name="as_sheet" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
 text = "sheet"
 
-[node name="file_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
-layout_mode = 2
-alignment = 1
-
-[node name="load" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "load"
-
-[node name="save" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "save"
-
-[node name="new" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "new"
-
-[node name="help" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/file_row"]
+[node name="help" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "help"
 
-[node name="mode_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer"]
-layout_mode = 2
-alignment = 1
-
-[node name="detach" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
+[node name="hide" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/edit_row"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
-text = "detach"
-
-[node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "drag file"
-script = ExtResource("8_4phrr")
-
-[node name="hide" type="Button" parent="scribbler_menu/VBoxContainer/button_container/VBoxContainer/mode_row"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
 text = "x
 "
+
+[node name="file_row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container/column"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="drag" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/file_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
+text = "copy"
+script = ExtResource("8_4phrr")
+
+[node name="load" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/file_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "load"
+
+[node name="save" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/file_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "save"
+
+[node name="new" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/file_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "new"
+
+[node name="detach" type="Button" parent="scribbler_menu/VBoxContainer/button_container/column/file_row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_hqi5c")
+text = "w"
+
+[node name="row" type="HBoxContainer" parent="scribbler_menu/VBoxContainer/button_container"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
