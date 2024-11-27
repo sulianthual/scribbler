@@ -30,7 +30,9 @@ func clear_onions():## calls from Scribbler
 func add_onion(filename_: String):## Calls from scribbler
 	if ResourceLoader.exists(filename_):
 		var _img: Image=Image.new()
-		_img.load(filename_)
+		#_img.load(filename_)
+		#_img=load(filename_)
+		_img=image_load(filename_)
 		_img.convert(Image.FORMAT_RGBA8)
 		_img=_make_transparent(_img,0.5)
 		var _img_rect: Rect2i=Rect2i(0,0,_img.get_width(),_img.get_height())
@@ -38,14 +40,16 @@ func add_onion(filename_: String):## Calls from scribbler
 		texture_from_img()
 		
 func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls from scribbler
-	if ResourceLoader.exists(filename_):
+	if FileAccess.file_exists(filename_):
+	#if ResourceLoader.exists(filename_):
 		var subx: int=input_subset[0]
 		var suby: int=input_subset[1]
 		var ix: int=input_subset[2]
 		var iy: int=input_subset[3]
 		var source_img: Image=Image.new()
+		#source_img.load(filename_)
+		source_img=image_load(filename_)
 		source_img.convert(Image.FORMAT_RGBA8)
-		source_img.load(filename_)
 		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
 		var _img: Image=Image.new()
 		_img.convert(Image.FORMAT_RGBA8)
@@ -94,3 +98,10 @@ func _make_transparent(input_image: Image, factor: float):
 			_col.a=clamp(_col.a*factor,0,1)
 			_new_img.set_pixel(_ix, _iy, _col)
 	return _new_img
+
+func image_load(filename_: String)->Image:# image must be loaded as textures then converted
+	if FileAccess.file_exists(filename_):
+		var _texture: CompressedTexture2D=load(filename_)
+		return _texture.get_image()
+	else:
+		return Image.new()

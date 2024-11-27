@@ -3,7 +3,6 @@ extends TextureRect
 
 ## Scribbler: Draw and save images in Godot (for game prototyping)
 
-@export_subgroup("image")
 ## Width in pixels
 @export var px: int=256:
 	set(value):
@@ -85,6 +84,13 @@ func _drop_data(position, data):
 ###############################################################################
 ## FILES
 
+func image_load(filename_: String)->Image:# image must be loaded as textures then converted
+	if FileAccess.file_exists(filename_):
+		var _texture: CompressedTexture2D=load(filename_)
+		return _texture.get_image()
+	else:
+		return Image.new()
+	
 func new_drawing(input_px: int, input_py: int):# create texture as image
 	px=input_px
 	py=input_py
@@ -97,7 +103,8 @@ func new_drawing(input_px: int, input_py: int):# create texture as image
 func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 	if FileAccess.file_exists(filename_):
 		img=Image.new()
-		img.load(filename_)
+		img=image_load(filename_)
+		#img.img_load(filename_)# this works but gives a warning
 		img.convert(Image.FORMAT_RGBA8)
 		#img.copy_from(_swap_color(img,back_color_in_file,back_color))# swap colors
 		px=img.get_width()
@@ -115,7 +122,8 @@ func load_drawing_subset(filename_: String, input_subset: Array[int]):## CALLS F
 	if FileAccess.file_exists(filename_):
 		var source_img: Image=Image.new()
 		source_img.convert(Image.FORMAT_RGBA8)
-		source_img.load(filename_)
+		source_img=image_load(filename_)
+		#source_img.load(filename_)
 		var subx: int=input_subset[0]
 		var suby: int=input_subset[1]
 		var ix: int=input_subset[2]
@@ -137,7 +145,8 @@ func save_drawing_subset(filename_: String,input_subset: Array[int]):## CALLS FR
 	if FileAccess.file_exists(filename_):# overwrite an existing file editing a subset
 		var source_img: Image=Image.new()
 		source_img.convert(Image.FORMAT_RGBA8)
-		source_img.load(filename_)
+		source_img=image_load(filename_)
+		#source_img.load(filename_)
 		var subset_rect: Rect2i=_get_image_subset_rect(source_img,subx,suby,ix,iy)# subset region
 		var img_rect: Rect2i=Rect2i(0,0,img.get_width(),img.get_height())
 		source_img.blit_rect(img,img_rect,subset_rect.position)
@@ -214,7 +223,8 @@ func rescale_drawing(input_px: int,input_py: int, interpolation_mode: Image.Inte
 
 func load_brush():# set the brush
 	if FileAccess.file_exists(brush_path):
-		brush_img_base.load(brush_path)
+		brush_img_base=image_load(brush_path)
+		#brush_img_base.load(brush_path)
 	brush_img_base.convert(Image.FORMAT_RGBA8)
 	brush_img.convert(Image.FORMAT_RGBA8)
 	brush_size_min=float(1.5/brush_img_base.get_width())# 1x1 min size (1.5 instead of 1 or disappears from rounding artifacts)

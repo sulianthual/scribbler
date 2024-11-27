@@ -65,7 +65,8 @@ func make_source_image(filename_: String):## CALLS from scribbler
 	if FileAccess.file_exists(filename_):# File exists: loading or saving over existing image
 		make_from_edited=false
 		var img: Image=Image.new()
-		img.load(filename_)
+		#img.load(filename_)
+		img=image_load(filename_)
 		img.convert(Image.FORMAT_RGBA8)
 		px=img.get_width()
 		py=img.get_height()
@@ -166,3 +167,10 @@ func update_grid():
 
 func update_region_size():
 	region_size.text=str(px/subx.value)+"x"+str(py/suby.value)
+
+func image_load(filename_: String)->Image:# image must be loaded as textures then converted
+	if FileAccess.file_exists(filename_):
+		var _texture: CompressedTexture2D=load(filename_)
+		return _texture.get_image()
+	else:
+		return Image.new()
