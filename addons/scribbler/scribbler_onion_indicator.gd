@@ -70,7 +70,7 @@ func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls f
 		texture_from_img()
 
 ## Filter onion image
-var filter_mode="outlines"
+var filter_mode="semitransparent"
 var transparency_factor: float=0.5
 var outlines_color_ref: Color=Color(0,0,0,transparency_factor)
 var outlines_color: Color=outlines_color_ref
@@ -101,12 +101,7 @@ func texture_from_img():# update displayed texture from image
 	var _texture: ImageTexture=ImageTexture.create_from_image(img)
 	texture=_texture
 
-func image_load(filename_: String)->Image:# image must be loaded as textures then converted
-	if FileAccess.file_exists(filename_):
-		var _texture: CompressedTexture2D=load(filename_)
-		return _texture.get_image()
-	else:
-		return Image.new()
+
 
 func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:int)->Rect2i:#->determine subset
 	# ix,iy are the coordinates and start at 1,1
@@ -150,3 +145,12 @@ func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 				_new_img.set_pixel(_ix, _iy, new_color)
 	return _new_img
 	
+
+func image_load(filename_: String)->Image:# image must be loaded as textures then converted
+	var img=Image.new()
+	if FileAccess.file_exists(filename_):
+		img.load(filename_)
+		#var _texture: CompressedTexture2D=load(filename_)#-> bad format!
+		#img=_texture.get_image()#-> bad format some transparent=0,0,0,0
+	img.convert(Image.FORMAT_RGBA8)
+	return img

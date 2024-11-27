@@ -248,15 +248,15 @@ func _help_dialogue():
 	Make basic drawings without leaving the editor, useful for prototyping. 
 	
 	Drawing Area:
-	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Pick pen color with middle mouse. \
+	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, color picker with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Tools:
 	color pen/eraser/bucket fill: classic paint tools
-	black pen: draw outlines with dedicated black pen (with dedicated pen size and color)
-	color pen alt1: draw with color pen but behind black strokes
-	color pen alt2: draw with color pen but behind black strokes and only over starting color
-	color slots: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse). 
+	black pen: draw with dedicated black pen (for outlines). Has a separate pen size and color.
+	color pen alt1: draw with color pen but behind black strokes (for filling)
+	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows)
+	color slots: left click to apply to color pen, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
 	Buttons:
 	x/menu/+: minimize/expand and detach/attach dock
@@ -277,6 +277,7 @@ func _help_dialogue():
 
 	Warnings: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
+	You will get many warnings "Loaded resource as image file", its normal. \
 	This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Likely inefficient for large files.
 	"""
 	file_dialogue.dialog_autowrap=true

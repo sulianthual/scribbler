@@ -84,13 +84,7 @@ func _drop_data(position, data):
 ###############################################################################
 ## FILES
 
-func image_load(filename_: String)->Image:# image must be loaded as textures then converted
-	if FileAccess.file_exists(filename_):
-		#return Image.new().load(filename_)
-		var _texture: CompressedTexture2D=load(filename_)
-		return _texture.get_image()
-	else:
-		return Image.new()
+
 	
 func new_drawing(input_px: int, input_py: int):# create texture as image
 	px=input_px
@@ -106,7 +100,7 @@ func load_drawing(filename_: String):## CALLS FROM SCRIBBLER
 		img=Image.new()
 		img=image_load(filename_)
 		#img.img_load(filename_)# this works but gives a warning
-		img.convert(Image.FORMAT_RGBA8)
+		
 		#img.copy_from(_swap_color(img,back_color_in_file,back_color))# swap colors
 		px=img.get_width()
 		py=img.get_height()
@@ -173,10 +167,6 @@ func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:in
 	
 ###############################################################################
 ## IMAGE AND TEXTURE
-
-func texture_from_img():# update displayed texture from image
-	var _texture: ImageTexture=ImageTexture.create_from_image(img)
-	texture=_texture# beware of scale (should be 1,1)
 
 func clear_drawing():
 	img.fill(back_color)
@@ -353,7 +343,7 @@ func _input(event):
 				undo_pressed=false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 			if event.pressed:# PICK A COLOR
-				print("midmouse pressed")
+				#print("midmouse pressed")
 				_drawing=false
 				if not pick_pressed:
 					pick_pressed=true
@@ -554,6 +544,28 @@ func _draw_point():
 func _end_stroke():# whenever end or cancel stroke
 	_drawing=false
 
+###############################################################################
+## CALLS (from Scribbler)
+
+func get_texture()->ImageTexture:
+	return texture
+func get_image()->Image:
+	return img
+func activate():
+	active=true
+	_drawing=false
+	pick_pressed=false
+	undo_pressed=false
+
+func deactivate():
+	active=false
+	_drawing=false
+	pick_pressed=false
+	undo_pressed=false
+
+###############################################################################
+## UTILS
+
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
 	
@@ -649,24 +661,18 @@ func _mask_from_image_difference(img1: Image, img2: Image)->Image:
 			if img1.get_pixel(_ix, _iy) != img2.get_pixel(_ix,_iy):
 				_new_img.set_pixel(_ix, _iy, Color.WHITE)
 	return _new_img
-###############################################################################
-## CALLS (from Scribbler)
 
-func get_texture()->ImageTexture:
-	return texture
-func get_image()->Image:
+func image_load(filename_: String)->Image:# image must be loaded as textures then converted
+	var img=Image.new()
+	if FileAccess.file_exists(filename_):
+		img.load(filename_)
+		#var _texture: CompressedTexture2D=load(filename_)#-> bad format!
+		#img=_texture.get_image()#-> bad format some transparent=0,0,0,0
+	img.convert(Image.FORMAT_RGBA8)
 	return img
-func activate():
-	active=true
-	_drawing=false
-	pick_pressed=false
-	undo_pressed=false
 
-func deactivate():
-	active=false
-	_drawing=false
-	pick_pressed=false
-	undo_pressed=false
-
-
+func texture_from_img():# update displayed texture from image
+	var _texture: ImageTexture=ImageTexture.create_from_image(img)
+	texture=_texture# beware of scale (should be 1,1)
+	
 ###############################################################################
