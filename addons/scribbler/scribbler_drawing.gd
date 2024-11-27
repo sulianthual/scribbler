@@ -178,8 +178,8 @@ func texture_from_img():# update displayed texture from image
 	texture=_texture# beware of scale (should be 1,1)
 
 func clear_drawing():
-	save_img_to_undo_history()#-> save to history
 	img.fill(back_color)
+	save_img_to_undo_history()#-> save to history
 	texture_from_img()
 	#clear_undo_history()#-> clears all previous!
 			

@@ -27,7 +27,20 @@ func _postready():
 	
 func clear_onions():## calls from Scribbler
 	clear_canvas()
-	
+
+var filter_mode="blackoutline"
+func filter_onion(image: Image)->Image:
+	var _img: Image=Image.create(image.get_width(),image.get_height(),false, Image.FORMAT_RGBA8)
+	_img.convert(Image.FORMAT_RGBA8)
+	_img.copy_from(image)
+	if filter_mode=="semitransparent":
+		image=_make_transparent(image,0.5)# just transparent
+	elif filter_mode=="blackoutline":
+		_img=_swap_notcolor(_img,Color.BLACK, Color.TRANSPARENT)
+		_img=_swap_color(_img,Color.BLACK, Color(1,0,0,0.5))
+	#_img.blit_rect_mask(image)
+
+	return _img
 func add_onion(filename_: String):## Calls from scribbler
 	if ResourceLoader.exists(filename_):
 		var _img: Image=Image.new()
@@ -35,7 +48,7 @@ func add_onion(filename_: String):## Calls from scribbler
 		#_img=load(filename_)
 		_img=image_load(filename_)
 		_img.convert(Image.FORMAT_RGBA8)
-		_img=_make_transparent(_img,0.5)
+		_img=filter_onion(_img)
 		var _img_rect: Rect2i=Rect2i(0,0,_img.get_width(),_img.get_height())
 		img.blend_rect(_img,_img_rect,Vector2(0,0))
 		texture_from_img()
@@ -55,7 +68,7 @@ func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls f
 		var _img: Image=Image.new()
 		_img.convert(Image.FORMAT_RGBA8)
 		_img=source_img.get_region(subset_rect)
-		_img=_make_transparent(_img,0.5)
+		_img=filter_onion(_img)
 		var _img_rect: Rect2i=Rect2i(0,0,_img.get_width(),_img.get_height())
 		img.blend_rect(_img,_img_rect,Vector2(0,0))
 		texture_from_img()
@@ -84,10 +97,21 @@ func clear_canvas():
 	#else:
 		#img.blend_rect(drawing.brush_img,Rect2(0,0,drawing.brush_img.get_width(),drawing.brush_img.get_height()),Vector2(0,0))
 	texture_from_img()
+	
+####################################
+## UTILS
+
 func texture_from_img():# update displayed texture from image
 	var _texture: ImageTexture=ImageTexture.create_from_image(img)
 	texture=_texture
 
+func image_load(filename_: String)->Image:# image must be loaded as textures then converted
+	if FileAccess.file_exists(filename_):
+		var _texture: CompressedTexture2D=load(filename_)
+		return _texture.get_image()
+	else:
+		return Image.new()
+		
 ## swap anything that isnt source color with new_color
 func _make_transparent(input_image: Image, factor: float):
 	var _new_img: Image=Image.new()
@@ -100,9 +124,24 @@ func _make_transparent(input_image: Image, factor: float):
 			_new_img.set_pixel(_ix, _iy, _col)
 	return _new_img
 
-func image_load(filename_: String)->Image:# image must be loaded as textures then converted
-	if FileAccess.file_exists(filename_):
-		var _texture: CompressedTexture2D=load(filename_)
-		return _texture.get_image()
-	else:
-		return Image.new()
+## swap anything that isnt source color with new_color
+func _swap_notcolor(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			if _new_img.get_pixel(_ix, _iy) != source_color:
+				_new_img.set_pixel(_ix, _iy, new_color)
+	return _new_img
+
+func _swap_color(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			if _new_img.get_pixel(_ix, _iy) == source_color:
+				_new_img.set_pixel(_ix, _iy, new_color)
+	return _new_img
+	
