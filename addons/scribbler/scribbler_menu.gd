@@ -258,6 +258,12 @@ func _help_dialogue():
 	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows)
 	color slots: left click to apply to color pen, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
+	Drag and Drop:
+	drawing area: drop any PNG (as file/texture) from Filesystem/Inspector/etc to load it.
+	copy: drag edited PNG from "copy" (must be saved on disk), drop to any texture to apply it.
+	colors slots: drop any PNG to any slot to load colors found in PNG.
+	onions: drop PNGs to load them as onion skinning. drop colors from color slots (see below).
+
 	Buttons:
 	x/menu/+: minimize/expand and detach/attach dock
 	load/save/new: manage PNG files in res://.
@@ -265,15 +271,13 @@ func _help_dialogue():
 	size: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
 	copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too.
-	onions: Onion skinnings show original (black) outlines as semi-transparent and are non editable. \
-	Drop files/textures to add. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
-	
-	Drag and Drop:
-	drawing area: drop any file or texture from Filesystem/Inspector/etc (with a PNG) to load it.
-	copy: drag edited image from "copy", drop to any texture to apply it (image must be saved on disk).
-	colors slots: drop files/textures to any slot to load colors found in image.
-	onions: drop files or textures to load them as onion skinning. \
-	drop colors to change color of new onion skins.
+	 
+	Onion Skinning:	
+	Onion skins are guidelines, shown as semi-transparent and non editable. \
+	Drop any PNG (e.g. from "copy") to "onions" to add a new onion skin. \
+	Drop a color to swap to colored outlines. \
+	Drop further colors to changes colored outlines for next onion skins loaded. \
+	Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins.
 
 	Warnings: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
@@ -339,10 +343,10 @@ var draw_mode: String="penblack"
 func _on_draw_mode_pressed(input_tool: String):
 	if input_tool=="pen":# color pen
 		draw_mode="pen"
+		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="penblack":
 		draw_mode="penblack"
 		drawing.resize_brush(pen_black_brush_scaling)
-		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="penoverfirst":# color pen
 		draw_mode="penoverfirst"
 		drawing.resize_brush(pen_color_brush_scaling)
@@ -357,8 +361,10 @@ func _on_draw_mode_pressed(input_tool: String):
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="bucket":
 		draw_mode="bucket"
+		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="bucketbrush":
 		draw_mode="bucketbrush"
+		drawing.resize_brush(pen_color_brush_scaling)
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
@@ -369,17 +375,17 @@ var pen_black_brush_scaling: float=1.0
 var pen_color_brush_scaling: float=1.0
 #brush_scaling_changed.emit()
 func on_drawing_brush_scaling_changed():
-	if draw_mode=="pen_black":
+	if draw_mode=="penblack":
 		pen_black_brush_scaling=drawing.brush_scaling
-	elif draw_mode=="regular" or draw_mode=="behindblack":
+	else:
 		pen_color_brush_scaling=drawing.brush_scaling
 
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
-var brush_colors: Array[Color]=[Color.WHITE,Color.DIM_GRAY,\
-Color.DARK_RED,Color.DARK_GREEN,\
-Color.DARK_BLUE,Color.ORANGE_RED,\
+var brush_colors: Array[Color]=[Color.DARK_RED,Color.DIM_GRAY,\
+Color.WHITE,Color.WHITE,\
+Color.WHITE,Color.WHITE,\
 Color.TRANSPARENT]
 var last_brush_color_button_pressed_index: int=0# last button selected
 var brush_color: Color=brush_colors[last_brush_color_button_pressed_index]
@@ -409,6 +415,8 @@ func _on_brush_color_i_data_dropped(input_color: Color,index: int):# dropped a c
 	#brush_color=brush_colors[index]
 	#drawing.recolor_brush(brush_color)	
 func _on_brush_color_i_colors_dropped(input_colors: Array[Color],index: int)->void: # drop array of colors, apply to row
+	for ic in range(len(brush_colors)):
+		brush_colors[ic]=Color.WHITE
 	var ic:int=0
 	for i in input_colors:
 		brush_colors[ic]=i

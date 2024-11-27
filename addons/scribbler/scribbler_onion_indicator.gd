@@ -70,7 +70,10 @@ func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls f
 		texture_from_img()
 
 ## Filter onion image
-var filter_mode="semitransparent"
+## Default mode is semitransparent
+## If color added to onions: set to outline with selected color
+## if onions reset: switch back to semi-transparent
+var filter_mode="semitransparent"# starting mode
 var transparency_factor: float=0.5
 var outlines_color_ref: Color=Color(0,0,0,transparency_factor)
 var outlines_color: Color=outlines_color_ref
@@ -80,19 +83,31 @@ func filter_onion(image: Image)->Image:
 	_img.convert(Image.FORMAT_RGBA8)
 	_img.copy_from(image)
 	if filter_mode=="semitransparent":
-		image=_make_transparent(image,transparency_factor)# just transparent
+		_img=_make_transparent(image,transparency_factor)# just transparent
 	elif filter_mode=="outlines":
 		_img=_swap_notcolor(_img,Color.BLACK, Color.TRANSPARENT)
 		_img=_swap_color(_img,Color.BLACK, outlines_color)
 	#_img.blit_rect_mask(image)
 	return _img
+
 func set_outlines_color(input_color: Color)->void: ## CALLS from scribbler or onion_drop
+	#print("ss")
 	outlines_color=input_color
 	outlines_color.a=outlines_color.a*transparency_factor
+	if filter_mode=="semitransparent":
+		#print("sdff")
+		img=_swap_notcolor_noalpha(img,Color.BLACK, Color.TRANSPARENT)
+		img=_swap_color_noalpha(img,Color.BLACK, outlines_color)
+		texture_from_img()
+	filter_mode="outlines"# reset mode
+	
+	#modulate=input_color
 func reset_outlines_color()->void: ## CALLS from scribbler or onion_drop
 	outlines_color=outlines_color_ref
-	
+	filter_mode="semitransparent"# reset mode
+	#modulate=Color.WHITE
 
+#
 	
 ####################################
 ## UTILS
@@ -120,7 +135,7 @@ func _make_transparent(input_image: Image, factor: float):
 	for _iy in _new_img.get_height():
 		for _ix in _new_img.get_width():
 			var _col: Color=_new_img.get_pixel(_ix, _iy)
-			_col.a=clamp(_col.a*factor,0,1)
+			_col.a=clamp(_col.a*factor,0.0,1.0)
 			_new_img.set_pixel(_ix, _iy, _col)
 	return _new_img
 
@@ -135,6 +150,18 @@ func _swap_notcolor(input_image: Image,source_color: Color, new_color: Color):
 				_new_img.set_pixel(_ix, _iy, new_color)
 	return _new_img
 
+## swap anything that isnt source color with new_color: ignore alpha value
+func _swap_notcolor_noalpha(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			var _col: Color=_new_img.get_pixel(_ix, _iy)
+			if _col.r!=source_color.r or _col.g!=source_color.g or _col.b!=source_color.b:
+				_new_img.set_pixel(_ix, _iy, new_color)
+	return _new_img
+	
 func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 	var _new_img: Image=Image.new()
 	_new_img.convert(Image.FORMAT_RGBA8)
@@ -145,6 +172,17 @@ func _swap_color(input_image: Image,source_color: Color, new_color: Color):
 				_new_img.set_pixel(_ix, _iy, new_color)
 	return _new_img
 	
+## ignore alpha matching (except transparent)
+func _swap_color_noalpha(input_image: Image,source_color: Color, new_color: Color):
+	var _new_img: Image=Image.new()
+	_new_img.convert(Image.FORMAT_RGBA8)
+	_new_img.copy_from(input_image)
+	for _iy in _new_img.get_height():
+		for _ix in _new_img.get_width():
+			var _col: Color=_new_img.get_pixel(_ix, _iy)
+			if _col.r==source_color.r and _col.g==source_color.g and _col.b==source_color.b and _col.a>0:
+				_new_img.set_pixel(_ix, _iy, new_color)
+	return _new_img
 
 func image_load(filename_: String)->Image:# image must be loaded as textures then converted
 	var img=Image.new()

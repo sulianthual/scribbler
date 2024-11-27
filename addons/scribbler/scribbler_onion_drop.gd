@@ -70,5 +70,5 @@ func _drop_data(position, data):
 		onion_indicator.set_outlines_color(data)
 
 func update_button_color(input_color: Color):
-	pass
+	add_theme_color_override("font_color",input_color)
 	#modulate=input_color
