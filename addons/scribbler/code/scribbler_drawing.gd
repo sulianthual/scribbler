@@ -27,7 +27,7 @@ const back_color: Color=Color.TRANSPARENT#background color on new_drawing or res
 const line_fill: bool=true# use line algorithm to fill gaps
 const max_undos: int=20## Max number of undos (important, high=performance issues)
 # Brush
-const brush_path: String="res://addons/scribbler/scribbler_brush.png"# must be square!
+const brush_path: String="res://addons/scribbler/code/scribbler_brush.png"# must be square!
 var brush_size_min: float=0.1# brush size min: (1x1 adjust according to base) 
 const brush_size_max: float=10.0# brush size max
 const brush_size_start: float=1.0# brush size start
