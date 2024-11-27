@@ -244,10 +244,10 @@ func _help_dialogue():
 	var file_dialogue = AcceptDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Help"
-	file_dialogue.dialog_text="""Scribbler (sul 2024, Godot 4.2): \
+	file_dialogue.dialog_text="""Scribbler (sul 2024, Godot v4.2+ plugin): \
 	Make basic drawings without leaving the editor, useful for prototyping. 
 	
-	Drawing Area: \
+	Drawing Area:
 	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Pick pen color with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
@@ -260,25 +260,24 @@ func _help_dialogue():
 	
 	Buttons:
 	x/menu/+: minimize/expand and detach/attach dock
-	load/save/new: manage from existing PNG file in res://.
+	load/save/new: manage PNG files in res://.
 	clear: clear the scribble (can be undone)
 	size: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
-	grid: toggle grid
-	copy: Drag the PNG file saved on disk from here to any texture in Editor.
+	copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too.
 	onions: Onion skinnings show original (black) outlines as semi-transparent and are non editable. \
-	Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
+	Drop files/textures to add. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
 	
-	Drag and Drop (awesome!):
+	Drag and Drop:
 	drawing area: drop any file or texture from Filesystem/Inspector/etc (with a PNG) to load it.
 	copy: drag edited image from "copy", drop to any texture to apply it (image must be saved on disk).
-	colors slots: drop files/textures (including from "copy") to any slot to load colors found in image.
-	onions: drop files or textures (including from "copy") to load them as onion skinning. \
+	colors slots: drop files/textures to any slot to load colors found in image.
+	onions: drop files or textures to load them as onion skinning. \
 	drop colors to change color of new onion skins.
 
 	Warnings: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
-	This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Probably inefficient for large files (I dunno).
+	This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Likely inefficient for large files.
 	"""
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)

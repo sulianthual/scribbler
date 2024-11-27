@@ -86,6 +86,7 @@ func _drop_data(position, data):
 
 func image_load(filename_: String)->Image:# image must be loaded as textures then converted
 	if FileAccess.file_exists(filename_):
+		#return Image.new().load(filename_)
 		var _texture: CompressedTexture2D=load(filename_)
 		return _texture.get_image()
 	else:

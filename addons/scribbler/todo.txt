@@ -1,3 +1,4 @@
 - grid-> can show but lines are finicky (cf rendering?)
 - middle mouse not detected
 - publish
+- problems with onions/something-> weird outlines: cf texture to image!
