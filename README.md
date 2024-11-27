@@ -4,7 +4,6 @@
 
 sul (2024), Plugin for Godot 4.2+.
 
-A side dock to make basic drawings without leaving the Godot editor, useful for prototyping. Has basic and custom paint tools tailored towards drawing black outlines and color/shadow filling. 
-Supports drag and drop from any file/texture in FileSystem/Inspector etc (PNG only), onion skinning, sprite sheets.
+A side dock to make basic drawings without leaving the Godot editor, useful for prototyping. Has basic and custom paint tools, supports drag and drop from any file/texture in FileSystem/Inspector etc (PNG only), onion skinning, sprite sheets, etc.
 
 Github reference: [link](https://github.com/sulianthual/scribbler)
