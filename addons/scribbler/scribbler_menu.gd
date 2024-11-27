@@ -10,8 +10,8 @@ extends Control
 		edited_file=value
 		if edited_file_label:
 			edited_file_label.text=edited_file
-		if drag:
-			drag.set_filename(edited_file)
+		if copy_button:
+			copy_button.set_filename(edited_file)
 ## image width (pixels) (as controlled here instead of drawing)
 @export var px: int=256
 ## image height (pixels) (as controlled here instead of drawing)
@@ -34,7 +34,7 @@ extends Control
 @onready var image_size_label: Label=%image_size
 @onready var edited_file_label: Label=%edited_file
 ## drop
-@onready var drag: Button=%drag
+@onready var copy_button: Button=%copy
 ## on
 @onready var onion_drop: Button = %onion_drop
 @onready var onion_indicator: TextureRect = %onion_indicator
@@ -43,6 +43,8 @@ extends Control
 @onready var detach: Button=%detach# update image size
 @onready var hide_button: Button=%hide# update image size
 @onready var help: Button=%help
+@onready var menu: Button = %menu
+
 ## file
 #@onready var mode_button: Button = %mode
 @onready var new: Button = %new# new drawing
@@ -70,13 +72,12 @@ extends Control
 @onready var brush_color_7: Button = %brush_color7
 @onready var brush_buttons: Array[Button]=[brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]
 #@onready var brush_color_button: Button=%brush_color# deprecated
-## containers
-@onready var row: HBoxContainer = %row
-@onready var column: VBoxContainer = %column
+## containers (for visibility)
 @onready var brush_row: HBoxContainer = %brush_row
+@onready var colors_row: HBoxContainer = %colors_row
 @onready var edit_row:HBoxContainer = %edit_row
+@onready var option_row: HBoxContainer = %option_row
 @onready var file_row: HBoxContainer = %file_row
-
 ## test
 #@onready var test: Button=%test
 
@@ -97,6 +98,7 @@ func _ready():
 	detach.connect("pressed",_on_detach_pressed)
 	hide_button.connect("pressed",_on_hide_pressed)
 	help.connect("pressed",_on_help_pressed)
+	menu.connect("pressed",_on_menu_pressed)
 	## edit buttons
 	clear.connect("pressed",_on_clear_pressed)
 	resize.connect("pressed",_on_resize_pressed)
@@ -121,7 +123,7 @@ func _ready():
 		i.connect("data_dropped",_on_brush_color_i_data_dropped.bind(ic))
 		ic+=1
 	## others
-	_update_hiding_buttons()
+	_update_buttons_visibility()
 	_update_image_size_label()
 	update_detach_button()
 	ready_brush_color()# wa make_brush+color
@@ -164,20 +166,27 @@ func _input(event):
 				# could have consecutive mouse events, put exclusive window unfocuses the window
 				brush_color_i_pick_color()
 
-
 ## HIDE BUTTONS
-var hiding_buttons: bool=false
+var hiding_buttons: bool=false# hidden by X
+var menu_expanded: bool=true# menu is expanded
 func _on_hide_pressed():
 	hiding_buttons=not hiding_buttons
-	_update_hiding_buttons()
-func _update_hiding_buttons():
-	# removed detach
-	for i in [new,clear,save,load,resize,help,as_sheet_button,drag,onion_drop,\
-	pen_button,pen_black_button,pen_behindblack_button,pen_overfirstbehindblack_button,eraser_button,bucket_button,\
-	brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]:
-		i.visible=not hiding_buttons
+	_update_buttons_visibility()
+## EXPAND MENU BUTTON
+func _on_menu_pressed():
+	menu_expanded=not menu_expanded
+	_update_buttons_visibility()
+	#_update_hiding_buttons()
+func _update_buttons_visibility():
+	brush_row.visible=not hiding_buttons
+	colors_row.visible=not hiding_buttons
+	edit_row.visible=not hiding_buttons and menu_expanded
+	file_row.visible=not hiding_buttons and menu_expanded
+	option_row.visible=not hiding_buttons and menu_expanded
+	menu.visible=not hiding_buttons
 	detach.visible=not hiding_buttons and can_detach
 
+	
 ## DETACH MENU (POPUP)
 var detached: bool=false# dock starts detached or not
 var can_detach: bool=true# MAY INTERFERE WITH MAKE FLOATING
