@@ -1,6 +1,4 @@
-- onion drop: pick color when adding onion? or drop from the colors saved
-- onion drop: swap between show onion and drawing, show onion not drawing, show drawing not onion
 -> add event messages when doing something (optional)
-- merge sheet/size into options-> + add grid, background color
+- background color
 - grid-> add maybe
 - publish

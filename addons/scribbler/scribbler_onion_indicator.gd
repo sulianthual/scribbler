@@ -72,7 +72,7 @@ func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls f
 ## Filter onion image
 var filter_mode="outlines"
 var transparency_factor: float=0.5
-var outlines_color_ref: Color=Color(1,0,0,transparency_factor)
+var outlines_color_ref: Color=Color(0,0,0,transparency_factor)
 var outlines_color: Color=outlines_color_ref
 
 func filter_onion(image: Image)->Image:
