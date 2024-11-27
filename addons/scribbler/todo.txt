@@ -1,4 +1,3 @@
 -> add event messages when doing something (optional)
-- background color
-- grid-> add maybe
+- grid-> can show but lines are finicky (cf rendering?)
 - publish

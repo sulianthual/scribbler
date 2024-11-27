@@ -33,6 +33,7 @@ extends Control
 @onready var drawing: TextureRect=%drawing
 @onready var image_size_label: Label=%image_size
 @onready var edited_file_label: Label=%edited_file
+@onready var grid_indicator = %grid_indicator
 ## drop
 @onready var copy_button: Button=%copy
 ## on
@@ -50,11 +51,12 @@ extends Control
 @onready var new: Button = %new# new drawing
 @onready var load: Button = %load# load drawing
 @onready var save: Button = %save# save drawing
-## edit
+## edit/options
 #@onready var onion_drop: Button = %onion_drop
 @onready var clear: Button = %clear# clear drawing (same as new drawing)
 @onready var resize: Button=%resize# update image size
 @onready var as_sheet_button: Button = %as_sheet# save drawing
+@onready var grid_button: Button = %grid
 ## drawing tools
 @onready var pen_button: Button=%pen
 @onready var pen_overfirstbehindblack_button: Button=%pen_overfirstbehindblack
@@ -103,6 +105,7 @@ func _ready():
 	clear.connect("pressed",_on_clear_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
+	grid_button.connect("toggled",_on_grid_toggled)
 	## files
 	new.connect("pressed",_on_new_pressed)
 	save.connect("pressed",_on_save_pressed)
@@ -249,7 +252,7 @@ func _help_dialogue():
 	Drag and Drop: \
 	Drag files or textures (with a PNG) to the drawing area to load and edit it. \
 	Drag the edited image (must be saved on disk) from "copy" to any texture to apply it. \
-	Drag any files or textures (with a PNG) to onion ("o") to load it as onion skinning (can stack). \
+	Drag any files or textures (with a PNG) to onions to load it as onion skinning (can stack). \
 	Drag colors between color slots, or to onion to change next loaded onions color.
 		
 	Tools:
@@ -260,13 +263,14 @@ func _help_dialogue():
 	color slots: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
 	Buttons:
-	+/-/x: detach the Scribbler dock to a popup window, or minimize/expand menu.
+	x/menu/+: minimize/expand and detach/attach dock
 	load/save/new: manage from existing PNG file in res://.
 	clear: clear the scribble (can be undone)
 	size: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
+	grid: toggle grid
 	copy: Drag the PNG file saved on disk from here to any texture in Editor.
-	o: drop onion skinning images (including from copy button). \
+	onions: drop onion skinning images (including from copy button). \
 	Onion skinnings show original (black) outlines as semi-transparent and are non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
 	
 	Warnings: \
@@ -323,7 +327,8 @@ func _on_resize_dialogue_confirmed():
 	elif resize_mode=="crop_cornered":
 		drawing.crop_drawing_cornered(px,py)
 
-
+func _on_grid_toggled(toggle_on: bool):
+	grid_indicator.set_grid_visibility(toggle_on)
 #############################################################################################3
 ## DRAWING TOOLS
 ## Draw mode (must match drawing.gd)

@@ -8,9 +8,11 @@ func _ready() -> void:
 	connect("pressed",on_pressed)
 	connect("mouse_entered",on_mouse_entered)
 	connect("mouse_exited",on_mouse_exited)
+	update_button_color(color_default)
 
 signal clear_onions
 signal toggle_onions_visibilty
+const color_default=Color(0.25,0.25,0.25,1)# fr button
 func on_pressed():
 	toggle_onions_visibilty.emit()# let menu handle it
 	#if onion_indicator:
@@ -34,9 +36,9 @@ func _input(event):
 
 func reset_onions():
 	clear_onions.emit()
-	modulate=Color.WHITE
 	#add_theme_stylebox_override()
 	onion_indicator.reset_outlines_color()
+	update_button_color(color_default)
 	
 func _can_drop_data(position, data):
 	#print("_can_drop_data: ",data)
@@ -64,5 +66,11 @@ func _drop_data(position, data):
 				#onion_indicator.add_onion(data.resource.resource_path)
 	elif typeof(data)==TYPE_COLOR:
 		#print("dropped color")
-		modulate=data
+		update_button_color(data)
 		onion_indicator.set_outlines_color(data)
+
+func update_button_color(input_color: Color):
+	#modulate=input_color# ugly
+	var _stylebox=get_theme_stylebox("normal")
+	_stylebox.bg_color=input_color
+	add_theme_stylebox_override("normal",_stylebox)

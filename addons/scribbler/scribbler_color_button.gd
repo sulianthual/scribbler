@@ -14,6 +14,8 @@ func _drop_data(position, data):
 		#modulate=data# handled by scribbler menu
 
 func _get_drag_data(at_position: Vector2):
-	var _preview: Control
-	#set_drag_preview(_preview)
+	var _preview: ColorRect=ColorRect.new()
+	_preview.color=modulate
+	_preview.custom_minimum_size=Vector2i(20,20)
+	set_drag_preview(_preview)
 	return modulate
