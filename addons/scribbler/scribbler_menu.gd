@@ -67,6 +67,7 @@ extends Control
 @onready var brush_color_5: Button = %brush_color5
 @onready var brush_color_6: Button = %brush_color6
 @onready var brush_color_7: Button = %brush_color7
+@onready var brush_buttons: Array[Button]=[brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]
 #@onready var brush_color_button: Button=%brush_color# deprecated
 ## containers
 @onready var row: HBoxContainer = %row
@@ -111,28 +112,13 @@ func _ready():
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
 	## colors
-	#brush_color_button.connect("pressed",_on_brush_color_pressed)# deprecated
-	brush_color_1.connect("pressed",_on_brush_color_i_pressed.bind(0))
-	brush_color_2.connect("pressed",_on_brush_color_i_pressed.bind(1))
-	brush_color_3.connect("pressed",_on_brush_color_i_pressed.bind(2))
-	brush_color_4.connect("pressed",_on_brush_color_i_pressed.bind(3))
-	brush_color_5.connect("pressed",_on_brush_color_i_pressed.bind(4))
-	brush_color_6.connect("pressed",_on_brush_color_i_pressed.bind(5))
-	brush_color_7.connect("pressed",_on_brush_color_i_pressed.bind(6))
-	brush_color_1.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(0))
-	brush_color_2.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(1))
-	brush_color_3.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(2))
-	brush_color_4.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(3))
-	brush_color_5.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(4))
-	brush_color_6.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(5))
-	brush_color_7.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(6))
-	brush_color_1.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(0))
-	brush_color_2.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(1))
-	brush_color_3.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(2))
-	brush_color_4.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(3))
-	brush_color_5.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(4))
-	brush_color_6.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(5))
-	brush_color_7.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(6))
+	var ic: int=0
+	for i in brush_buttons:
+		i.connect("pressed",_on_brush_color_i_pressed.bind(ic))
+		i.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(ic))
+		i.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(ic))
+		i.connect("data_dropped",_on_brush_color_i_data_dropped.bind(ic))
+		ic+=1
 	## others
 	_update_hiding_buttons()
 	_update_image_size_label()
@@ -379,23 +365,31 @@ func on_drawing_brush_scaling_changed():
 var brush_color: Color=Color.WHITE
 var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1)\
 ,Color(0.4,0.4,0.4,1),Color(0.2,0.2,0.2,1),Color(1,1,1,0)]
-@onready var brush_buttons: Array[Button]=[brush_color_1,brush_color_2,brush_color_3,brush_color_4,brush_color_5,brush_color_6,brush_color_7]
 var last_brush_color_button_pressed_index: int=0# last button selected
 func make_brush_color():# choose all the colors
 	update_brush_color_buttons()
-	
 func update_brush_color_buttons():
 	var ic: int=0
 	for i in brush_buttons:
 		i.modulate=brush_colors[ic]
 		ic+=1
+func recolor_brush_from_last_color_button():
+	brush_color=brush_colors[last_brush_color_button_pressed_index]
+	drawing.recolor_brush(brush_color)
 func _on_brush_color_i_pressed(index: int):# left click
 	last_brush_color_button_pressed_index=index
-	brush_color=brush_colors[index]
-	drawing.recolor_brush(brush_color)
-	#if draw_mode in ["penblack","eraser"]:
-		#_on_draw_mode_pressed("pen")
+	recolor_brush_from_last_color_button()
+	#brush_color=brush_colors[index]
+	#drawing.recolor_brush(brush_color)
+
 var brush_color_i_hovered: int=-1# -1 if none
+func _on_brush_color_i_data_dropped(input_color: Color,index: int):# dropped a color
+	brush_colors[index]=input_color
+	last_brush_color_button_pressed_index=index
+	update_brush_color_buttons()
+	recolor_brush_from_last_color_button()
+	#brush_color=brush_colors[index]
+	#drawing.recolor_brush(brush_color)	
 func _on_brush_color_i_mouse_entered(index: int):
 	#print("entered: ",index)
 	brush_color_i_hovered=index
@@ -430,18 +424,18 @@ func _on_brush_color_i_dialogue_color_changed(input_color: Color, index: int):##
 	last_brush_color_button_pressed_index=index
 	brush_colors[index]=input_color
 func _on_brush_color_i_dialogue_confirmed():
+	recolor_brush_from_last_color_button()
 	update_brush_color_buttons()
-	#brush_colors[index]=input_color
 ## BRUSH COLOR FROM DRAWING COLOR PICKER
 func on_drawing_color_picked(input_color: Color):
-	print('color picked')
 	#print("color picked:",input_color)
 	#if input_color!=Color.BLACK:# only change last color in row
 	last_brush_color_button_pressed_index=len(brush_colors)-1
 	brush_colors[-1]=input_color
-	brush_color=brush_colors[-1]
-	drawing.recolor_brush(brush_color)
+	#brush_color=brush_colors[-1]
+	#drawing.recolor_brush(brush_color)
 	update_brush_color_buttons()
+	recolor_brush_from_last_color_button()
 
 
 

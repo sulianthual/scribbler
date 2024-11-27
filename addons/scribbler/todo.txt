@@ -1,4 +1,4 @@
-
+- color button drag and drop colors
 - onion drop: pick color when adding onion?
 -> add indicator (text) in image saying "onions on" if on
 -> add event messages when doing something (optional)
