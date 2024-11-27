@@ -271,9 +271,9 @@ func _help_dialogue():
 	
 	Drag and Drop (awesome!):
 	drawing area: drop any file or texture from Filesystem/Inspector/etc (with a PNG) to load it.
-	copy: drag edited image (must be saved on disk), drop to any texture to apply it.
-	colors slots: drop files/textures (or "copy") to any slot to load colors found in image.
-	onions: drop files or textures (or "copy") to load them as onion skinning. \
+	copy: drag edited image from "copy", drop to any texture to apply it (image must be saved on disk).
+	colors slots: drop files/textures (including from "copy") to any slot to load colors found in image.
+	onions: drop files or textures (including from "copy") to load them as onion skinning. \
 	drop colors to change color of new onion skins.
 
 	Warnings: \
