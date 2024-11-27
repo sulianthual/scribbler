@@ -230,45 +230,39 @@ func _help_dialogue():
 	var file_dialogue = AcceptDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Help"
-	file_dialogue.dialog_text="""Scribbler Instructions (sul 2024, Godot 4.2): \
-	Make basic drawings without leaving the editor, useful for prototyping.
+	file_dialogue.dialog_text="""Scribbler (sul 2024, Godot 4.2): \
+	Make basic drawings without leaving the editor, useful for prototyping. 
 	
-	Drawing Area:
+	Drawing Area: \
 	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Pick pen color with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
-	Drag and Drop (awesome!):
-	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
-	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
-	Drag any file or texture (with a PNG) to "o" to load it as onion skinning. 
-	Drag and drop colors between color slots.
+	Drag and Drop: \
+	Drag files or textures (with a PNG) to the drawing area to load and edit it. \
+	Drag the edited image (must be saved on disk) from "copy" to any texture to apply it. \
+	Drag any files or textures (with a PNG) to onion ("o") to load it as onion skinning (can stack). \
+	Drag colors between color slots, or to onion to change next loaded onions color.
 		
-	Tools (tailored towards drawing black outlines+filling):
-	black pen: draw with dedicated black pen (with dedicated pen size and color)
-	color pen: draw with color
-	color pen alt1: draw with color behind black strokes
-	color pen alt2: draw with color behind black strokes and only over starting color
-	eraser: erase
-	bucket: bucket fill (use with transparent color to erase)
+	Tools:
+	color pen/eraser/bucket fill: classic paint tools
+	black pen: draw outlines with dedicated black pen (with dedicated pen size and color)
+	color pen alt1: draw with color pen but behind black strokes
+	color pen alt2: draw with color pen but behind black strokes and only over starting color
 	color slots: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
 	Buttons:
-	+/-: detach the Scribbler dock to a popup window. 
-	x: minimize/expand menu
-	o: drop onion skinning images (including from copy button). Onion skinnings appear as semi-transparent and are non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
-	clear: clear the scribble
-	resize: resize the scribble (choose new width and height in pixels, and resize mode)
+	+/-/x: detach the Scribbler dock to a popup window, or minimize/expand menu.
+	load/save/new: manage from existing PNG file in res://.
+	clear: clear the scribble (can be undone)
+	size: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
-	help: this help menu.
-	copy: Drag the PNG file saved on disk.
-	load: generate scribble from existing PNG file in res://.
-	save: save scribble to an existing or new PNG file in res://.
-	new: new scribble.
+	copy: Drag the PNG file saved on disk from here to any texture in Editor.
+	o: drop onion skinning images (including from copy button). \
+	Onion skinnings show original (black) outlines as semi-transparent and are non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
 	
-	Warnings:
-	Do not "Make Floating" the Scribbler dock if detached (may close plugin).
-	You will get many warnings "Loaded resource as image file", its normal just ignore them.
-	The plugin may be buggy or inefficient for large files (I dunno), use with caution if editing nice assets.
+	Warnings: \
+	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
+	This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Probably inefficient for large files (I dunno).
 	"""
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)

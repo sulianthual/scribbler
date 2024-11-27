@@ -24,28 +24,24 @@ func _postready():
 	py=drawing.py
 	#img=load("res://demo/head.png")## TEST
 	clear_canvas()
-	
+
+func on_px_changed(input_px:int):
+	px=input_px
+	clear_canvas()
+func on_py_changed(input_py:int):
+	py=input_py
+	clear_canvas()
 func clear_onions():## calls from Scribbler
 	clear_canvas()
-
-var filter_mode="blackoutline"
-func filter_onion(image: Image)->Image:
-	var _img: Image=Image.create(image.get_width(),image.get_height(),false, Image.FORMAT_RGBA8)
-	_img.convert(Image.FORMAT_RGBA8)
-	_img.copy_from(image)
-	if filter_mode=="semitransparent":
-		image=_make_transparent(image,0.5)# just transparent
-	elif filter_mode=="blackoutline":
-		_img=_swap_notcolor(_img,Color.BLACK, Color.TRANSPARENT)
-		_img=_swap_color(_img,Color.BLACK, Color(1,0,0,0.5))
-	#_img.blit_rect_mask(image)
-
-	return _img
+func clear_canvas():
+	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
+	img.convert(Image.FORMAT_RGBA8)
+	img.fill(back_color)
+	texture_from_img()
 func add_onion(filename_: String):## Calls from scribbler
 	if ResourceLoader.exists(filename_):
 		var _img: Image=Image.new()
 		#_img.load(filename_)
-		#_img=load(filename_)
 		_img=image_load(filename_)
 		_img.convert(Image.FORMAT_RGBA8)
 		_img=filter_onion(_img)
@@ -73,30 +69,30 @@ func add_onion_from_sheet(filename_: String,input_subset: Array[int]):## Calls f
 		img.blend_rect(_img,_img_rect,Vector2(0,0))
 		texture_from_img()
 
-func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:int)->Rect2i:#->determine subset
-	# ix,iy are the coordinates and start at 1,1
-	var subset_rect_w: int=roundi(source_img.get_width()/subx)
-	var subset_rect_h: int=roundi(source_img.get_height()/suby)
-	var subset_rect_x: int=subset_rect_w*clamp(ix-1,0,subx-1)
-	var subset_rect_y: int=subset_rect_h*clamp(iy-1,0,suby-1)
-	var subset_rect: Rect2i=Rect2i(subset_rect_x,subset_rect_y,subset_rect_w,subset_rect_h)
-	return subset_rect
+## Filter onion image
+var filter_mode="outlines"
+var transparency_factor: float=0.5
+var outlines_color_ref: Color=Color(1,0,0,transparency_factor)
+var outlines_color: Color=outlines_color_ref
+
+func filter_onion(image: Image)->Image:
+	var _img: Image=Image.create(image.get_width(),image.get_height(),false, Image.FORMAT_RGBA8)
+	_img.convert(Image.FORMAT_RGBA8)
+	_img.copy_from(image)
+	if filter_mode=="semitransparent":
+		image=_make_transparent(image,transparency_factor)# just transparent
+	elif filter_mode=="outlines":
+		_img=_swap_notcolor(_img,Color.BLACK, Color.TRANSPARENT)
+		_img=_swap_color(_img,Color.BLACK, outlines_color)
+	#_img.blit_rect_mask(image)
+	return _img
+func set_outlines_color(input_color: Color)->void: ## CALLS from scribbler or onion_drop
+	outlines_color=input_color
+	outlines_color.a=outlines_color.a*transparency_factor
+func reset_outlines_color()->void: ## CALLS from scribbler or onion_drop
+	outlines_color=outlines_color_ref
 	
-func on_px_changed(input_px:int):
-	px=input_px
-	clear_canvas()
-func on_py_changed(input_py:int):
-	py=input_py
-	clear_canvas()
-func clear_canvas():
-	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
-	img.convert(Image.FORMAT_RGBA8)
-	img.fill(back_color)
-	#if drawing.draw_mode==drawing.DRAW_MODES.PENBLACK:
-		#img.blend_rect(drawing.black_pen_img,Rect2(0,0,drawing.black_pen_img.get_width(),drawing.black_pen_img.get_height()),Vector2(0,0))
-	#else:
-		#img.blend_rect(drawing.brush_img,Rect2(0,0,drawing.brush_img.get_width(),drawing.brush_img.get_height()),Vector2(0,0))
-	texture_from_img()
+
 	
 ####################################
 ## UTILS
@@ -111,7 +107,16 @@ func image_load(filename_: String)->Image:# image must be loaded as textures the
 		return _texture.get_image()
 	else:
 		return Image.new()
-		
+
+func _get_image_subset_rect(source_img: Image,subx: int, suby:int, ix:int, iy:int)->Rect2i:#->determine subset
+	# ix,iy are the coordinates and start at 1,1
+	var subset_rect_w: int=roundi(source_img.get_width()/subx)
+	var subset_rect_h: int=roundi(source_img.get_height()/suby)
+	var subset_rect_x: int=subset_rect_w*clamp(ix-1,0,subx-1)
+	var subset_rect_y: int=subset_rect_h*clamp(iy-1,0,suby-1)
+	var subset_rect: Rect2i=Rect2i(subset_rect_x,subset_rect_y,subset_rect_w,subset_rect_h)
+	return subset_rect
+	
 ## swap anything that isnt source color with new_color
 func _make_transparent(input_image: Image, factor: float):
 	var _new_img: Image=Image.new()
