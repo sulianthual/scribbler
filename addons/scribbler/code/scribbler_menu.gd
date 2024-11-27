@@ -134,6 +134,8 @@ func _ready():
 	_update_draw_mode()
 	ready_onion_controls()
 	grid_button.visible=false# WE DONT USE IT
+	### load icons manuall
+	#pen_black_button.add_theme_icon_override()
 	
 	## deferred
 	_postready.call_deferred()
