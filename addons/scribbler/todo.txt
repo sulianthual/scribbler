@@ -1,9 +1,0 @@
-- grid-> can show but lines are finicky (cf rendering?)
-- other: background color
-- options (could make a button): 
-	grid (finicky)
-	background color
-	sheet on/off
-	onion import (semi transparent or colored outlines)
-	-> not fundamental
-- publish

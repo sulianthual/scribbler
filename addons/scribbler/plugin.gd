@@ -6,7 +6,7 @@ extends EditorPlugin
 var dock
 func _enter_tree():
 	# Initialization of the plugin goes here.
-	dock=preload("res://addons/scribbler/scribbler.tscn").instantiate()
+	dock=preload("res://addons/scribbler/code/scribbler.tscn").instantiate()
 	add_control_to_dock(DOCK_SLOT_RIGHT_BL,dock)
 
 func _exit_tree():
