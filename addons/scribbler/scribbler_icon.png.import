@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c7xe0p65agwui"
-path="res://.godot/imported/scribbler_icon2.png-a77a63beb2f5e83037698e1e26d54d32.ctex"
+path="res://.godot/imported/scribbler_icon.png-50c1c94a90353682f69d7dd5fcb2dfaa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/scribbler/code/scribbler_icon2.png"
-dest_files=["res://.godot/imported/scribbler_icon2.png-a77a63beb2f5e83037698e1e26d54d32.ctex"]
+source_file="res://addons/scribbler/scribbler_icon.png"
+dest_files=["res://.godot/imported/scribbler_icon.png-50c1c94a90353682f69d7dd5fcb2dfaa.ctex"]
 
 [params]
 
