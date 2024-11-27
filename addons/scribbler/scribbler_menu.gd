@@ -375,8 +375,9 @@ func on_drawing_brush_scaling_changed():
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
-var brush_colors: Array[Color]=[Color.RED,Color.BLUE,Color.GREEN,\
-Color.ORANGE,Color.SADDLE_BROWN,Color.DIM_GRAY,\
+var brush_colors: Array[Color]=[Color.WHITE,Color.DIM_GRAY,\
+Color.DARK_RED,Color.DARK_GREEN,\
+Color.DARK_BLUE,Color.ORANGE_RED,\
 Color.TRANSPARENT]
 var last_brush_color_button_pressed_index: int=0# last button selected
 var brush_color: Color=brush_colors[last_brush_color_button_pressed_index]

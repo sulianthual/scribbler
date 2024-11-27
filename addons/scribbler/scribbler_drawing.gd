@@ -352,7 +352,7 @@ func _input(event):
 				undo_pressed=false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 			if event.pressed:# PICK A COLOR
-				#print("midmouse pressed")
+				print("midmouse pressed")
 				_drawing=false
 				if not pick_pressed:
 					pick_pressed=true
@@ -550,7 +550,8 @@ func _draw_point():
 		if _drawing:
 			_drawing=false
 			save_img_to_undo_history()
-			
+func _end_stroke():# whenever end or cancel stroke
+	_drawing=false
 
 func rect_from_centered_rect(rectc: Rect2)->Rect2:# convert a Rect(center:Vector2,size:Vector2) to regular
 	return Rect2(rectc.position[0]-rectc.size[0]/2,rectc.position[1]-rectc.size[1]/2,rectc.size[0],rectc.size[1])
@@ -656,6 +657,9 @@ func get_image()->Image:
 	return img
 func activate():
 	active=true
+	_drawing=false
+	pick_pressed=false
+	undo_pressed=false
 
 func deactivate():
 	active=false
