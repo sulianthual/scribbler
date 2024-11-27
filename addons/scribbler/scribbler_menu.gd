@@ -269,13 +269,13 @@ func _help_dialogue():
 	onions: Onion skinnings show original (black) outlines as semi-transparent and are non editable. \
 	Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
 	
-	Drag and Drop (awesome!): \
-	drawing area: drag any files or textures (with a PNG) to drawing area to load them. \
-	copy: drag edited image (must be saved on disk) from "copy" to any texture to apply it. \
-	onions: drag any files or textures (with a PNG) to "onions" to load them as onion skinning. \
-	drag colors to "onions" to change color of new onion skins.
-	colors slots: drag colors between color slots, drag files/textures to a color slot to charge colors found in image.
-	
+	Drag and Drop (awesome!):
+	drawing area: drop any file or texture from Filesystem/Inspector/etc (with a PNG) to load it.
+	copy: drag edited image (must be saved on disk), drop to any texture to apply it.
+	colors slots: drop files/textures (or "copy") to any slot to load colors found in image.
+	onions: drop files or textures (or "copy") to load them as onion skinning. \
+	drop colors to change color of new onion skins.
+
 	Warnings: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
 	This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Probably inefficient for large files (I dunno).

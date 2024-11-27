@@ -10,23 +10,22 @@ func _can_drop_data(position, data):
 			return true
 		if data.type=="resource" and data.resource.resource_path and data.resource.resource_path.get_extension()=="png":
 			return true
-	elif typeof(data)==TYPE_COLOR:
-		return true
+	#elif typeof(data)==TYPE_COLOR:
+		#return true
 	return false
 
 signal data_dropped(value: Color)# return the png file
 signal colors_dropped(value: Array[Color])
 func _drop_data(position, data):
-	if typeof(data)==TYPE_COLOR:
-		data_dropped.emit(data)
-	elif typeof(data) == TYPE_DICTIONARY:
+	if typeof(data) == TYPE_DICTIONARY:
 		if data.type=="files" and data.files[0].get_extension()=="png":
 			var colors: Array[Color]=get_image_colors(data.files[0],7)
 			colors_dropped.emit(colors)
 		elif data.type=="resource" and data.resource.resource_path and data.resource.resource_path.get_extension()=="png":
 			var colors: Array[Color]=get_image_colors(data.resource.resource_path,7)
 			colors_dropped.emit(colors)
-		#modulate=data# handled by scribbler menu
+	#elif typeof(data)==TYPE_COLOR:
+		#data_dropped.emit(data)
 
 func _get_drag_data(at_position: Vector2):
 	var _preview: ColorRect=ColorRect.new()
