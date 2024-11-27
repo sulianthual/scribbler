@@ -178,9 +178,10 @@ func texture_from_img():# update displayed texture from image
 	texture=_texture# beware of scale (should be 1,1)
 
 func clear_drawing():
+	save_img_to_undo_history()#-> save to history
 	img.fill(back_color)
 	texture_from_img()
-	clear_undo_history()#-> clears all previous!
+	#clear_undo_history()#-> clears all previous!
 			
 func crop_drawing_centered(input_px: int,input_py: int):# crop to/expand from drawing center
 	save_img_to_undo_history()#-> save to history

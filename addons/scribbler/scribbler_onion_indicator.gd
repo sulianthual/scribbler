@@ -11,6 +11,7 @@ extends TextureRect
 @export var back_color: Color=Color.TRANSPARENT
 
 @onready var drawing: TextureRect=%drawing
+
 var img: Image=Image.new()
 var px: int=128
 var py: int=128

@@ -38,6 +38,7 @@ extends Control
 ## on
 @onready var onion_drop: Button = %onion_drop
 @onready var onion_indicator: TextureRect = %onion_indicator
+@onready var onion_onoff: Label = %onion_onoff
 ## dock
 @onready var detach: Button=%detach# update image size
 @onready var hide_button: Button=%hide# update image size
@@ -123,8 +124,9 @@ func _ready():
 	_update_hiding_buttons()
 	_update_image_size_label()
 	update_detach_button()
-	make_brush_color()
+	ready_brush_color()# wa make_brush+color
 	_update_draw_mode()
+	ready_onion_controls()
 	
 	## deferred
 	_postready.call_deferred()
@@ -239,6 +241,7 @@ func _help_dialogue():
 	Drag any file or texture (with a PNG) and drop it in the drawing area to load and edit it.
 	Drag the edited image (must be saved on disk) from "copy" then drop it to any texture to apply it.
 	Drag any file or texture (with a PNG) to "o" to load it as onion skinning. 
+	Drag and drop colors between color slots.
 		
 	Tools (tailored towards drawing black outlines+filling):
 	black pen: draw with dedicated black pen (with dedicated pen size and color)
@@ -247,7 +250,7 @@ func _help_dialogue():
 	color pen alt2: draw with color behind black strokes and only over starting color
 	eraser: erase
 	bucket: bucket fill (use with transparent color to erase)
-	colors: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse).
+	color slots: left click to apply to color pens, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
 	Buttons:
 	+/-: detach the Scribbler dock to a popup window. 
@@ -366,7 +369,7 @@ var brush_color: Color=Color.WHITE
 var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1)\
 ,Color(0.4,0.4,0.4,1),Color(0.2,0.2,0.2,1),Color(1,1,1,0)]
 var last_brush_color_button_pressed_index: int=0# last button selected
-func make_brush_color():# choose all the colors
+func ready_brush_color():# choose all the colors
 	update_brush_color_buttons()
 func update_brush_color_buttons():
 	var ic: int=0
@@ -570,24 +573,26 @@ func _on_save_from_sheet_dialogue_confirmed():
 ################################################################
 ## ONIONS
 
+func ready_onion_controls():
+	onion_onoff.visible=false
 func on_onion_drop_clear_onions():## signal from onion_drop
 	onion_indicator.clear_onions()
+	onion_onoff.visible=false
 func on_onion_drop_toggle_onions_visibility():
 	onion_indicator.visible=not onion_indicator.visible
-	
+	onion_onoff.visible=onion_indicator.visible
 func on_onion_drop_data_dropped(filename_: String):## signal from onion_drop
 	if as_sheet:
 		_load_onion_from_sheet_select_subset_dialogue(filename_)
 	else:
 		onion_indicator.add_onion(filename_)
 		onion_indicator.visible=true
+		onion_onoff.visible=true
 
 
 ## LOAD SCRIBBLE FROM SHEET
 #var sheet_dialogue_input_subset: Array[int]=[1,1,1,1]# subx,suby,ix,iy, subset of source image
 var load_onion_from_sheet_selected_file: String# pass selected file
-#func reset_sheet():
-	#sheet_dialogue_input_subset=[1,1,1,1]
 func _load_onion_from_sheet_select_subset_dialogue(input_file: String):
 	load_onion_from_sheet_selected_file=input_file
 	var file_dialogue = ConfirmationDialog.new()
@@ -608,6 +613,7 @@ func _on_load_onion_from_sheet_dialogue_confirmed():
 	if load_onion_from_sheet_selected_file:
 		onion_indicator.add_onion_from_sheet(load_onion_from_sheet_selected_file, sheet_dialogue_input_subset)
 		onion_indicator.visible=true
+		onion_onoff.visible=true
 		load_onion_from_sheet_selected_file=""
 		
 ################################################################
