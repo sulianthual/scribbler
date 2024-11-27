@@ -124,6 +124,7 @@ func _ready():
 		i.connect("mouse_entered",_on_brush_color_i_mouse_entered.bind(ic))
 		i.connect("mouse_exited",_on_brush_color_i_mouse_exited.bind(ic))
 		i.connect("data_dropped",_on_brush_color_i_data_dropped.bind(ic))
+		i.connect("colors_dropped",_on_brush_color_i_colors_dropped.bind(ic))
 		ic+=1
 	## others
 	_update_buttons_visibility()
@@ -250,12 +251,6 @@ func _help_dialogue():
 	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Pick pen color with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
-	Drag and Drop: \
-	Drag files or textures (with a PNG) to the drawing area to load and edit it. \
-	Drag the edited image (must be saved on disk) from "copy" to any texture to apply it. \
-	Drag any files or textures (with a PNG) to onions to load it as onion skinning (can stack). \
-	Drag colors between color slots, or to onion to change next loaded onions color.
-		
 	Tools:
 	color pen/eraser/bucket fill: classic paint tools
 	black pen: draw outlines with dedicated black pen (with dedicated pen size and color)
@@ -271,8 +266,15 @@ func _help_dialogue():
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
 	grid: toggle grid
 	copy: Drag the PNG file saved on disk from here to any texture in Editor.
-	onions: drop onion skinning images (including from copy button). \
-	Onion skinnings show original (black) outlines as semi-transparent and are non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
+	onions: Onion skinnings show original (black) outlines as semi-transparent and are non editable. \
+	Left mouse: toggle onion skins visibility. Right mouse: clear all onions. 
+	
+	Drag and Drop (awesome!): \
+	drawing area: drag any files or textures (with a PNG) to drawing area to load them. \
+	copy: drag edited image (must be saved on disk) from "copy" to any texture to apply it. \
+	onions: drag any files or textures (with a PNG) to "onions" to load them as onion skinning. \
+	drag colors to "onions" to change color of new onion skins.
+	colors slots: drag colors between color slots, drag files/textures to a color slot to charge colors found in image.
 	
 	Warnings: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
@@ -406,6 +408,13 @@ func _on_brush_color_i_data_dropped(input_color: Color,index: int):# dropped a c
 	recolor_brush_from_last_color_button()
 	#brush_color=brush_colors[index]
 	#drawing.recolor_brush(brush_color)	
+func _on_brush_color_i_colors_dropped(input_colors: Array[Color],index: int)->void: # drop array of colors, apply to row
+	var ic:int=0
+	for i in input_colors:
+		brush_colors[ic]=i
+		ic+=1
+	update_brush_color_buttons()
+	recolor_brush_from_last_color_button()
 func _on_brush_color_i_mouse_entered(index: int):
 	#print("entered: ",index)
 	brush_color_i_hovered=index
