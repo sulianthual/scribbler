@@ -132,6 +132,7 @@ func _ready():
 	ready_brush_color()# wa make_brush+color
 	_update_draw_mode()
 	ready_onion_controls()
+	grid_button.visible=false# WE DONT USE IT
 	
 	## deferred
 	_postready.call_deferred()
@@ -374,12 +375,14 @@ func on_drawing_brush_scaling_changed():
 
 ## BRUSH COLOR
 ## brush color (as controlled here instead of drawing)
-var brush_color: Color=Color.WHITE
-var brush_colors: Array[Color]=[Color.WHITE,Color.WHITE,Color(0.8,0.8,0.8,1),Color(0.6,0.6,0.6,1)\
-,Color(0.4,0.4,0.4,1),Color(0.2,0.2,0.2,1),Color(1,1,1,0)]
+var brush_colors: Array[Color]=[Color.RED,Color.BLUE,Color.GREEN,\
+Color.ORANGE,Color.SADDLE_BROWN,Color.DIM_GRAY,\
+Color.TRANSPARENT]
 var last_brush_color_button_pressed_index: int=0# last button selected
+var brush_color: Color=brush_colors[last_brush_color_button_pressed_index]
 func ready_brush_color():# choose all the colors
 	update_brush_color_buttons()
+	recolor_brush_from_last_color_button()
 func update_brush_color_buttons():
 	var ic: int=0
 	for i in brush_buttons:

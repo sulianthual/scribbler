@@ -12,7 +12,7 @@ func _ready() -> void:
 
 signal clear_onions
 signal toggle_onions_visibilty
-const color_default=Color(0.25,0.25,0.25,1)# fr button
+const color_default=Color.BLACK# fr button
 func on_pressed():
 	toggle_onions_visibilty.emit()# let menu handle it
 	#if onion_indicator:
@@ -70,7 +70,5 @@ func _drop_data(position, data):
 		onion_indicator.set_outlines_color(data)
 
 func update_button_color(input_color: Color):
-	#modulate=input_color# ugly
-	var _stylebox=get_theme_stylebox("normal")
-	_stylebox.bg_color=input_color
-	add_theme_stylebox_override("normal",_stylebox)
+	pass
+	#modulate=input_color
