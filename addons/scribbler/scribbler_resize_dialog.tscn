@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://csrs4ajsvdtjx"]
+[gd_scene load_steps=3 format=3 uid="uid://csrs4ajsvdtjx"]
 
 [ext_resource type="Script" path="res://addons/scribbler/scribbler_resize_dialog.gd" id="1_5ps8k"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vna0r"]
+bg_color = Color(0.430057, 0.430057, 0.430057, 1)
 
 [node name="resize_dialogue" type="Control"]
 layout_mode = 3
@@ -27,6 +30,7 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_vna0r")
 text = "mode: crop from center"
 
 [node name="setup" type="HBoxContainer" parent="VBoxContainer"]

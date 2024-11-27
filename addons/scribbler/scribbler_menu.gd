@@ -288,8 +288,8 @@ var resize_mode: String="crop_centered"
 func _on_resize_pressed():
 	_resize_dialogue()
 func _resize_dialogue():
-	resize_mode="crop_centered"
-	var file_dialogue = AcceptDialog.new()
+	
+	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Resize Scribble"
 	file_dialogue.dialog_autowrap=true
@@ -302,6 +302,7 @@ func _resize_dialogue():
 	_dialogue.px.connect("value_changed",_on_resize_dialogue_px_changed)
 	_dialogue.py.connect("value_changed",_on_resize_dialogue_py_changed)
 	_dialogue.connect("scale_mode_changed",_on_resize_dialogue_resize_mode_changed)
+	resize_mode=_dialogue.get_scale_mode()#"crop_centered"# as in ready of packedscene
 	file_dialogue.popup()
 	return file_dialogue
 ## FROM DRAWING

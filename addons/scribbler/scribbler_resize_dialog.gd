@@ -21,7 +21,7 @@ extends Control
 
 enum SCALEMODE {STRETCH, CROP_CENTERED,CROP_CORNERED}
 signal scale_mode_changed(value: String)
-var scale_mode: SCALEMODE=SCALEMODE.CROP_CENTERED:
+var scale_mode: SCALEMODE=SCALEMODE.CROP_CORNERED:
 	set(value):
 		var prev_value: SCALEMODE=scale_mode
 		scale_mode=value
@@ -58,13 +58,15 @@ func make_scale_mode():
 	update_scale_mode_button()
 	
 signal resize_mode_changed(value:String)
+		
 func change_scale_mode():
-	if scale_mode==SCALEMODE.CROP_CENTERED:
-		scale_mode=SCALEMODE.CROP_CORNERED
-	elif scale_mode==SCALEMODE.CROP_CORNERED:
+	if scale_mode==SCALEMODE.CROP_CORNERED:
+		scale_mode=SCALEMODE.CROP_CENTERED
+	elif scale_mode==SCALEMODE.CROP_CENTERED:
 		scale_mode=SCALEMODE.STRETCH
 	elif scale_mode==SCALEMODE.STRETCH:
-		scale_mode=SCALEMODE.CROP_CENTERED
+		scale_mode=SCALEMODE.CROP_CORNERED
+		
 	update_scale_mode_button()
 func update_scale_mode_button():
 	if scale_mode==SCALEMODE.STRETCH:
@@ -73,7 +75,14 @@ func update_scale_mode_button():
 		smode.text="mode: crop from center"
 	elif scale_mode==SCALEMODE.CROP_CORNERED:
 		smode.text="mode: crop from corner"
-
+func get_scale_mode():## CALLS from scribbler
+	if scale_mode==SCALEMODE.STRETCH:
+		return "stretch"
+	elif scale_mode==SCALEMODE.CROP_CENTERED:
+		return "crop_centered"
+	elif scale_mode==SCALEMODE.CROP_CORNERED:
+		return "crop_cornered"
+	return ""
 func make_mults():
 	multby.connect("pressed",_on_multby_pressed)
 	dividby.connect("pressed",_on_dividby_pressed)
