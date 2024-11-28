@@ -336,7 +336,40 @@ func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 		draw_mode_duals_updated.emit(false)
 	draw_mode_changed.emit()
 
-
+func draw_mode_duals_invert():## CALLS FROM SCRIBBLER
+	if draw_mode==DRAW_MODES.PEN:
+		draw_mode=DRAW_MODES.ERASER
+		draw_mode_duals_updated.emit(true)
+	elif draw_mode==DRAW_MODES.ERASER:
+		draw_mode=DRAW_MODES.PEN
+		draw_mode_duals_updated.emit(false)
+	elif draw_mode==DRAW_MODES.PENBLACK:
+		draw_mode=DRAW_MODES.ERASERBLACK
+		draw_mode_duals_updated.emit(true)
+	elif draw_mode==DRAW_MODES.ERASERBLACK:
+		draw_mode=DRAW_MODES.PENBLACK
+		draw_mode_duals_updated.emit(false)
+	elif draw_mode==DRAW_MODES.PENBEHINDBLACK:
+		draw_mode=DRAW_MODES.ERASERBEHINDBLACK
+		draw_mode_duals_updated.emit(true)
+	elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
+		draw_mode=DRAW_MODES.PENBEHINDBLACK
+		draw_mode_duals_updated.emit(false)
+	elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
+		draw_mode=DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK
+		draw_mode_duals_updated.emit(true)
+	elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
+		draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
+		draw_mode_duals_updated.emit(false)
+	elif draw_mode==DRAW_MODES.BUCKET:
+		draw_mode=DRAW_MODES.BUCKETERASER
+		draw_mode_duals_updated.emit(true)
+	elif draw_mode==DRAW_MODES.BUCKETERASER:
+		draw_mode=DRAW_MODES.BUCKET
+		draw_mode_duals_updated.emit(false)
+		
+	draw_mode_changed.emit()
+	
 ## INPUTS
 var _drawing: bool=false:# is drawing (within drawing area, Left Mouse Pressed)
 	set(value):
@@ -375,39 +408,7 @@ func _input(event):
 				_drawing=false
 				if not pick_pressed:
 					pick_pressed=true
-					## INVERT here
-					if draw_mode==DRAW_MODES.PEN:
-						draw_mode=DRAW_MODES.ERASER
-						draw_mode_duals_updated.emit(true)
-					elif draw_mode==DRAW_MODES.ERASER:
-						draw_mode=DRAW_MODES.PEN
-						draw_mode_duals_updated.emit(false)
-					elif draw_mode==DRAW_MODES.PENBLACK:
-						draw_mode=DRAW_MODES.ERASERBLACK
-						draw_mode_duals_updated.emit(true)
-					elif draw_mode==DRAW_MODES.ERASERBLACK:
-						draw_mode=DRAW_MODES.PENBLACK
-						draw_mode_duals_updated.emit(false)
-					elif draw_mode==DRAW_MODES.PENBEHINDBLACK:
-						draw_mode=DRAW_MODES.ERASERBEHINDBLACK
-						draw_mode_duals_updated.emit(true)
-					elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
-						draw_mode=DRAW_MODES.PENBEHINDBLACK
-						draw_mode_duals_updated.emit(false)
-					elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
-						draw_mode=DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK
-						draw_mode_duals_updated.emit(true)
-					elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
-						draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
-						draw_mode_duals_updated.emit(false)
-					elif draw_mode==DRAW_MODES.BUCKET:
-						draw_mode=DRAW_MODES.BUCKETERASER
-						draw_mode_duals_updated.emit(true)
-					elif draw_mode==DRAW_MODES.BUCKETERASER:
-						draw_mode=DRAW_MODES.BUCKET
-						draw_mode_duals_updated.emit(false)
-						
-					draw_mode_changed.emit()
+					draw_mode_duals_invert()
 			else:
 				#print("midmouse released")
 				pick_pressed=false
@@ -498,7 +499,7 @@ func _draw_point():
 				elif draw_mode==DRAW_MODES.ERASERBLACK:##-> not using black_pen_img TODO
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
-					#_mask=_swap_notcolor(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
+					_mask=_swap_notcolor(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
 					_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
 					img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENOVER:

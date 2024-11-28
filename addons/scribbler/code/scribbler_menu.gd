@@ -64,6 +64,7 @@ extends Control
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
+@onready var swap_dual: Button=%swap_dual
 ## drawing tools erase mode (just icons)
 @onready var over_eraserblack = %over_eraserblack
 @onready var over_eraser = %over_eraser
@@ -127,6 +128,7 @@ func _ready():
 	pen_overfirstbehindblack_button.connect("pressed",_on_draw_mode_pressed.bind("penoverfirstbehindblack"))
 	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
+	swap_dual.connect("pressed",_on_swap_dual_pressed)
 	## colors
 	var ic: int=0
 	for i in brush_buttons:
@@ -261,7 +263,7 @@ func _help_dialogue():
 	Janky, minimal and tailored to drawing black outlines+fillings and shadows.
 	
 	Drawing Area:
-	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, and draw/erase mode with middle mouse. \
+	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, swap draw/erase mode with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Tools:
@@ -374,25 +376,26 @@ func _on_draw_mode_pressed(input_tool: String):
 		draw_mode="bucket" if not draw_mode_inverted else "bucketeraser"
 		drawing.resize_brush(pen_color_brush_scaling)
 	# not used anymore
-	elif input_tool=="eraser":
-		pass
+	#elif input_tool=="eraser":
 		#draw_mode="eraser"
 		#drawing.resize_brush(pen_color_brush_scaling)
-	elif input_tool=="penoverfirst":# color pen
-		draw_mode="penoverfirst"
-		drawing.resize_brush(pen_color_brush_scaling)
-	elif input_tool=="bucketbrush":
-		draw_mode="bucketbrush"
-		drawing.resize_brush(pen_color_brush_scaling)
+	#elif input_tool=="penoverfirst":# color pen
+		#draw_mode="penoverfirst"
+		#drawing.resize_brush(pen_color_brush_scaling)
+	#elif input_tool=="bucketbrush":
+		#draw_mode="bucketbrush"
+		#drawing.resize_brush(pen_color_brush_scaling)
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
 func on_drawing_draw_mode_changed():# from drawing, for visuals
 	pass## not used here, used by brush_indicator tho
-func on_drawing_draw_mode_duals_updated(inversion: bool):# are we inverted or not
+func on_drawing_draw_mode_duals_updated(inversion: bool):# are we inverted or not, from drawing
 	draw_mode_inverted=inversion
 	for i in over_buttons:
 		i.visible=inversion
+func _on_swap_dual_pressed():# button swap duals
+	drawing.draw_mode_duals_invert()
 	
 ## BRUSH SIZE
 ## we track separately brush size for black pen or color pen
@@ -400,7 +403,7 @@ var pen_black_brush_scaling: float=1.0
 var pen_color_brush_scaling: float=1.0
 #brush_scaling_changed.emit()
 func on_drawing_brush_scaling_changed():
-	if draw_mode=="penblack":
+	if draw_mode=="penblack" or draw_mode=="eraserblack":
 		pen_black_brush_scaling=drawing.brush_scaling
 	else:
 		pen_color_brush_scaling=drawing.brush_scaling

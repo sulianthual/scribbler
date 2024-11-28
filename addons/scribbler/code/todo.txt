@@ -1,14 +1,4 @@
--  change controls:
-	Ctrl+Z or middle mouse: undo (use dedicated undoredo)
-	Right Mouse: Eraser version of current brush
-	black pen -> erase black TODO
-	pen -> eraser (erase all) DONE
-	pen behind black -> erase behind black DONE
-	pen behind black over color -> erase behind black only over color DONE
-	bucket -> fill transparent (behind black) -> DONE
-	*also remove eraser button as it is redundant, maybe replace with undo (cf middle mouse janky)
-	-> replace eraser with "invert button" that middle mouse calls, put it most right:
-		changes all icons on the row (pen-> eraser), etc, just replace brush with eraser icon (except bucket)
+- brush indicator finicky on black pen/eraser
 - options (could make a button): 
 	grid (finicky)
 	background color
