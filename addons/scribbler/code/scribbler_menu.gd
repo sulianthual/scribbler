@@ -277,14 +277,14 @@ func _help_dialogue():
 	
 	Drag and Drop:
 	drawing area: drop any PNG (as file/texture) from Filesystem/Inspector/etc to load it.
-	copy: drag edited PNG from "copy" (must be saved on disk), drop to any texture to apply it.
+	file: reference to edited PNG (as saved on disk), drag and drop to any texture to apply it.
 	colors slots: drop any PNG to any slot to load colors found in PNG.
 	onions: drop PNGs to load them as onion skinning. drop colors from color slots (see below).
 	size: drop any Vector2 (e.g. scale...) from inspector to stretch image *Vector2.
 
 	Buttons:
 	x/menu/+: minimize/expand and detach/attach dock
-	load/save/new: manage PNG files in res://.
+	new/load/save: manage PNG files in res://.
 	clear: clear the scribble (can be undone)
 	size: resize the scribble (choose new width and height in pixels, and resize mode)
 	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
@@ -292,7 +292,7 @@ func _help_dialogue():
 	 
 	Onion Skinning:	
 	Onion skins are guidelines, shown as semi-transparent and non editable. \
-	Drop any PNG (e.g. from "copy") to "onions" to add a new onion skin. \
+	Drop any PNG (e.g. from "file") to "onions" to add a new onion skin. \
 	Drop a color to swap to colored outlines. \
 	Drop further colors to changes colored outlines for next onion skins loaded. \
 	Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins.
@@ -415,7 +415,7 @@ func on_drawing_brush_scaling_changed():
 var brush_colors: Array[Color]=[Color.DARK_RED,Color.DIM_GRAY,\
 Color.WHITE,Color.WHITE,\
 Color.WHITE,Color.WHITE,\
-Color.TRANSPARENT]
+Color.WHITE]
 var last_brush_color_button_pressed_index: int=0# last button selected
 var brush_color: Color=brush_colors[last_brush_color_button_pressed_index]
 func ready_brush_color():# choose all the colors

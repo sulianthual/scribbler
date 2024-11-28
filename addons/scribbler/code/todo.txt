@@ -1,4 +1,3 @@
-- brush indicator finicky on black pen/eraser
 - options (could make a button): 
 	grid (finicky)
 	background color

@@ -35,7 +35,7 @@ func update_canvas():
 	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
 	img.convert(Image.FORMAT_RGBA8)
 	img.fill(back_color)
-	if drawing.draw_mode==drawing.DRAW_MODES.PENBLACK:
+	if drawing.draw_mode==drawing.DRAW_MODES.PENBLACK or drawing.draw_mode==drawing.DRAW_MODES.ERASERBLACK:
 		img.blend_rect(drawing.black_pen_img,Rect2(0,0,drawing.black_pen_img.get_width(),drawing.black_pen_img.get_height()),Vector2(0,0))
 	else:
 		img.blend_rect(drawing.brush_img,Rect2(0,0,drawing.brush_img.get_width(),drawing.brush_img.get_height()),Vector2(0,0))
