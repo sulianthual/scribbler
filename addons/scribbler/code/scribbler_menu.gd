@@ -64,6 +64,13 @@ extends Control
 @onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
+## drawing tools erase mode (just icons)
+@onready var over_eraserblack = %over_eraserblack
+@onready var over_eraser = %over_eraser
+@onready var over_eraserbehindblack = %over_eraserbehindblack
+@onready var over_eraseroverfirstbehindblack = %over_eraseroverfirstbehindblack
+@onready var over_eraserbucket = %over_eraserbucket
+@onready var over_buttons: Array[MarginContainer]=[over_eraserblack,over_eraser,over_eraserbehindblack,over_eraseroverfirstbehindblack,over_eraserbucket]
 ## colors
 @onready var brush_color_1: Button = %brush_color1
 @onready var brush_color_2: Button = %brush_color2
@@ -92,6 +99,9 @@ func _ready():
 	drawing.connect("mouse_exited",drawing.deactivate)
 	drawing.connect("brush_scaling_changed",on_drawing_brush_scaling_changed)
 	drawing.connect("color_picked",on_drawing_color_picked)
+	drawing.connect("draw_mode_changed",on_drawing_draw_mode_changed)
+	drawing.connect("draw_mode_duals_updated",on_drawing_draw_mode_duals_updated)
+	
 	## onion
 	onion_drop.connect("data_dropped",on_onion_drop_data_dropped)
 	onion_drop.connect("clear_onions",on_onion_drop_clear_onions)
@@ -251,7 +261,7 @@ func _help_dialogue():
 	Janky, minimal and tailored to drawing black outlines+fillings and shadows.
 	
 	Drawing Area:
-	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, color picker with middle mouse. \
+	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, and draw/erase mode with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Tools:
@@ -345,27 +355,31 @@ func _on_grid_toggled(toggle_on: bool):
 ## DRAWING TOOLS
 ## Draw mode (must match drawing.gd)
 var draw_mode: String="penblack"
+var draw_mode_inverted: bool=false
 func _on_draw_mode_pressed(input_tool: String):
 	if input_tool=="pen":# color pen
-		draw_mode="pen"
+		#if draw_mode_inverted:
+		draw_mode="pen" if not draw_mode_inverted else "eraser"
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="penblack":
-		draw_mode="penblack"
+		draw_mode="penblack" if not draw_mode_inverted else "eraserblack"
 		drawing.resize_brush(pen_black_brush_scaling)
-	elif input_tool=="penoverfirst":# color pen
-		draw_mode="penoverfirst"
-		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="penoverfirstbehindblack":# color pen
-		draw_mode="penoverfirstbehindblack"
+		draw_mode="penoverfirstbehindblack" if not draw_mode_inverted else "eraseroverfirstbehindblack"
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="penbehindblack":
-		draw_mode="penbehindblack"
-		drawing.resize_brush(pen_color_brush_scaling)
-	elif input_tool=="eraser":
-		draw_mode="eraser"
+		draw_mode="penbehindblack" if not draw_mode_inverted else "eraserbehindblack"
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="bucket":
-		draw_mode="bucket"
+		draw_mode="bucket" if not draw_mode_inverted else "bucketeraser"
+		drawing.resize_brush(pen_color_brush_scaling)
+	# not used anymore
+	elif input_tool=="eraser":
+		pass
+		#draw_mode="eraser"
+		#drawing.resize_brush(pen_color_brush_scaling)
+	elif input_tool=="penoverfirst":# color pen
+		draw_mode="penoverfirst"
 		drawing.resize_brush(pen_color_brush_scaling)
 	elif input_tool=="bucketbrush":
 		draw_mode="bucketbrush"
@@ -373,7 +387,13 @@ func _on_draw_mode_pressed(input_tool: String):
 	_update_draw_mode()
 func _update_draw_mode():
 	drawing.set_draw_mode(draw_mode)
-
+func on_drawing_draw_mode_changed():# from drawing, for visuals
+	pass## not used here, used by brush_indicator tho
+func on_drawing_draw_mode_duals_updated(inversion: bool):# are we inverted or not
+	draw_mode_inverted=inversion
+	for i in over_buttons:
+		i.visible=inversion
+	
 ## BRUSH SIZE
 ## we track separately brush size for black pen or color pen
 var pen_black_brush_scaling: float=1.0

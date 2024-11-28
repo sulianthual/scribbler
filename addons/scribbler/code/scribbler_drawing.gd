@@ -288,28 +288,52 @@ enum DRAW_MODES {PEN,ERASER,PENBLACK,ERASERBLACK,PENOVER,PENOVERFIRST,PENOVERFIR
 PENBEHIND,PENBEHINDBLACK,ERASERBEHINDBLACK,BUCKET,BUCKETERASER,BUCKETBRUSH}
 var draw_mode: DRAW_MODES=DRAW_MODES.PENBLACK
 signal draw_mode_changed
+signal draw_mode_duals_updated(inversion: bool)# for ones that have pen/eraser duality, emit value
 func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
 	## State machine but we still use boolean (keep as other nodes listen to this)
 	if input_draw_mode=="pen":
 		draw_mode=DRAW_MODES.PEN
-	elif input_draw_mode=="penblack":
-		draw_mode=DRAW_MODES.PENBLACK
-	elif input_draw_mode=="penover":
-		draw_mode=DRAW_MODES.PENOVER
-	elif input_draw_mode=="penoverfirst":
-		draw_mode=DRAW_MODES.PENOVERFIRST
-	elif input_draw_mode=="penoverfirstbehindblack":
-		draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
-	elif input_draw_mode=="penbehind":
-		draw_mode=DRAW_MODES.PENBEHIND
-	elif input_draw_mode=="penbehindblack":
-		draw_mode=DRAW_MODES.PENBEHINDBLACK
+		draw_mode_duals_updated.emit(false)
 	elif input_draw_mode=="eraser":
 		draw_mode=DRAW_MODES.ERASER
+		draw_mode_duals_updated.emit(true)
+	elif input_draw_mode=="penblack":
+		draw_mode=DRAW_MODES.PENBLACK
+		draw_mode_duals_updated.emit(false)
+	elif input_draw_mode=="eraserblack":
+		draw_mode=DRAW_MODES.ERASERBLACK
+		draw_mode_duals_updated.emit(true)
+	elif input_draw_mode=="penbehindblack":
+		draw_mode=DRAW_MODES.PENBEHINDBLACK
+		draw_mode_duals_updated.emit(false)
+	elif input_draw_mode=="eraserbehindblack":
+		draw_mode=DRAW_MODES.ERASERBEHINDBLACK
+		draw_mode_duals_updated.emit(true)
+	elif input_draw_mode=="penoverfirstbehindblack":
+		draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
+		draw_mode_duals_updated.emit(false)
+	elif input_draw_mode=="eraseroverfirstbehindblack":
+		draw_mode=DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK
+		draw_mode_duals_updated.emit(true)
 	elif input_draw_mode=="bucket":
 		draw_mode=DRAW_MODES.BUCKET
+		draw_mode_duals_updated.emit(false)
+	elif input_draw_mode=="bucketeraser":
+		draw_mode=DRAW_MODES.BUCKETERASER
+		draw_mode_duals_updated.emit(true)
+	## below not used
+	elif input_draw_mode=="penover":
+		draw_mode=DRAW_MODES.PENOVER
+		draw_mode_duals_updated.emit(false)
+	elif input_draw_mode=="penoverfirst":
+		draw_mode=DRAW_MODES.PENOVERFIRST
+		draw_mode_duals_updated.emit(false)
+	elif input_draw_mode=="penbehind":
+		draw_mode=DRAW_MODES.PENBEHIND
+		draw_mode_duals_updated.emit(false)
 	elif input_draw_mode=="bucketbrush":
 		draw_mode=DRAW_MODES.BUCKETBRUSH# too costly!
+		draw_mode_duals_updated.emit(false)
 	draw_mode_changed.emit()
 
 
@@ -346,55 +370,66 @@ func _input(event):
 				#print("rmouse released")
 				undo_pressed=false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
-			if true:
-				#
-				if event.pressed:# INVER DRAWING STYLE
-					print("midmouse pressed")
-					_drawing=false
-					if not pick_pressed:
-						pick_pressed=true
-						## INVERT here
-						if draw_mode==DRAW_MODES.PEN:
-							draw_mode=DRAW_MODES.ERASER
-						elif draw_mode==DRAW_MODES.ERASER:
-							draw_mode=DRAW_MODES.PEN
-						elif draw_mode==DRAW_MODES.PENBLACK:
-							draw_mode=DRAW_MODES.ERASERBLACK
-						elif draw_mode==DRAW_MODES.ERASERBLACK:
-							draw_mode=DRAW_MODES.PENBLACK
-						elif draw_mode==DRAW_MODES.PENBEHINDBLACK:
-							draw_mode=DRAW_MODES.ERASERBEHINDBLACK
-						elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
-							draw_mode=DRAW_MODES.PENBEHINDBLACK
-						elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
-							draw_mode=DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK
-						elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
-							draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
-				else:
-					print("midmouse released")
-					pick_pressed=false
-				#
+			if event.pressed:# SWAP PENS/ERASERS
+				#print("midmouse pressed")
+				_drawing=false
+				if not pick_pressed:
+					pick_pressed=true
+					## INVERT here
+					if draw_mode==DRAW_MODES.PEN:
+						draw_mode=DRAW_MODES.ERASER
+						draw_mode_duals_updated.emit(true)
+					elif draw_mode==DRAW_MODES.ERASER:
+						draw_mode=DRAW_MODES.PEN
+						draw_mode_duals_updated.emit(false)
+					elif draw_mode==DRAW_MODES.PENBLACK:
+						draw_mode=DRAW_MODES.ERASERBLACK
+						draw_mode_duals_updated.emit(true)
+					elif draw_mode==DRAW_MODES.ERASERBLACK:
+						draw_mode=DRAW_MODES.PENBLACK
+						draw_mode_duals_updated.emit(false)
+					elif draw_mode==DRAW_MODES.PENBEHINDBLACK:
+						draw_mode=DRAW_MODES.ERASERBEHINDBLACK
+						draw_mode_duals_updated.emit(true)
+					elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
+						draw_mode=DRAW_MODES.PENBEHINDBLACK
+						draw_mode_duals_updated.emit(false)
+					elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
+						draw_mode=DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK
+						draw_mode_duals_updated.emit(true)
+					elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
+						draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
+						draw_mode_duals_updated.emit(false)
+					elif draw_mode==DRAW_MODES.BUCKET:
+						draw_mode=DRAW_MODES.BUCKETERASER
+						draw_mode_duals_updated.emit(true)
+					elif draw_mode==DRAW_MODES.BUCKETERASER:
+						draw_mode=DRAW_MODES.BUCKET
+						draw_mode_duals_updated.emit(false)
+						
+					draw_mode_changed.emit()
 			else:
-				#
-				if event.pressed:# PICK A COLOR
-					#print("midmouse pressed")
-					_drawing=false
-					if not pick_pressed:
-						pick_pressed=true
-						pick_color()
-				else:
-					#print("midmouse released")
-					pick_pressed=false
-		elif event is InputEventMouseMotion:
-			mouse_position_changed.emit()
-			if not _first_point and _drawing:
-				_draw_point()
+				#print("midmouse released")
+				pick_pressed=false
+			#if event.pressed:# PICK A COLOR (deprecated not useful)
+				##print("midmouse pressed")
+				#_drawing=false
+				#if not pick_pressed:
+					#pick_pressed=true
+					#pick_color()
+			#else:
+				##print("midmouse released")
+				#pick_pressed=false
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_UP:
 			resize_brush(clamp(brush_scaling*brush_resize_rate,brush_size_min,brush_size_max))
 			#_drawing=false# no, can be useful to combine
 		elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:
 			resize_brush(clamp(brush_scaling/brush_resize_rate,brush_size_min,brush_size_max))
 			#_drawing=false# no, can be useful to combine
+		elif event is InputEventMouseMotion:
+			mouse_position_changed.emit()
+			if not _first_point and _drawing:
+				_draw_point()
 
 ## PICK COLOR
 signal color_picked(value: Color)
@@ -460,7 +495,7 @@ func _draw_point():
 					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENBLACK:
 					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
-				elif draw_mode==DRAW_MODES.ERASERBLACK:
+				elif draw_mode==DRAW_MODES.ERASERBLACK:##-> not using black_pen_img TODO
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
 					#_mask=_swap_notcolor(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
@@ -599,7 +634,6 @@ func _draw_point():
 							_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
 							img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 							#img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
-
 					elif draw_mode==DRAW_MODES.PENBEHIND:
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
 						var _mask: Image=_swap_transparent(img.get_region(_region))
@@ -629,11 +663,12 @@ func _draw_point():
 		texture.update(img)
 		
 	else:# outside edges
+		#if active:
+			#deactivate()## TODO not tested
 		if _drawing:
 			_drawing=false
 			save_img_to_undo_history()
-func _end_stroke():# whenever end or cancel stroke
-	_drawing=false
+
 
 ###############################################################################
 ## CALLS (from Scribbler)
