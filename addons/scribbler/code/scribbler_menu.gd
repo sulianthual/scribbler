@@ -247,17 +247,19 @@ func _help_dialogue():
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Help"
 	file_dialogue.dialog_text="""Scribbler (sul 2024, Godot v4.2+ plugin): \
-	Make basic drawings without leaving the editor, useful for prototyping. 
+	Make basic drawings without leaving the editor, useful for prototyping. \
+	Janky, minimal and tailored to drawing black outlines+fillings and shadows.
 	
 	Drawing Area:
 	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, color picker with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Tools:
-	color pen/eraser/bucket fill: classic paint tools
+	color pen/eraser: classic paint tools 
 	black pen: draw with dedicated black pen (for outlines). Has a separate pen size and color.
 	color pen alt1: draw with color pen but behind black strokes (for filling)
 	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows)
+	bucket fill: classic bucket but doesnt overwrite black
 	color slots: left click to apply to color pen, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
 	Drag and Drop:
@@ -265,6 +267,7 @@ func _help_dialogue():
 	copy: drag edited PNG from "copy" (must be saved on disk), drop to any texture to apply it.
 	colors slots: drop any PNG to any slot to load colors found in PNG.
 	onions: drop PNGs to load them as onion skinning. drop colors from color slots (see below).
+	size: drop any Vector2 (e.g. scale...) from inspector to stretch image *Vector2.
 
 	Buttons:
 	x/menu/+: minimize/expand and detach/attach dock
@@ -330,7 +333,7 @@ func _on_resize_dialogue_resize_mode_changed(input_mode: String):## SIGNAL FROM 
 	resize_mode=input_mode
 func _on_resize_dialogue_confirmed():
 	if resize_mode=="stretch":
-		drawing.rescale_drawing(px,py,Image.INTERPOLATE_NEAREST)
+		drawing.rescale_drawing(px,py)
 	elif resize_mode=="crop_centered":
 		drawing.crop_drawing_centered(px,py)
 	elif resize_mode=="crop_cornered":

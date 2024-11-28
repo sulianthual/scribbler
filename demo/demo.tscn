@@ -1,0 +1,158 @@
+[gd_scene load_steps=17 format=3 uid="uid://dbwsyoffw5ov2"]
+
+[ext_resource type="Texture2D" uid="uid://drkexjtfpdt8k" path="res://demo/background.png" id="1_5prii"]
+[ext_resource type="Texture2D" uid="uid://7ccq7ogwl254" path="res://demo/tree.png" id="2_nnhru"]
+[ext_resource type="Texture2D" uid="uid://cx6lfqvmy4gis" path="res://demo/cloud.png" id="3_is3qu"]
+[ext_resource type="Texture2D" uid="uid://dms0l05r15qj2" path="res://demo/sun.png" id="4_sn0se"]
+[ext_resource type="Texture2D" uid="uid://d18qgyygumm7x" path="res://demo/player.png" id="5_25awc"]
+[ext_resource type="Texture2D" uid="uid://8bddl6nax86v" path="res://demo/house.png" id="6_lvuwe"]
+[ext_resource type="Texture2D" uid="uid://benmwqhdxax0k" path="res://demo/skeleton.png" id="7_245qc"]
+[ext_resource type="Texture2D" uid="uid://cpjh4als36fkf" path="res://demo/ghost.png" id="8_c7ftw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tuv40"]
+atlas = ExtResource("7_245qc")
+region = Rect2(0, 0, 128, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oykl2"]
+atlas = ExtResource("7_245qc")
+region = Rect2(128, 0, 128, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r6uub"]
+atlas = ExtResource("7_245qc")
+region = Rect2(256, 0, 128, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jowyy"]
+atlas = ExtResource("7_245qc")
+region = Rect2(384, 0, 128, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_460oh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tuv40")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oykl2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r6uub")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jowyy")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Animation" id="Animation_p4jak"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("skeleton:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(382, 125)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("skeleton:flip_h")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_3vwcj"]
+resource_name = "movie"
+length = 3.0
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("skeleton:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.53333, 2.96667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(382, 125), Vector2(218, 161), Vector2(382, 125)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("skeleton:flip_h")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.53333, 2.96667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8no1g"]
+_data = {
+"RESET": SubResource("Animation_p4jak"),
+"movie": SubResource("Animation_3vwcj")
+}
+
+[node name="demo" type="Node2D"]
+
+[node name="background" type="Sprite2D" parent="."]
+texture = ExtResource("1_5prii")
+
+[node name="house" type="Sprite2D" parent="."]
+position = Vector2(-234, 51)
+texture = ExtResource("6_lvuwe")
+
+[node name="tree" type="Sprite2D" parent="."]
+position = Vector2(-470, 49)
+texture = ExtResource("2_nnhru")
+
+[node name="cloud" type="Sprite2D" parent="."]
+position = Vector2(-359, -198)
+texture = ExtResource("3_is3qu")
+
+[node name="sun" type="Sprite2D" parent="."]
+position = Vector2(217, -255)
+texture = ExtResource("4_sn0se")
+
+[node name="player" type="Sprite2D" parent="."]
+position = Vector2(47, 67)
+texture = ExtResource("5_25awc")
+
+[node name="skeleton" type="AnimatedSprite2D" parent="."]
+position = Vector2(382, 125)
+sprite_frames = SubResource("SpriteFrames_460oh")
+autoplay = "default"
+frame_progress = 0.421277
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_8no1g")
+}
+autoplay = "movie"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-59, -80)
+texture = ExtResource("8_c7ftw")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -333.0
+offset_top = -72.0
+offset_right = -170.0
+offset_bottom = 232.0
+color = Color(1, 1, 1, 0)

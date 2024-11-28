@@ -107,17 +107,12 @@ func make_presets():
 	## make presets
 	var preset_list: Array[String]=[]
 	# small
+	preset_list.append("1x1")
 	preset_list.append("16x16")
-	preset_list.append("32x32")
 	preset_list.append("64x64")
-	preset_list.append("128x128")
 	preset_list.append("256x256")
+	preset_list.append("1024x1024")
 	# med
-	preset_list.append("16x32")
-	preset_list.append("32x64")
-	preset_list.append("64x128")
-	preset_list.append("128x256")
-	preset_list.append("256x512")
 	#preset_list.append("512x512")
 	#preset_list.append("1024x1024")
 	# screens 16:9

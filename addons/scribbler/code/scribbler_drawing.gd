@@ -27,7 +27,7 @@ const back_color: Color=Color.TRANSPARENT#background color on new_drawing or res
 const line_fill: bool=true# use line algorithm to fill gaps
 const max_undos: int=20## Max number of undos (important, high=performance issues)
 # Brush
-const brush_path: String="res://addons/scribbler/code/scribbler_brush.png"# must be square!
+const brush_path: String="res://addons/scribbler/icons/scribbler_brush.png"# must be square!
 var brush_size_min: float=0.1# brush size min: (1x1 adjust according to base) 
 const brush_size_max: float=10.0# brush size max
 const brush_size_start: float=1.0# brush size start
@@ -175,7 +175,7 @@ func clear_drawing():
 	#clear_undo_history()#-> clears all previous!
 			
 func crop_drawing_centered(input_px: int,input_py: int):# crop to/expand from drawing center
-	save_img_to_undo_history()#-> save to history
+	#save_img_to_undo_history()#-> save to history
 	var _last_img: Image=Image.new()# make image copy and blend to it
 	_last_img.copy_from(img)
 	px=input_px
@@ -187,9 +187,10 @@ func crop_drawing_centered(input_px: int,input_py: int):# crop to/expand from dr
 	var iy: int=int(py/2-_last_img.get_height()/2)
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
+	clear_undo_history()
 
 func crop_drawing_cornered(input_px: int,input_py: int):# crop to/expand from drawing top-left corner
-	save_img_to_undo_history()#-> save to history
+	#save_img_to_undo_history()#-> save to history
 	var _last_img: Image=Image.new()# make image copy and blend to it
 	_last_img.copy_from(img)
 	px=input_px
@@ -201,13 +202,15 @@ func crop_drawing_cornered(input_px: int,input_py: int):# crop to/expand from dr
 	var iy: int=0#
 	img.blend_rect(_last_img,Rect2(0,0,_last_img.get_width(),_last_img.get_height()),Vector2(ix,iy))
 	texture_from_img()
+	clear_undo_history()
 	
-func rescale_drawing(input_px: int,input_py: int, interpolation_mode: Image.Interpolation):# stretch mode
-	save_img_to_undo_history()#-> save to history
+func rescale_drawing(input_px: int,input_py: int):# stretch mode
+	#save_img_to_undo_history()#-> save to history
 	px=input_px
 	py=input_py
-	img.resize(input_px,input_py,interpolation_mode)
+	img.resize(input_px,input_py,Image.INTERPOLATE_NEAREST)
 	texture_from_img()
+	clear_undo_history()
 
 
 ###############################################################################
@@ -463,7 +466,8 @@ func _draw_point():
 				elif draw_mode==DRAW_MODES.ERASER:
 					img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.BUCKET:
-					flood_fill(img,color_at_first_point,brush_color,ix+float(px)/2,iy+float(py/2))# beware will not work if not line_fill
+					if color_at_first_point!=Color.BLACK:
+						flood_fill(img,color_at_first_point,brush_color,ix+float(px)/2,iy+float(py/2))# beware will not work if not line_fill
 				elif draw_mode==DRAW_MODES.BUCKETBRUSH:## too costly!
 					var _imgbucket: Image=Image.new()
 					_imgbucket.copy_from(img)
