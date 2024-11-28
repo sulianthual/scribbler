@@ -7,6 +7,8 @@
 	pen behind black over color -> erase behind black only over color DONE
 	bucket -> fill transparent (behind black) -> DONE
 	*also remove eraser button as it is redundant, maybe replace with undo (cf middle mouse janky)
+	-> replace eraser with "invert button" that middle mouse calls, put it most right:
+		changes all icons on the row (pen-> eraser), etc, just replace brush with eraser icon (except bucket)
 - options (could make a button): 
 	grid (finicky)
 	background color
