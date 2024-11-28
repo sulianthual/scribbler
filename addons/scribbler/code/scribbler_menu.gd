@@ -263,15 +263,16 @@ func _help_dialogue():
 	Janky, minimal and tailored to drawing black outlines+fillings and shadows.
 	
 	Drawing Area:
-	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, swap draw/erase mode with middle mouse. \
+	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Swap draw/erase tools with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Tools:
-	color pen/eraser: classic paint tools 
 	black pen: draw with dedicated black pen (for outlines). Has a separate pen size and color.
+	color pen: draw with color over anything
 	color pen alt1: draw with color pen but behind black strokes (for filling)
 	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows)
 	bucket fill: classic bucket but doesnt overwrite black
+	swap draw/erase mode: toggle eraser tools (each is a mirror of its draw tool, e.g. black eraser only erases black etc)
 	color slots: left click to apply to color pen, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
 	Drag and Drop:
