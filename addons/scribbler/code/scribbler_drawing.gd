@@ -345,27 +345,46 @@ func _input(event):
 			else:
 				#print("rmouse released")
 				undo_pressed=false
-		#elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
-			#if event.pressed:# TESTS HERE
-				#draw_mode=DRAW_MODES.ERASERBLACK
-				##print("pressed")
-				#_drawing=true
-				#_first_point=true
-				#_draw_point()
-			#else:
-				##print("released")
-				#_drawing=false
-				#save_img_to_undo_history()
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
-			if event.pressed:# PICK A COLOR
-				#print("midmouse pressed")
-				_drawing=false
-				if not pick_pressed:
-					pick_pressed=true
-					pick_color()
+			if true:
+				#
+				if event.pressed:# INVER DRAWING STYLE
+					print("midmouse pressed")
+					_drawing=false
+					if not pick_pressed:
+						pick_pressed=true
+						## INVERT here
+						if draw_mode==DRAW_MODES.PEN:
+							draw_mode=DRAW_MODES.ERASER
+						elif draw_mode==DRAW_MODES.ERASER:
+							draw_mode=DRAW_MODES.PEN
+						elif draw_mode==DRAW_MODES.PENBLACK:
+							draw_mode=DRAW_MODES.ERASERBLACK
+						elif draw_mode==DRAW_MODES.ERASERBLACK:
+							draw_mode=DRAW_MODES.PENBLACK
+						elif draw_mode==DRAW_MODES.PENBEHINDBLACK:
+							draw_mode=DRAW_MODES.ERASERBEHINDBLACK
+						elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
+							draw_mode=DRAW_MODES.PENBEHINDBLACK
+						elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
+							draw_mode=DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK
+						elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
+							draw_mode=DRAW_MODES.PENOVERFIRSTBEHINDBLACK
+				else:
+					print("midmouse released")
+					pick_pressed=false
+				#
 			else:
-				#print("midmouse released")
-				pick_pressed=false
+				#
+				if event.pressed:# PICK A COLOR
+					#print("midmouse pressed")
+					_drawing=false
+					if not pick_pressed:
+						pick_pressed=true
+						pick_color()
+				else:
+					#print("midmouse released")
+					pick_pressed=false
 		elif event is InputEventMouseMotion:
 			mouse_position_changed.emit()
 			if not _first_point and _drawing:
@@ -441,8 +460,12 @@ func _draw_point():
 					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENBLACK:
 					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
-				elif draw_mode==DRAW_MODES.ERASERBLACK:## TODO
-					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				elif draw_mode==DRAW_MODES.ERASERBLACK:
+					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
+					var _mask: Image=img.get_region(_region)
+					#_mask=_swap_notcolor(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
+					_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
+					img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENOVER:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
@@ -479,7 +502,6 @@ func _draw_point():
 						_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
 						img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 						#img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
-
 				elif draw_mode==DRAW_MODES.PENBEHIND:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=_swap_transparent(img.get_region(_region))
@@ -535,8 +557,12 @@ func _draw_point():
 						img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_mode==DRAW_MODES.PENBLACK:
 						img.blend_rect(black_pen_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
-					elif draw_mode==DRAW_MODES.ERASERBLACK:## TODO
-						img.blend_rect(black_pen_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_mode==DRAW_MODES.ERASERBLACK:
+						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
+						var _mask: Image=img.get_region(_region)
+						_mask=_swap_notcolor(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
+						_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
+						img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_mode==DRAW_MODES.PENOVER:
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
 						var _mask: Image=img.get_region(_region)
