@@ -284,7 +284,8 @@ func clear_undo_history():
 
 	
 ## MODE
-enum DRAW_MODES {PEN,PENBLACK,PENOVER,PENOVERFIRST,PENOVERFIRSTBEHINDBLACK,PENBEHIND,PENBEHINDBLACK,ERASER,BUCKET,BUCKETBRUSH}
+enum DRAW_MODES {PEN,ERASER,PENBLACK,ERASERBLACK,PENOVER,PENOVERFIRST,PENOVERFIRSTBEHINDBLACK,ERASEROVERFIRSTBEHINDBLACK,\
+PENBEHIND,PENBEHINDBLACK,ERASERBEHINDBLACK,BUCKET,BUCKETERASER,BUCKETBRUSH}
 var draw_mode: DRAW_MODES=DRAW_MODES.PENBLACK
 signal draw_mode_changed
 func set_draw_mode(input_draw_mode: String):## CALLS FROM SCRIBBLER
@@ -344,6 +345,17 @@ func _input(event):
 			else:
 				#print("rmouse released")
 				undo_pressed=false
+		#elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+			#if event.pressed:# TESTS HERE
+				#draw_mode=DRAW_MODES.ERASERBLACK
+				##print("pressed")
+				#_drawing=true
+				#_first_point=true
+				#_draw_point()
+			#else:
+				##print("released")
+				#_drawing=false
+				#save_img_to_undo_history()
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 			if event.pressed:# PICK A COLOR
 				#print("midmouse pressed")
@@ -429,6 +441,8 @@ func _draw_point():
 					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENBLACK:
 					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				elif draw_mode==DRAW_MODES.ERASERBLACK:## TODO
+					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENOVER:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
@@ -453,6 +467,19 @@ func _draw_point():
 						else:
 							_mask=_swap_notcolor(_mask,color_at_first_point,Color.TRANSPARENT)# exclude black
 						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
+					if color_at_first_point!=Color.BLACK:
+						var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
+						var _mask: Image=img.get_region(_region)
+						if color_at_first_point==Color.TRANSPARENT:
+							_mask=_swap_notcolor(_mask,Color.TRANSPARENT,Color.WHITE)
+							_mask=_swap_between_color(_mask,Color.WHITE,Color.TRANSPARENT)
+						else:
+							_mask=_swap_notcolor(_mask,color_at_first_point,Color.TRANSPARENT)# exclude black
+						_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
+						img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+						#img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+
 				elif draw_mode==DRAW_MODES.PENBEHIND:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=_swap_transparent(img.get_region(_region))
@@ -465,9 +492,19 @@ func _draw_point():
 					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.ERASER:
 					img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
+				elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
+					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
+					var _mask: Image=img.get_region(_region)
+					_mask=_swap_color(_mask,Color.TRANSPARENT,Color.WHITE)
+					_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)
+					_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
+					img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.BUCKET:
 					if color_at_first_point!=Color.BLACK:
 						flood_fill(img,color_at_first_point,brush_color,ix+float(px)/2,iy+float(py/2))# beware will not work if not line_fill
+				elif draw_mode==DRAW_MODES.BUCKETERASER:
+					if color_at_first_point!=Color.BLACK:
+						flood_fill(img,color_at_first_point,Color.TRANSPARENT,ix+float(px)/2,iy+float(py/2))
 				elif draw_mode==DRAW_MODES.BUCKETBRUSH:## too costly!
 					var _imgbucket: Image=Image.new()
 					_imgbucket.copy_from(img)
@@ -494,7 +531,11 @@ func _draw_point():
 				if _drawing:
 					if draw_mode==DRAW_MODES.PEN:
 						img.blend_rect(brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_mode==DRAW_MODES.ERASER:
+						img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_mode==DRAW_MODES.PENBLACK:
+						img.blend_rect(black_pen_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_mode==DRAW_MODES.ERASERBLACK:## TODO
 						img.blend_rect(black_pen_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_mode==DRAW_MODES.PENOVER:
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
@@ -520,6 +561,19 @@ func _draw_point():
 							else:
 								_mask=_swap_notcolor(_mask,color_at_first_point,Color.TRANSPARENT)# exclude black
 							img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_mode==DRAW_MODES.ERASEROVERFIRSTBEHINDBLACK:
+						if color_at_first_point!=Color.BLACK:
+							var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
+							var _mask: Image=img.get_region(_region)
+							if color_at_first_point==Color.TRANSPARENT:
+								_mask=_swap_notcolor(_mask,Color.TRANSPARENT,Color.WHITE)
+								_mask=_swap_between_color(_mask,Color.WHITE,Color.TRANSPARENT)
+							else:
+								_mask=_swap_notcolor(_mask,color_at_first_point,Color.TRANSPARENT)# exclude black
+							_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
+							img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+							#img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+
 					elif draw_mode==DRAW_MODES.PENBEHIND:
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
 						var _mask: Image=_swap_transparent(img.get_region(_region))
@@ -530,9 +584,16 @@ func _draw_point():
 						_mask=_swap_color(_mask,Color.TRANSPARENT,Color.WHITE)
 						_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)
 						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
-					elif draw_mode==DRAW_MODES.ERASER:
-						img.blit_rect_mask(eraser_img,brush_img,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
+					elif draw_mode==DRAW_MODES.ERASERBEHINDBLACK:
+						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
+						var _mask: Image=img.get_region(_region)# not optimized, should not reload mask constantly whatever
+						_mask=_swap_color(_mask,Color.TRANSPARENT,Color.WHITE)
+						_mask=_swap_color(_mask,Color.BLACK,Color.TRANSPARENT)
+						_mask.blit_rect_mask(brush_img,_mask,offr,Vector2(0,0))
+						img.blit_rect_mask(eraser_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_mode==DRAW_MODES.BUCKET:
+						pass
+					elif draw_mode==DRAW_MODES.BUCKETERASER:
 						pass
 					elif draw_mode==DRAW_MODES.BUCKETBRUSH:## too costly
 						var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
