@@ -496,7 +496,7 @@ func _draw_point():
 					img.blend_rect(brush_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENBLACK:
 					img.blend_rect(black_pen_img,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
-				elif draw_mode==DRAW_MODES.ERASERBLACK:##-> not using black_pen_img TODO
+				elif draw_mode==DRAW_MODES.ERASERBLACK:
 					var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 					var _mask: Image=img.get_region(_region)
 					_mask=_swap_notcolor(_mask,Color.BLACK,Color.TRANSPARENT)# exclude black
@@ -517,7 +517,7 @@ func _draw_point():
 						_mask=_swap_notcolor(_mask,color_at_first_point,Color.TRANSPARENT)# exclude black
 					img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(ix+offx),roundi(iy+offy)))
 				elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
-					if color_at_first_point!=Color.BLACK:
+					if color_at_first_point!=Color.BLACK and color_at_first_point!=brush_color:
 						var _region: Rect2i=Rect2i(roundi(ix+offx),roundi(iy+offy),brush_size,brush_size)# region being drawn
 						var _mask: Image=img.get_region(_region)
 						if color_at_first_point==Color.TRANSPARENT:
@@ -614,7 +614,7 @@ func _draw_point():
 							_mask=_swap_notcolor(_mask,color_at_first_point,Color.TRANSPARENT)# exclude black
 						img.blend_rect_mask(brush_img,_mask,offr,Vector2(roundi(lx+offx),roundi(ly+offy)))
 					elif draw_mode==DRAW_MODES.PENOVERFIRSTBEHINDBLACK:
-						if color_at_first_point!=Color.BLACK:
+						if color_at_first_point!=Color.BLACK and color_at_first_point!=brush_color:
 							var _region: Rect2i=Rect2i(roundi(lx+offx),roundi(ly+offy),brush_size,brush_size)# region being drawn
 							var _mask: Image=img.get_region(_region)
 							if color_at_first_point==Color.TRANSPARENT:

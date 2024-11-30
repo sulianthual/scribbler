@@ -280,7 +280,7 @@ func _help_dialogue():
 	file: reference to edited PNG (as saved on disk), drag and drop to any texture to apply it.
 	colors slots: drop any PNG to any slot to load colors found in PNG.
 	onions: drop PNGs to load them as onion skinning. drop colors from color slots (see below).
-	size: drop any Vector2 (e.g. scale...) from inspector to stretch image *Vector2.
+	size: drop any Vector2 (e.g. scale...) from inspector to stretch image to size*scale.
 
 	Buttons:
 	x/menu/+: minimize/expand and detach/attach dock
