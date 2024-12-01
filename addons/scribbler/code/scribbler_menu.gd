@@ -143,7 +143,7 @@ func _ready():
 	_update_image_size_label()
 	update_detach_button()
 	ready_brush_color()# wa make_brush+color
-	_update_draw_mode()
+	ready_drawing_tools()
 	ready_onion_controls()
 	### load icons manuall
 	#pen_black_button.add_theme_icon_override()
@@ -395,6 +395,10 @@ func _on_options_dialogue_confirmed():
 	show_grid=_options_dialogue_show_grid
 #############################################################################################3
 ## DRAWING TOOLS
+
+func ready_drawing_tools():
+	_update_draw_mode()
+	pen_black_button.grab_focus()# must match starting draw mode
 ## Draw mode (must match drawing.gd)
 var draw_mode: String="penblack"
 var draw_mode_inverted: bool=false
