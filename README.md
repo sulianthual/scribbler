@@ -49,14 +49,14 @@ The pen you are currently using is shown in top left, the image size in top righ
 
 The drawing tools are tailored towards drawing black outlines, color fillings and shadows (as shown in the image above). From left to right they are:
 
-- Black Pen: A dedicated pen that only draws black, useful for outlines. This pen has a dedicated pen size, that changes (with mouse wheel) only when black pen is selected and doesnt change when other pens are selected (this is helpful to conserve a uniform outline thickness).
+- Black Pen: A dedicated pen that only draws black, useful for making outlines. This pen has a dedicated pen size, that changes (with mouse wheel) only when black pen is selected and doesnt change when other pens are selected (this is helpful to conserve a uniform outline thickness).
 - Color Pen: A classic color pen, pick its color from one of the color slots (see hereafter). 
-- Color Pen Behind Black: Same as the color pen, but draws behind black strokes. Useful for fillings with colors behind the outlines.
+- Color Pen Behind Black: Same as the color pen, but draws behind black strokes. Useful for making color fillings behind the outlines.
 - Color Pen Behind Black and Over First Color: Same as the color pen, but draws behind black strokes and over first color encountered. The first color encountered is the color under mouse when starting stroke. Useful for making shadows over existing fillings.
-- Bucket: A classic bucket, fills first color encountered. However doesnt fill over black. 
+- Bucket: A classic bucket, fills first color encountered. However doesnt fill over black (as outlines are supposed to stay black). 
 - Swap: Swaps between drawing and eraser tools (same as middle mouse).
 
-Next is the eraser tools (accessed with swap button), that mirror the drawing tools. From left to right:
+Next is the eraser tools (toggled with swap button), that mirror the drawing tools. From left to right:
 
 - Black Eraser: Erases only black (outlines) and has same dedicated pen size as the black pen.
 - Eraser: A classic eraser
@@ -74,7 +74,7 @@ You have seven color slots to work with:
 - Right click on a color to choose its color in a popup menu.
 - Left click on a color slot to apply color to pen (this only works if a color pen is selected, but not the black pen or black eraser).
 
-You can drag any .png to a color slot, which will assign all color slots to colors found in image (well, to the seven first ones or less, with remaining slots assigned to white). To load colors of current drawing, drag from "file" to any color slot (see hereafter). 
+You can drag any .png to a color slot, which will assign all colors found in image to the colors slots (if less then seven colors are found, remaining slots are assigned to white). To load colors of current drawing, drag from "file" to any color slot (see hereafter). 
 
 <h4>Menu Buttons</h4>
 
