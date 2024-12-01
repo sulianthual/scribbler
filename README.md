@@ -25,7 +25,7 @@ I made this plugin because I wanted to quickly prototype some drawings directly 
 
 The UI consists of a drawing area, a row of drawing tools, a row of color slots and several menu buttons. The main controls are as follows:
 
-- Press "+" in the menu to expand dock, and when expanded press "-" to minimize again. Expanding gives you more space to draw. Note: do not "Make Floating" the dock and expand/minimize altogether or the plugin will close. If the plugin closes disable/reenable it again in Project Settings/Plugins. Best practice is to not use "Make Floating".
+- Press "+" in the menu to expand dock, and when expanded press "-" to minimize again. Expanding gives you more space to draw. Note: do not "Make Floating" the dock and expand/minimize altogether or the plugin will close. Best practice is to not use "Make Floating".
 
 - Press "X" to hide the menu, press again to show. This is helpful if collapsing the dock (as buttons otherwise overlap, its basically janky).
 
@@ -74,13 +74,13 @@ You have seven color slots to work with:
 - Right click on a color to choose its color in a popup menu.
 - Left click on a color slot to apply color to pen (this only works if a color pen is selected, but not the black pen or black eraser).
 
-You can drag any .png to a color slot, which will load assign all color slots to colors found in image (well, to the seven first ones or less, with remaining slots assigned to white). To load colors of current drawing, drag from "file" to any color slot (see hereafter). 
+You can drag any .png to a color slot, which will assign all color slots to colors found in image (well, to the seven first ones or less, with remaining slots assigned to white). To load colors of current drawing, drag from "file" to any color slot (see hereafter). 
 
 <h4>Menu Buttons</h4>
 
 The menu buttons are as follows:
 
-- file: this is a reference to the .png image saved on file, that can be dragged and dropped elsewhere. Drag and drop to a texture (e.g. of a Sprite2D) to apply the image. Or drag and drop to the drawing area, any color slot, or to "onions". Remember to save your changes. 
+- file: this is a reference to the .png image saved on file, that can be dragged and dropped elsewhere. Drag and drop to a texture (e.g. of a Sprite2D) to apply the image. Or drag and drop to the drawing area, any color slot, or to "onions". Remember to save your changes before dragging. 
 - clear: clears the current drawing
 - help: a very basic popup help text.
 - size: opens a popup menu to resize the image. In the popup menu you can select resize mode (stretch, crop to top-left corner or crop to center), select template sizes, multiply/divide width and height or swap them, etc. Then press OK to confirm (no undo).
