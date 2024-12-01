@@ -21,10 +21,6 @@ normal_texture = ExtResource("4_677wj")
 diffuse_texture = ExtResource("5_25awc")
 normal_texture = ExtResource("7_t4hqg")
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_akr3u"]
-atlas = ExtResource("8_fwtmy")
-region = Rect2(0, 0, 128, 256)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_jgonr"]
 atlas = ExtResource("8_fwtmy")
 region = Rect2(128, 0, 128, 256)
@@ -33,18 +29,22 @@ region = Rect2(128, 0, 128, 256)
 atlas = ExtResource("8_fwtmy")
 region = Rect2(384, 0, 128, 256)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_akr3u"]
+atlas = ExtResource("8_fwtmy")
+region = Rect2(0, 0, 128, 256)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_460oh"]
 resource_local_to_scene = true
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_akr3u")
-}, {
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_jgonr")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_oy6eg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_akr3u")
 }],
 "loop": true,
 "name": &"default",

@@ -1,6 +1,6 @@
 <div align="center"><img src="game_icon.png"></div>
 
-<h4>Scribbler</h4>
+<h1>Scribbler</h1>
 
 sul (2024), Plugin for Godot 4.2+.
 
@@ -8,21 +8,119 @@ A side dock to make basic drawings without leaving the Godot editor, useful for 
 
 <h4>Installation</h4>
 
-All you need is the folder "addons/scribbler" in your Godot project (with same path). Either 1) Download from [github](https://github.com/sulianthual/scribbler), then copy only addons/scribbler to addons/scribbler in your project (the rest is documentation and some demo, not needed). Or 2) download from Godot Asset Library, which should install only addons/scribbler. Version from Godot Asset Library may not be latest version, as I keep making changes on github.
+All you need is the folder "addons/scribbler" in your Godot project (with same path). Either 1) Download from [github](https://github.com/sulianthual/scribbler), then copy addons/scribbler to addons/scribbler in your project (the rest is documentation and some demo). Or 2) download from Godot Asset Library, which should install only addons/scribbler. Version from Godot Asset Library may not be latest github version.
 
-Open your Godot project with Godot(4.2 or above), in Project Settings/Plugins enable the Scribbler Plugin. This will load the Scribbler side dock to bottom right. You can replace the dock anywhere (but dont "Make Floating"). 
+Open your Godot project with Godot (4.2 or above), in Project Settings/Plugins enable the Scribbler Plugin. This will load the Scribbler side dock to bottom right. You can replace the dock anywhere (but dont "Make Floating"). 
 
-<h4>Getting Started</h4>
+<h4>Quick Oveview</h4>
 
-Lets do a quick overview of features without details. Start a new drawing (press "menu" then "new").
-Lets make a quick drawing to show an overview of features. 
+A quick tour without much details. Start a new drawing (press "menu" then "new"). Draw with left mouse, undo with right mouse, change pen size with mouse wheel, and swap tools with middle mouse. You can use black pen, color pen, eraser, bucket, etc (more details hereafter). Save drawing ("menu" then "save") as png file. Now drag from "file" (hold left mouse) and drop (release) to any texture in Inspector (e.g. a Sprite 2D texture), and the drawing will be applied. Inversely, drag any texture from Inspector (as long as its resource_path is a png) or any png file from FileSystem to the drawing area to load and edit it. 
 
 
-<h4>Buttons</h4>
+I made this plugin because I wanted to quickly prototype some drawings directly in the editor. The plugin is very limited in scope compared to all around painting softwares (or other very nice Godot plugins, e.g. Sprite Painter), it basically has a few minimal features I found essential for my workflow. It can use drag and drop to quickly assign drawings, along with a few other features detailed hereafter like sprite sheets and onion skinning for animations. The plugin is also tailored toward a specific drawing style: black outlines with color fillings and shadows, for which there are specific drawing tools and key bindings. And lastly the plugin can be janky.
 
-Press "+" in the menu to expand dock, when expanded press "-" to minimize again. Note: do not "Make Floating" the dock and expand/minimize altogether or the plugin will close. If the plugin closes disable/reenable it again in Project Settings/Plugins. Best practice is to not use "Make Floating".
+<div align="center"><img src="doc/doc_ui.png"></div>
 
-Press "X" to hide the menu, press again to show. This is helpful if resizing the dock to a minimum (as buttons otherwise overlap).
+<h4>Main Controls</h4>
 
-Press "menu" to show/hide additional options (more later). Press "new" to make a new drawing.
+The UI consists of a drawing area, a row of drawing tools, a row of color slots and several menu buttons. The main controls are as follows:
 
+- Press "+" in the menu to expand dock, and when expanded press "-" to minimize again. Expanding gives you more space to draw. Note: do not "Make Floating" the dock and expand/minimize altogether or the plugin will close. If the plugin closes disable/reenable it again in Project Settings/Plugins. Best practice is to not use "Make Floating".
+
+- Press "X" to hide the menu, press again to show. This is helpful if collapsing the dock (as buttons otherwise overlap, its basically janky).
+
+- Press "menu" to show/hide additional buttons (again this gives you more drawing space).
+
+<h4>Drawing Area</h4>
+
+
+In the drawing area, the controls are:
+
+- Left Mouse: Draw
+- Right Mouse: Undo stroke (its binded this way because I often redo strokes)
+- Mouse wheel: change pen size
+- Middle Mouse: swap tools between pens/erasers (same as swap button)
+
+Any .png resource can be dragged and dropped to the drawing area, which will load it. This can be a png file from Filesystem, a texture from the Inspector, etc (I havent tested all cases). Just make sure the resource uses a .png saved on file (as indicated in Resource/resource_path).
+
+The pen you are currently using is shown in top left, the image size in top right (as width x height in pixels), and the .png file path (if any) at the bottom. 
+
+<h4>Drawing Tools</h4>
+
+The drawing tools are tailored towards drawing black outlines, color fillings and shadows (as shown in the image above). From left to right they are:
+
+- Black Pen: A dedicated pen that only draws black, useful for outlines (see picture above). This pen has a dedicated pen size, that changes (with mouse wheel) only when black pen is selected and doesnt change when other pens are selected (this is very helpful to conserve a unique pen size for all outlines).
+- Color Pen: A classic color pen, pick its color from one of the color slots (see hereafter). 
+- Color Pen Behind Black: Same as the color pen, but draws behind black strokes. Useful for filling with colors (see picture above).
+- Color Pen Behind Black and Over First Color: Same as the color pen, but draws behind black strokes and over first color encountered. The first color encountered is the color under mouse when starting stroke. Useful for making shadows over existing fillings (see picture above).
+- Bucket: A classic bucket, fills first color encountered. However doesnt fill over black. 
+- Swap: Swaps between drawing and eraser tools (same as middle mouse).
+
+Next is the eraser tools (accessed with swap button), that mirror the drawing tools. From left to right:
+
+- Black Eraser: Erases only black (outlines) and has same dedicated pen size as the black pen.
+- Eraser: A classic eraser
+- Eraser Behind Black: Same as eraser but doesnt erase black.
+- Eraser Behind Black and Over First Color: Same as eraser but doesnt erase black, and only erases first color encountered.
+- Bucket Eraser: Erases first color encountered, excluding black. Useful to remove fillings that poke out of outlines.
+- Swap: Swaps between drawing and eraser tools (same as middle mouse).
+
+Note that when using erasers, the pen indicator in top-left of drawing area still indicates drawing color but not erasing color (its like that).
+
+<h4>Color Slots</h4>
+
+You have seven color slots to work with:
+
+- Right click on a color to choose its color in a popup menu.
+- Left click on a color slot to apply color to pen (this only works if a color pen is selected, but not the black pen or black eraser).
+
+You can drag any .png to a color slot, which will load assign all color slots to colors found in image (well, to the seven first ones or less, with remaining slots assigned to white). To load colors of current drawing, drag from "file" to any color slot (see hereafter). 
+
+<h4>Menu Buttons</h4>
+
+The menu buttons are as follows:
+
+- file: this is a reference to the .png image saved on file, that can be dragged and dropped elsewhere. Drag and drop to a texture (e.g. of a Sprite2D) to apply the image. Or drag and drop to the drawing area, any color slot, or to "onions". Remember to save your changes. 
+- clear: clears the current drawing
+- help: a very basic popup help text.
+- size: opens a popup menu to resize the image. In the popup menu you can select resize mode (stretch, crop to top-left corner or crop to center), select template sizes, multiply/divide width and height or swap them, etc. Then press OK to confirm (no undo).
+- onions: used for onion skinning (see below).
+- options: opens a popup with option to show a grid (still finnicky) or use sprite sheets (see below).
+- new: start a new drawing
+- load: load drawing from a png file
+- save: save drawing to a png file or overwrite existing one. When saving, all Godot resources that use the png are updated, but changes are not systematically visible in Godot editor (e.g. some textures in Inspector still display former image until reloaded, that seems to be just Godot).
+- +/menu/X: hide/expand menu (as detailed above in Main Controls)
+
+<div align="center"><img src="doc/doc_sheets.png"></div>
+
+<h4>Sprite Sheets</h4>
+
+Sprite sheets are useful to contain several sprites in a single file (e.g. for doing animations, atlas, etc). Enable using sprite sheets in options popup menu. When using sprite sheets, drawings load and save as a subregion of the image on disk. This means:
+
+- When you load (or drop) a png, a popup appears to select subregion. Here subx, suby are the numbers of subdivisions in width, height, and ix, iy are the indices of the subregion (offsets are not supported). Pick subx and suby, select subregion with left mouse, then confirm. This will load the subregion for editing
+- When you save a png, a similar popup appears to select subregion. If you are overwriting an existing png file, only the subregion will be overwritten. If you are saving a new png file, the subregion will be overwritten and all other regions written as transparent. Note: make sure your drawing size matches the subregion size, otherwise it will be cropped to the subregion in the saved file.
+
+Note that using sprite sheets also applies to loading onion skins (see below).
+
+<div align="center"><img src="doc/doc_onions.png"></div>
+
+<h4>Onion Skinning</h4>
+
+Onion skins are semi-transparent guidelines that you can overlay on top drawing area (useful for doing e.g. animations):
+
+- Drag any png to "onions" which will load it as a new onion skin. Typically your image is a sprite sheet, you drag it from "file" to "onions" then select one of the sprites. You can keep dragging to overlay multiple onion skins (but it looks messy quite quickly).
+
+- Toggle onion skins visibility by clicking on "onions" with left mouse. Clear all onions skins by clicking on "onions" with right mouse. 
+
+- By default an onion skin is the original image as semi-transparent. You can change the display to colored outlines by dragging a color from a color slot to "onions": what will happen is only black strokes from the original image will appear and they will be colored in the chosen color.
+
+- If you add another color, colored outline will change for next loaded onion skins. Thus you can combine several onion skins with different colored outlines. To obtain the image above, we have 1) loaded an image and allowed sprite sheets, 2) dropped "file" to "onions" and selected sprite, 3) dropped red color to "onions", 4) dropped blue color to "onions" and 5) dropped "file" to onions again and selected another sprite, and 6) cleared drawing.  
+
+<h4>Notes</h4>
+
+A few last notes:
+
+- When using the plugin you will get many warnings "Loaded resource as image file", its normal.
+- This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. It is likely inefficient for large files.
+- If the plugin closes for any reason (typically if you used "Make Floating"), just disable/reenable the plugin and it should be fine. Remember, it will only overwrite your png assets if you press "Save" and confirm overwrite.
+- There are some bash files in directory I use for github (git_init, git_reset,git_push), dont mind those.
