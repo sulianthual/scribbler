@@ -262,40 +262,36 @@ func _help_dialogue():
 	Make basic drawings without leaving the editor, useful for prototyping. \
 	Janky, minimal and tailored to drawing black outlines+fillings and shadows.
 	
-	Drawing Area:
+	Drawing Area: \
 	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Swap draw/erase tools with middle mouse. \
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
-	Tools:
-	black pen: draw with dedicated black pen (for outlines). Has a separate pen size and color.
-	color pen: draw with color over anything
-	color pen alt1: draw with color pen but behind black strokes (for filling)
-	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows)
-	bucket fill: classic bucket but doesnt overwrite black
-	swap draw/erase mode: toggle eraser tools (each is a mirror of its draw tool, e.g. black eraser only erases black etc)
+	Tools: \
+	black pen: draw with dedicated black pen (for outlines), has a separate pen size and color. \
+	color pen: draw with color from current color slot. \
+	color pen alt1: draw with color pen but behind black strokes (for filling). \
+	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows). \
+	bucket fill: classic bucket but behind black strokes. \
+	swap: toggle eraser tools (each is a mirror of its draw tool, e.g. black eraser only erases black etc). \
 	color slots: left click to apply to color pen, right click to pick color. Last color in row is modified by color picker (middle mouse). 
 	
-	Drag and Drop:
-	drawing area: drop any PNG (as file/texture) from Filesystem/Inspector/etc to load it.
-	file: reference to edited PNG (as saved on disk), drag and drop to any texture to apply it.
-	colors slots: drop any PNG to any slot to load colors found in PNG.
-	onions: drop PNGs to load them as onion skinning. drop colors from color slots (see below).
-	size: drop any Vector2 (e.g. scale...) from inspector to stretch image to size*scale.
-
-	Buttons:
-	x/menu/+: minimize/expand and detach/attach dock
-	new/load/save: manage PNG files in res://.
-	clear: clear the scribble (can be undone)
-	size: resize the scribble (choose new width and height in pixels, and resize mode)
-	sheet: if toggled, will load/save scribble as a subregion of the image on disk.
-	copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too.
-	 
-	Onion Skinning:	
-	Onion skins are guidelines, shown as semi-transparent and non editable. \
-	Drop any PNG (e.g. from "file") to "onions" to add a new onion skin. \
-	Drop a color to swap to colored outlines. \
+	Buttons: \
+	x/menu/+: minimize/expand and detach/attach dock. \
+	new/load/save: manage PNG files in res://. \
+	clear: clear the scribble (no undo). \
+	size: resize the scribble (choose new width and height in pixels, and resize mode, no undo). \
+	sheet: if toggled, will load/save scribble as a subregion of the image on disk. \
+	copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too. \
+	onions: Onion skins are guidelines, shown as semi-transparent and non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins. 
+	
+	Drag and Drop: \
+	Drop any PNG (from Filesystem, or from Inspector/texture,etc) to "drawing area" to load it. \
+	Drag from "file" and drop to any texture to apply PNG (as saved on disk). \
+	Drop any PNG to a color slot to load colors found in PNG. \
+	Drop any PNG to "onions" to load it as onion skin. \
+	Drop colors from color slots to swap to colored outlines. \
 	Drop further colors to changes colored outlines for next onion skins loaded. \
-	Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins.
+	Drop any Vector2 (e.g. scale...) from Inspector to "size" to stretch image to size*scale.
 
 	Warnings: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \

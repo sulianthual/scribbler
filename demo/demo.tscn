@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dbwsyoffw5ov2"]
+[gd_scene load_steps=25 format=3 uid="uid://dbwsyoffw5ov2"]
 
 [ext_resource type="Texture2D" uid="uid://drkexjtfpdt8k" path="res://demo/background.png" id="1_5prii"]
 [ext_resource type="Texture2D" uid="uid://7ccq7ogwl254" path="res://demo/tree.png" id="2_nnhru"]
@@ -29,10 +29,6 @@ region = Rect2(0, 0, 128, 256)
 atlas = ExtResource("8_fwtmy")
 region = Rect2(128, 0, 128, 256)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_nrplu"]
-atlas = ExtResource("8_fwtmy")
-region = Rect2(256, 0, 128, 256)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_oy6eg"]
 atlas = ExtResource("8_fwtmy")
 region = Rect2(384, 0, 128, 256)
@@ -46,9 +42,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jgonr")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_nrplu")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_oy6eg")
@@ -159,6 +152,10 @@ texture = ExtResource("4_sn0se")
 [node name="player" type="Sprite2D" parent="."]
 position = Vector2(47, 67)
 texture = SubResource("CanvasTexture_8e0xo")
+
+[node name="player2" type="Sprite2D" parent="."]
+position = Vector2(137, 66)
+texture = ExtResource("5_25awc")
 
 [node name="skeleton" type="AnimatedSprite2D" parent="."]
 position = Vector2(382, 125)

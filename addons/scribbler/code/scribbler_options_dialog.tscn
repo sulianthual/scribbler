@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://cx00nuomkissq"]
+
+[node name="options_dialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -79.5
+offset_right = 79.5
+offset_bottom = 66.0
+grow_horizontal = 2
+
+[node name="sheets" type="CheckBox" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "use sprite sheets"
+
+[node name="grid" type="CheckBox" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "show grid"
+
+[node name="background_color" type="ColorPickerButton" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "background color"

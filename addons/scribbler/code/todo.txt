@@ -1,13 +1,8 @@
-- control odes should not spread out of the dock
 - options (make a button that replaces sheet): 
 	grid (finicky)
 	background color
 	sheet on/off
 	onion import (semi transparent or colored outlines)
-	normal maps config
 	-> not fundamental
-- normal maps: 
-	implement a normal map=on
-	run script (Laigter) that creates normal map on save
-	also makes canvastexture directly(.tres) with texture+normal
+- sheet: give a base (e.g 32x32) and add option to overlap
 - publish
