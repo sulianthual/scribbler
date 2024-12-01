@@ -49,10 +49,10 @@ The pen you are currently using is shown in top left, the image size in top righ
 
 The drawing tools are tailored towards drawing black outlines, color fillings and shadows (as shown in the image above). From left to right they are:
 
-- Black Pen: A dedicated pen that only draws black, useful for outlines (see picture above). This pen has a dedicated pen size, that changes (with mouse wheel) only when black pen is selected and doesnt change when other pens are selected (this is very helpful to conserve a unique pen size for all outlines).
+- Black Pen: A dedicated pen that only draws black, useful for outlines. This pen has a dedicated pen size, that changes (with mouse wheel) only when black pen is selected and doesnt change when other pens are selected (this is very helpful to conserve a unique pen size for all outlines).
 - Color Pen: A classic color pen, pick its color from one of the color slots (see hereafter). 
-- Color Pen Behind Black: Same as the color pen, but draws behind black strokes. Useful for filling with colors (see picture above).
-- Color Pen Behind Black and Over First Color: Same as the color pen, but draws behind black strokes and over first color encountered. The first color encountered is the color under mouse when starting stroke. Useful for making shadows over existing fillings (see picture above).
+- Color Pen Behind Black: Same as the color pen, but draws behind black strokes. Useful for fillings with colors.
+- Color Pen Behind Black and Over First Color: Same as the color pen, but draws behind black strokes and over first color encountered. The first color encountered is the color under mouse when starting stroke. Useful for making shadows over existing fillings.
 - Bucket: A classic bucket, fills first color encountered. However doesnt fill over black. 
 - Swap: Swaps between drawing and eraser tools (same as middle mouse).
 
