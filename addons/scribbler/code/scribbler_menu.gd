@@ -257,7 +257,8 @@ func _help_dialogue():
 	file_dialogue.title="Help"
 	file_dialogue.dialog_text="""Scribbler (sul 2024, Godot v4.2+ plugin): \
 	Make basic drawings without leaving the editor, useful for prototyping. \
-	Janky, minimal and tailored to drawing black outlines+fillings and shadows.
+	Janky, minimal and tailored to drawing black outlines+fillings and shadows. \
+	See: https://github.com/sulianthual/scribbler
 	
 	Drawing Area: \
 	Draw with left mouse, Undo with right mouse, Change pen size with mouse wheel, Swap draw/erase tools with middle mouse. \
@@ -275,7 +276,7 @@ func _help_dialogue():
 	Buttons: \
 	*x/menu/+: minimize/expand and detach/attach dock. \
 	*new/load/save: manage PNG files in res://. \
-	*clear: clear the scribble (no undo). \
+	*clear: clear the scribble. \
 	*size: resize the scribble (choose new width and height in pixels, and resize mode, no undo). \
 	*options: if use sheets, will load/save scribble as a subregion of the image on disk. \
 	If show grid, shows grid (finnicky). \
