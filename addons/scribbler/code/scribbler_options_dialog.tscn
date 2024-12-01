@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://cx00nuomkissq"]
+[gd_scene load_steps=2 format=3 uid="uid://cx00nuomkissq"]
+
+[ext_resource type="Script" path="res://addons/scribbler/code/scribbler_options_dialog.gd" id="1_gd7ai"]
 
 [node name="options_dialog" type="Control"]
 layout_mode = 3
@@ -7,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_gd7ai")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -18,17 +21,14 @@ offset_right = 79.5
 offset_bottom = 66.0
 grow_horizontal = 2
 
-[node name="sheets" type="CheckBox" parent="VBoxContainer"]
+[node name="as_sheet" type="CheckBox" parent="VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 text = "use sprite sheets"
 
 [node name="grid" type="CheckBox" parent="VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 text = "show grid"
-
-[node name="background_color" type="ColorPickerButton" parent="VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-text = "background color"

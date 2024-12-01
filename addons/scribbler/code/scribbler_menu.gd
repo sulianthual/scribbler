@@ -22,7 +22,8 @@ extends Control
 @export var resize_dialogue: PackedScene
 ## Dialogue Control scene for sheet 
 @export var sheet_dialogue: PackedScene
-
+## Options dialogue
+@export var options_dialogue: PackedScene
 
 #############################################################
 ## SETUP
@@ -55,8 +56,7 @@ extends Control
 #@onready var onion_drop: Button = %onion_drop
 @onready var clear: Button = %clear# clear drawing (same as new drawing)
 @onready var resize: Button=%resize# update image size
-@onready var as_sheet_button: Button = %as_sheet# save drawing
-@onready var grid_button: Button = %grid
+@onready var options: Button=%options
 ## drawing tools
 @onready var pen_button: Button=%pen
 @onready var pen_overfirstbehindblack_button: Button=%pen_overfirstbehindblack
@@ -116,8 +116,7 @@ func _ready():
 	clear.connect("pressed",_on_clear_pressed)
 	resize.connect("pressed",_on_resize_pressed)
 	resize.connect("data_dropped",_on_resize_data_dropped)
-	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
-	grid_button.connect("toggled",_on_grid_toggled)
+	options.connect("pressed",_on_options_pressed)
 	## files
 	new.connect("pressed",_on_new_pressed)
 	save.connect("pressed",_on_save_pressed)
@@ -146,7 +145,6 @@ func _ready():
 	ready_brush_color()# wa make_brush+color
 	_update_draw_mode()
 	ready_onion_controls()
-	grid_button.visible=false# WE DONT USE IT
 	### load icons manuall
 	#pen_black_button.add_theme_icon_override()
 	
@@ -281,17 +279,18 @@ func _help_dialogue():
 	*new/load/save: manage PNG files in res://. \
 	*clear: clear the scribble (no undo). \
 	*size: resize the scribble (choose new width and height in pixels, and resize mode, no undo). \
-	*sheet: if toggled, will load/save scribble as a subregion of the image on disk. \
-	*copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too. \
-	*onions: Onion skins are guidelines, shown as semi-transparent and non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins. 
+	*options: if use sheets, will load/save scribble as a subregion of the image on disk. \
+	If show grid, shows grid (finnicky). \
+	*file: see drag and drop. \
+	*onions: see drag and drop, onion skins are semi-transparent guidelines. Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins. 
 	
 	Drag and Drop: \
 	Drop any PNG (from Filesystem, or from Inspector/texture,etc) to "drawing area" to load it. \
 	Drag from "file" and drop to any texture to apply PNG (as saved on disk). \
 	Drop any PNG to a color slot to load colors found in PNG. \
 	Drop any PNG to "onions" to load it as onion skin. \
-	Drop colors from color slots to swap to colored outlines. \
-	Drop further colors to changes colored outlines for next onion skins loaded. \
+	Drop colors from color slots to "onions" to swap to colored outlines. \
+	Drop further colors to "onions" to change colored outlines for next onion skins loaded. \
 	Drop any Vector2 (e.g. scale...) from Inspector to "size" to load as factors.
 
 	Notes: \
@@ -356,6 +355,44 @@ func _on_resize_dialogue_confirmed():
 ##GRID
 func _on_grid_toggled(toggle_on: bool):
 	grid_indicator.set_grid_visibility(toggle_on)
+
+
+
+## OPTIONS
+var as_sheet: bool=false# use sheet for loading/saving
+var show_grid: bool=false:# show grid (finicky)
+	set(value):
+		show_grid=value
+		grid_indicator.set_grid_visibility(value)
+func _on_options_pressed():
+	_options_dialogue()
+var _options_dialogue_as_sheet: bool=false# temporary to dialogue
+var _options_dialogue_show_grid: bool=false# temporary to dialogue
+func _options_dialogue():
+	_options_dialogue_as_sheet=as_sheet
+	_options_dialogue_show_grid=show_grid
+	var file_dialogue = ConfirmationDialog.new()
+	file_dialogue.set_size(Vector2(640, 360))
+	file_dialogue.title="Resize Scribble"
+	file_dialogue.dialog_autowrap=true
+	EditorInterface.popup_dialog_centered(file_dialogue)
+	file_dialogue.connect("confirmed",_on_options_dialogue_confirmed)
+	var _dialogue: Control=options_dialogue.instantiate()
+	file_dialogue.add_child(_dialogue)
+	_dialogue.set_as_sheet(_options_dialogue_as_sheet)
+	_dialogue.set_show_grid(_options_dialogue_show_grid)
+	_dialogue.connect("as_sheet_changed",_on_options_dialogue_as_sheet_changed)
+	_dialogue.connect("grid_changed",_on_options_dialogue_show_grid_changed)
+	file_dialogue.popup()
+	return _dialogue#file_dialogue
+## FROM DRAWING
+func _on_options_dialogue_as_sheet_changed(value: bool):
+	_options_dialogue_as_sheet=value
+func _on_options_dialogue_show_grid_changed(value: bool):
+	_options_dialogue_show_grid=value
+func _on_options_dialogue_confirmed():
+	as_sheet=_options_dialogue_as_sheet
+	show_grid=_options_dialogue_show_grid
 #############################################################################################3
 ## DRAWING TOOLS
 ## Draw mode (must match drawing.gd)
@@ -506,11 +543,6 @@ func on_drawing_color_picked(input_color: Color):
 
 ################################################################
 ## FILES
-
-## USE SHEETS OR NOT
-var as_sheet: bool=false# use sheet for loading/saving
-func _on_as_sheet_toggled(toggle_on: bool):
-	as_sheet=toggle_on
 
 ## NEW DRAWING
 func _on_new_pressed():
