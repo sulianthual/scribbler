@@ -1,8 +1,5 @@
-- options (make a button that replaces sheet): 
-	grid (finicky)
+- options: 
+	grid (finicky-> rework)
 	background color
-	sheet on/off
-	onion import (semi transparent or colored outlines)
-	-> not fundamental
 - sheet: give a base (e.g 32x32) and add option to overlap
 - publish

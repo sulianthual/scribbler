@@ -61,7 +61,6 @@ extends Control
 @onready var pen_button: Button=%pen
 @onready var pen_overfirstbehindblack_button: Button=%pen_overfirstbehindblack
 @onready var pen_black_button: Button=%pen_black
-@onready var eraser_button: Button=%eraser
 @onready var bucket_button: Button=%bucket
 @onready var pen_behindblack_button: Button=%pen_behindblack# behind black
 @onready var swap_dual: Button=%swap_dual
@@ -126,7 +125,6 @@ func _ready():
 	pen_button.connect("pressed",_on_draw_mode_pressed.bind("pen"))
 	pen_behindblack_button.connect("pressed",_on_draw_mode_pressed.bind("penbehindblack"))
 	pen_overfirstbehindblack_button.connect("pressed",_on_draw_mode_pressed.bind("penoverfirstbehindblack"))
-	eraser_button.connect("pressed",_on_draw_mode_pressed.bind("eraser"))
 	bucket_button.connect("pressed",_on_draw_mode_pressed.bind("bucket"))
 	swap_dual.connect("pressed",_on_swap_dual_pressed)
 	## colors
@@ -352,12 +350,6 @@ func _on_resize_dialogue_confirmed():
 		drawing.crop_drawing_cornered(px,py)
 
 
-##GRID
-func _on_grid_toggled(toggle_on: bool):
-	grid_indicator.set_grid_visibility(toggle_on)
-
-
-
 ## OPTIONS
 var as_sheet: bool=false# use sheet for loading/saving
 var show_grid: bool=false:# show grid (finicky)
@@ -373,7 +365,7 @@ func _options_dialogue():
 	_options_dialogue_show_grid=show_grid
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
-	file_dialogue.title="Resize Scribble"
+	file_dialogue.title="Options"
 	file_dialogue.dialog_autowrap=true
 	EditorInterface.popup_dialog_centered(file_dialogue)
 	file_dialogue.connect("confirmed",_on_options_dialogue_confirmed)
@@ -399,6 +391,7 @@ func _on_options_dialogue_confirmed():
 func ready_drawing_tools():
 	_update_draw_mode()
 	pen_black_button.grab_focus()# must match starting draw mode
+
 ## Draw mode (must match drawing.gd)
 var draw_mode: String="penblack"
 var draw_mode_inverted: bool=false
@@ -554,9 +547,7 @@ func _on_new_pressed():
 	reset_sheet()
 	edited_file=""
 
-###
 ## LOAD FROM FILE
-
 func _on_load_pressed():
 	if edited_file:
 		_load_dialogue().set_current_path(edited_file)# doesnt display name
@@ -611,16 +602,13 @@ func _on_load_from_sheet_dialogue_confirmed():
 		edited_file=load_from_sheet_selected_file
 		load_from_sheet_selected_file=""
 		
-#########################################################################################
+
 ## SAVE TO FILE
-
-
 func _on_save_pressed():
 	if edited_file:
 		_save_dialogue().set_current_path(edited_file)
 	else:
 		_save_dialogue()
-
 func _save_dialogue():
 	var file_dialogue = EditorFileDialog.new()
 	file_dialogue.clear_filters()
