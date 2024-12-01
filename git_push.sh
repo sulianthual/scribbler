@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+echo "GIT PUSH:" 
+echo "this script will commit changes and push to github"
 # Automated code for git push
 echo "Pushing to git:"
 
@@ -20,7 +23,7 @@ echo "done"
 
 #####################################
 ## NOTES:
-## 1) always create new repo from github following their instructions
+## 1) create new repo from github following their instructions
 ## 2) Above script for regular pushes
 ## 3) If not working, probably password expired:
 ## - make new password (token) on github (attach extra rights to edit/overwrite)
