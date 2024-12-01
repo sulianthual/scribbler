@@ -80,15 +80,15 @@ You can drag any .png to a color slot, which will assign all colors found in ima
 
 The menu buttons are as follows:
 
-- file: this is a reference to the .png image saved on file, that can be dragged and dropped elsewhere. Drag and drop to a texture (e.g. of a Sprite2D) to apply the image. Or drag and drop to the drawing area, any color slot, or to "onions". Remember to save your changes before dragging. 
+- file: this is a reference to the png image being edited, that can be dragged and dropped elsewhere (as long as it is saved). Drag and drop to a texture (e.g. of a Sprite2D) to apply the image. Or drag and drop to the drawing area, any color slot, or to "onions". Remember to save your changes before dragging. 
 - clear: clears the current drawing
 - help: a very basic popup help text.
 - size: opens a popup menu to resize the image. In the popup menu you can select resize mode (stretch, crop to top-left corner or crop to center), select template sizes, multiply/divide width and height or swap them, etc. Then press OK to confirm (no undo).
 - onions: used for onion skinning (see below).
 - options: opens a popup with option to show a grid (still finnicky) or use sprite sheets (see below).
 - new: start a new drawing
-- load: load drawing from a png file
-- save: save drawing to a png file or overwrite existing one. When saving, all Godot resources that use the png are updated, but changes are not systematically visible in Godot editor (e.g. some textures in Inspector still display former image until reloaded, that seems to be just Godot).
+- load: load drawing from a png file in res://
+- save: save drawing to a png file in res:// or overwrite existing one. When saving, all Godot resources that use the png are updated, but changes are not systematically visible in Godot editor (e.g. some textures in Inspector still display former image until reloaded, that seems to be just Godot).
 - +/menu/X: hide/expand menu (as detailed above in Main Controls)
 
 <div align="center"><img src="doc/doc_sheets.png"></div>
