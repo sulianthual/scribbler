@@ -1,4 +1,4 @@
-![alt text](game_icon.png)
+<div align="center"><img src="game_icon.png"></div>
 
 <h4>Scribbler</h4>
 
