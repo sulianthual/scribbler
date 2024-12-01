@@ -98,7 +98,7 @@ The menu buttons are as follows:
 Sprite sheets are useful to contain several sprites in a single file (e.g. for doing animations, atlas, etc). Enable using sprite sheets in options popup menu. When using sprite sheets, drawings load and save as a subregion of the image on disk. This means:
 
 - When you load (or drop) a png, a popup appears to select subregion. Here subx, suby are the numbers of subdivisions in width, height, and ix, iy are the indices of the subregion (offsets are not supported). Pick subx and suby, select subregion with left mouse, then confirm. This will load the subregion for editing
-- When you save a png, a similar popup appears to select subregion. If you are overwriting an existing png file, only the subregion will be overwritten. If you are saving a new png file, the subregion will be overwritten and all other regions written as transparent. Note: make sure your drawing size matches the subregion size, otherwise it will be cropped to the subregion in the saved file.
+- When you save a png, a similar popup appears to select subregion. If you are overwriting an existing png file, only the subregion will be overwritten. If you are saving a new png file, the subregion will be written with the drawing and all other regions written as transparent. Note: make sure your drawing size matches the subregion size, otherwise it will be cropped to the subregion in the saved file.
 
 Note that using sprite sheets also applies to loading onion skins (see below).
 
