@@ -86,17 +86,17 @@ text = "multiply"
 [node name="factx" type="SpinBox" parent="VBoxContainer/modifiers"]
 unique_name_in_owner = true
 layout_mode = 2
-min_value = 1.0
+min_value = 0.01
+step = 0.01
 value = 2.0
-rounded = true
 select_all_on_focus = true
 
 [node name="facty" type="SpinBox" parent="VBoxContainer/modifiers"]
 unique_name_in_owner = true
 layout_mode = 2
-min_value = 1.0
+min_value = 0.01
+step = 0.01
 value = 2.0
-rounded = true
 select_all_on_focus = true
 
 [node name="dividby" type="Button" parent="VBoxContainer/modifiers"]

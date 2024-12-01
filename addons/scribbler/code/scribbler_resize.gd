@@ -15,6 +15,7 @@ func _drop_data(position, data):
 	#print("_drop_data: ",data)
 	if typeof(data) == TYPE_DICTIONARY:
 		if data.type=="obj_property" and data.has("value") and data["value"] is Vector2:
-			var px: int= roundi(drawing.px*data["value"][0])
-			var py: int= roundi(drawing.py*data["value"][1])
-			drawing.rescale_drawing(px,py)
+			data_dropped.emit(data["value"])
+			#var px: int= roundi(drawing.px*data["value"][0])
+			#var py: int= roundi(drawing.py*data["value"][1])
+			#drawing.rescale_drawing(px,py)

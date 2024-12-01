@@ -40,7 +40,14 @@ func _ready():
 	update_ratio()
 	px.connect("value_changed",_on_any_pxpy_changed)
 	py.connect("value_changed",_on_any_pxpy_changed)
-	
+
+func set_factors(factors: Vector2):## CALLS from SCRIBBLER
+	#px.value=px.value*factors[0]
+	#py.value=py.value*factors[1]
+	print(factors)
+	factx.value=snappedf(factors[0],0.01)
+	facty.value=snappedf(factors[1],0.01)
+
 func _on_any_pxpy_changed(value: float):
 	update_ratio()
 func update_ratio():

@@ -115,6 +115,7 @@ func _ready():
 	## edit buttons
 	clear.connect("pressed",_on_clear_pressed)
 	resize.connect("pressed",_on_resize_pressed)
+	resize.connect("data_dropped",_on_resize_data_dropped)
 	as_sheet_button.connect("toggled",_on_as_sheet_toggled)
 	grid_button.connect("toggled",_on_grid_toggled)
 	## files
@@ -267,22 +268,22 @@ func _help_dialogue():
 	Pen size and color is indicated in top left corner, image dimensions (in pixels) in top right, and filename (if any) in bottom.
 	
 	Tools: \
-	black pen: draw with dedicated black pen (for outlines), has a separate pen size and color. \
-	color pen: draw with color from current color slot. \
-	color pen alt1: draw with color pen but behind black strokes (for filling). \
-	color pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows). \
-	bucket fill: classic bucket but behind black strokes. \
-	swap: toggle eraser tools (each is a mirror of its draw tool, e.g. black eraser only erases black etc). \
-	color slots: left click to apply to color pen, right click to pick color. Last color in row is modified by color picker (middle mouse). 
+	*Black Pen: draw with dedicated black pen (for outlines). \
+	*Color Pen: draw with color from current color slot. \
+	*Color Pen alt1: draw with color pen but behind black strokes (for filling). \
+	*Color Pen alt2: draw with color pen but behind black strokes and only over starting color (for shadows). \
+	*Bucket: classic bucket but behind black strokes. \
+	*Swap: toggle eraser tools (each is a mirror of its draw tool, e.g. black eraser only erases black etc). \
+	*Color Slots: left click to apply to color pen, right click to pick color. 
 	
 	Buttons: \
-	x/menu/+: minimize/expand and detach/attach dock. \
-	new/load/save: manage PNG files in res://. \
-	clear: clear the scribble (no undo). \
-	size: resize the scribble (choose new width and height in pixels, and resize mode, no undo). \
-	sheet: if toggled, will load/save scribble as a subregion of the image on disk. \
-	copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too. \
-	onions: Onion skins are guidelines, shown as semi-transparent and non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins. 
+	*x/menu/+: minimize/expand and detach/attach dock. \
+	*new/load/save: manage PNG files in res://. \
+	*clear: clear the scribble (no undo). \
+	*size: resize the scribble (choose new width and height in pixels, and resize mode, no undo). \
+	*sheet: if toggled, will load/save scribble as a subregion of the image on disk. \
+	*copy: Drag the PNG file saved on disk from here to any texture in Editor. Can be dropped to "onions" or colors slots too. \
+	*onions: Onion skins are guidelines, shown as semi-transparent and non editable. Left mouse: toggle onion skins visibility. Right mouse: clear all onion skins. 
 	
 	Drag and Drop: \
 	Drop any PNG (from Filesystem, or from Inspector/texture,etc) to "drawing area" to load it. \
@@ -291,11 +292,12 @@ func _help_dialogue():
 	Drop any PNG to "onions" to load it as onion skin. \
 	Drop colors from color slots to swap to colored outlines. \
 	Drop further colors to changes colored outlines for next onion skins loaded. \
-	Drop any Vector2 (e.g. scale...) from Inspector to "size" to stretch image to size*scale.
+	Drop any Vector2 (e.g. scale...) from Inspector to "size" to load as factors.
 
-	Warnings: \
+	Notes: \
 	Do not "Make Floating" the Scribbler dock if detached (may close plugin). \
 	You will get many warnings "Loaded resource as image file", its normal. \
+	Black pen and color pens have separate brush sizes. \
 	This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Likely inefficient for large files.
 	"""
 	file_dialogue.dialog_autowrap=true
@@ -315,8 +317,10 @@ func _on_clear_pressed():
 var resize_mode: String="crop_centered"
 func _on_resize_pressed():
 	_resize_dialogue()
+func _on_resize_data_dropped(value: Vector2):
+	var _dial: Control=_resize_dialogue()
+	_dial.set_factors(value)
 func _resize_dialogue():
-	
 	var file_dialogue = ConfirmationDialog.new()
 	file_dialogue.set_size(Vector2(640, 360))
 	file_dialogue.title="Resize Scribble"
@@ -332,7 +336,7 @@ func _resize_dialogue():
 	_dialogue.connect("scale_mode_changed",_on_resize_dialogue_resize_mode_changed)
 	resize_mode=_dialogue.get_scale_mode()#"crop_centered"# as in ready of packedscene
 	file_dialogue.popup()
-	return file_dialogue
+	return _dialogue#file_dialogue
 ## FROM DRAWING
 func _on_resize_dialogue_px_changed(input_px: float):## SIGNAL FROM DRAWING
 	px=int(input_px)
@@ -348,6 +352,8 @@ func _on_resize_dialogue_confirmed():
 	elif resize_mode=="crop_cornered":
 		drawing.crop_drawing_cornered(px,py)
 
+
+##GRID
 func _on_grid_toggled(toggle_on: bool):
 	grid_indicator.set_grid_visibility(toggle_on)
 #############################################################################################3
