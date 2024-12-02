@@ -108,17 +108,15 @@ Note that using sprite sheets also applies to loading onion skins (see below).
 
 Onion skins are semi-transparent guidelines that you can overlay on top drawing area (useful for doing e.g. animations):
 
-- Drag any png to "onions" which will load it as a new onion skin. Typically your image is a sprite sheet, you drag it from "file" to "onions" then select one of the sprites. You can keep dragging to overlay multiple onion skins (but it looks messy quite quickly).
+- Drag any png to "onions" which will load it as a new onion skin. Typically your image is a sprite sheet, you drag it from "file" to "onions" then select one of the sprites. You can keep dragging to overlay multiple onion skins.
 
 - Toggle onion skins visibility by clicking on "onions" with left mouse. Clear all onions skins by clicking on "onions" with right mouse. 
 
-- By default an onion skin is the original image as semi-transparent. You can change the display to colored outlines by dragging a color from a color slot to "onions": what will happen is only black strokes from the original image will appear and they will be colored in the chosen color.
+- By default an onion skin is the original image as semi-transparent. You can change the display to colored outlines by dragging a color from a color slot to "onions": what will happen is only black strokes from the original image will appear and they will be colored in the chosen color and semi-transparent (see image above).
 
-- If you add another color, colored outline will change for next loaded onion skins. Thus you can combine several onion skins with different colored outlines. To obtain the image above, we have 1) loaded an image and allowed sprite sheets, 2) dropped "file" to "onions" and selected sprite, 3) dropped red color to "onions", 4) dropped blue color to "onions" and 5) dropped "file" to onions again and selected another sprite, and 6) cleared drawing.  
+- If you drop another color to "onions", colored outline will change for next loaded onion skins. Thus you can combine several onion skins with different colored outlines. To obtain the image above, we have 1) loaded a sprite sheet image, 2) dropped "file" to "onions" and selected a subregion, 3) dropped red color to "onions", 4) dropped blue color to "onions" and 5) dropped "file" to onions again and selected another subregion, and 6) cleared drawing.
 
 <h4>Notes</h4>
-
-A few last notes:
 
 - When using the plugin you will get many warnings "Loaded resource as image file", its normal.
 - This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. It is likely inefficient for large files.
