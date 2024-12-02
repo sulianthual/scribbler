@@ -18,6 +18,11 @@ extends Control
 @onready var factx: SpinBox=%factx
 @onready var facty: SpinBox=%facty
 @onready var swap: Button=%swap
+## adders
+@onready var addx = %addx
+@onready var addy = %addy
+@onready var add = %add
+@onready var substract = %substract
 
 enum SCALEMODE {STRETCH, CROP_CENTERED,CROP_CORNERED}
 signal scale_mode_changed(value: String)
@@ -35,6 +40,7 @@ var scale_mode: SCALEMODE=SCALEMODE.CROP_CORNERED:
 
 func _ready():
 	make_mults()
+	make_adds()
 	make_presets()
 	make_scale_mode()
 	update_ratio()
@@ -44,7 +50,7 @@ func _ready():
 func set_factors(factors: Vector2):## CALLS from SCRIBBLER
 	#px.value=px.value*factors[0]
 	#py.value=py.value*factors[1]
-	print(factors)
+	#print(factors)
 	factx.value=snappedf(factors[0],0.01)
 	facty.value=snappedf(factors[1],0.01)
 
@@ -110,6 +116,16 @@ func swap_pxpy():
 	px.value=_py
 	py.value=_px
 	
+func make_adds():
+	add.connect("pressed",_on_add_pressed)
+	substract.connect("pressed",_on_substract_pressed)
+func _on_add_pressed():
+	px.value=clamp(px.value+addx.value,0,1920)
+	py.value=clamp(py.value+addy.value,0,1080)
+func _on_substract_pressed():
+	px.value=clamp(px.value-addx.value,0,1920)
+	py.value=clamp(py.value-addy.value,0,1080)
+
 func make_presets():
 	## make presets
 	var preset_list: Array[String]=[]
