@@ -8,6 +8,8 @@ extends TextureRect
 var img: Image=Image.new()
 var px: int=128
 var py: int=128
+const px0: int=256
+const py0: int=256
 
 var grid_on: bool=false# must match menu button
 const grid_color: Color=Color(0.1,0.1,0.1,1)
@@ -29,8 +31,18 @@ func on_py_changed(input_py:int):
 	py=input_py
 	update_canvas()
 func update_canvas():
-	px=drawing.px
-	py=drawing.py
+	#px=128#drawing.px
+	#py=128#drawing.py
+	var _ratio: float=drawing.px/drawing.py# just constant size
+	if _ratio>1:
+		px=px0*_ratio
+		py=py0
+	elif _ratio<1:
+		px=px0
+		py=py0/_ratio
+	else:
+		px=px0
+		py=py0
 	img=Image.create(px,py,false, Image.FORMAT_RGBA8)
 	img.convert(Image.FORMAT_RGBA8)
 	img.fill(Color.TRANSPARENT)
@@ -61,4 +73,4 @@ func set_grid_visibility(input_visibility: bool)->void: # CALLS from scribbler
 	update_canvas()
 
 #func _draw():
-	#draw_line(Vector2(1.5, 1.0), Vector2(1.5, 4.0), Color.GREEN, 1.0)
+	#draw_line(Vector2(0.0, 1.0), Vector2(0.0, 4.0), Color.GREEN, 5.0)
