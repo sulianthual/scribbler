@@ -119,6 +119,7 @@ Onion skins are semi-transparent guidelines that you can overlay on top drawing 
 <h4>Notes</h4>
 
 - When using the plugin you will get many warnings "Loaded resource as image file", its normal.
-- This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. It is likely inefficient for large files.
-- If the plugin closes for any reason (typically if you used "Make Floating"), just disable/reenable the plugin and it should be fine. Remember, it will only overwrite your png assets if you press "Save" and confirm overwrite.
+- This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Remember, the plugin overwrites your png assets only if you press "Save" and confirm the overwrite. Also the plugin is likely inefficient for large files (untested). 
+- If the plugin closes for any reason (typically if you used "Make Floating"), just disable/reenable the plugin and it should be fine. 
 - There are some bash files in directory I use for github (git_init, git_reset,git_push), dont mind those.
+- The demo folder has a few images made quickly with the plugin, as well as normal maps generated using "Laigter" (which is an awesome app).
