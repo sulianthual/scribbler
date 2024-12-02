@@ -17,7 +17,7 @@ Open your Godot project with Godot (4.2 or above), in Project Settings/Plugins e
 A quick tour without much details. Start a new drawing (press "menu" then "new"). Draw with left mouse, undo with right mouse, change pen size with mouse wheel, and swap tools with middle mouse. You can use black pen, color pen, eraser, bucket, etc (more details hereafter). Save drawing ("menu" then "save") as png file. Now drag from "file" (hold left mouse) and drop (release) to any texture in Inspector (e.g. a Sprite 2D texture), and the drawing will be applied. Inversely, drag any texture from Inspector (as long as its resource_path is a png) or any png file from FileSystem to the drawing area to load and edit it. 
 
 
-I made this plugin because I wanted to quickly prototype some drawings directly in the editor. The plugin is very limited in scope compared to all around painting softwares (or other very nice Godot plugins, e.g. Sprite Painter), it basically has a few minimal features I found essential (and was able to code) for myself. It can use drag and drop to quickly assign drawings, along with sprite sheets and onion skinning for animations. The plugin is also tailored toward a specific drawing style: black outlines with color fillings and shadows, for which there are specific drawing tools and key bindings. And lastly the plugin can be janky.
+I made this plugin to quickly prototype some drawings directly in the editor. The plugin is very limited in scope compared to all around painting softwares (or other very nice Godot plugins, e.g. Sprite Painter), it basically has a few minimal features I found essential (and was able to code) for myself. It can use drag and drop to quickly assign drawings, along with sprite sheets and onion skinning for animations. The plugin is also tailored toward a specific drawing style: black outlines with color fillings and shadows, for which there are specific drawing tools and key bindings. And lastly the plugin can be janky.
 
 <div align="center"><img src="doc/doc_ui.png"></div>
 
@@ -83,7 +83,7 @@ The menu buttons are as follows:
 - file: this is a reference to the png image being edited, that can be dragged and dropped elsewhere (as long as it is saved). Drag and drop to a texture (e.g. of a Sprite2D) to apply the image. Or drag and drop to the drawing area, any color slot, or to "onions". Remember to save your changes before dragging. 
 - clear: clears the current drawing
 - help: a very basic popup help text.
-- size: opens a popup menu to resize the image. In the popup menu you can select resize mode (stretch, crop to top-left corner or crop to center), select template sizes, multiply/divide width and height or swap them, etc. Then press OK to confirm (no undo).
+- size: opens a popup menu to resize the image. In the popup menu you can select resize mode (stretch, crop to top-left corner or crop to center), multiply/divide width and height or swap them, select from some templates, etc. Then press OK to confirm (no undo). You can drag any Vector2 from Inspector (e.g. scale) to "size" which will fill the multiply/divide factors (can be useful if resizing a sprite on screen or whatever).
 - onions: used for onion skinning (see below).
 - options: opens a popup with option to show a grid (still finnicky) or use sprite sheets (see below).
 - new: start a new drawing
