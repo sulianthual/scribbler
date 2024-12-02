@@ -114,7 +114,7 @@ Onion skins are semi-transparent guidelines that you can overlay on top drawing 
 
 - By default an onion skin is the original image as semi-transparent. You can change the display to colored outlines by dragging a color from a color slot to "onions": what will happen is only black strokes from the original image will appear and they will be colored in the chosen color and semi-transparent (see image above).
 
-- If you drop another color to "onions", colored outline will change for next loaded onion skins. Thus you can combine several onion skins with different colored outlines. To obtain the image above, we have 1) loaded a sprite sheet image, 2) dropped "file" to "onions" and selected a subregion, 3) dropped red color to "onions", 4) dropped blue color to "onions" and 5) dropped "file" to onions again and selected another subregion, and 6) cleared drawing.
+- If you drop another color to "onions", colored outline will change for next loaded onion skins. Thus you can combine several onion skins with different colored outlines. To obtain the image above, we have 1) loaded a sprite sheet image and cleared drawing, 2) dropped red color to "onions", 3) dropped "file" to "onions" and selected a subregion, 4) dropped blue color to "onions", 5) dropped "file" to onions again and selected another subregion.
 
 <h4>Notes</h4>
 
