@@ -120,6 +120,5 @@ Onion skins are semi-transparent guidelines that you can overlay on top drawing 
 
 - When using the plugin you will get many warnings "Loaded resource as image file", its normal.
 - Within the plugin, texture filtering is set to "nearest" so drawings appear sharp, but they may not appear the same in your game if using a different texture filtering (e.g. linear). 
-- This plugin is made by a amateurish Godot coder, use with caution if editing nice assets. Remember, the plugin overwrites your png assets only if you press "Save" and confirm the overwrite. Also the plugin is likely inefficient for large files (untested). 
+- This plugin is made by a amateurish coder, use with caution if editing nice assets. Remember, the plugin overwrites your png assets only if you press "Save" and confirm the overwrite. Also the plugin is likely inefficient for large files (untested). 
 - If the plugin closes for any reason (typically if you used "Make Floating"), just disable/reenable the plugin and it should be fine. 
-- Apart from the plugin, the project has a demo folder has a few images made quickly with the plugin, as well as normal maps generated using "Laigter" (which is an awesome app). There are also some bash files in directory used for github (git_init, git_reset,git_push), dont mind those.
