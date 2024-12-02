@@ -31,6 +31,7 @@ extends Control
 ## menu
 @onready var parent_container: Control# ref to parent before detach
 ## drawing
+@onready var drawing_container: MarginContainer = %drawing_container
 @onready var drawing: TextureRect=%drawing
 @onready var image_size_label: Label=%image_size
 @onready var edited_file_label: Label=%edited_file
@@ -194,6 +195,7 @@ func _on_menu_pressed():
 	_update_buttons_visibility()
 	#_update_hiding_buttons()
 func _update_buttons_visibility():
+	drawing_container.visible=not hiding_buttons
 	brush_row.visible=not hiding_buttons
 	colors_row.visible=not hiding_buttons
 	edit_row.visible=not hiding_buttons and menu_expanded
