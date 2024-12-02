@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://dbwsyoffw5ov2"]
+[gd_scene load_steps=23 format=3 uid="uid://dbwsyoffw5ov2"]
 
 [ext_resource type="Texture2D" uid="uid://drkexjtfpdt8k" path="res://demo/background.png" id="1_5prii"]
 [ext_resource type="Texture2D" uid="uid://7ccq7ogwl254" path="res://demo/tree.png" id="2_nnhru"]
@@ -7,7 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://dms0l05r15qj2" path="res://demo/sun.png" id="4_sn0se"]
 [ext_resource type="Texture2D" uid="uid://d18qgyygumm7x" path="res://demo/player.png" id="5_25awc"]
 [ext_resource type="Texture2D" uid="uid://8bddl6nax86v" path="res://demo/house.png" id="6_lvuwe"]
-[ext_resource type="Texture2D" uid="uid://c30657bh0sacp" path="res://demo/player_n.png" id="7_t4hqg"]
 [ext_resource type="Texture2D" uid="uid://cpjh4als36fkf" path="res://demo/ghost.png" id="8_c7ftw"]
 [ext_resource type="Texture2D" uid="uid://dx4ru20new76q" path="res://demo/skeleton_canvas_texture.tres" id="8_fwtmy"]
 [ext_resource type="Texture2D" uid="uid://up524c7y6ko8" path="res://demo/ghost_n.png" id="10_dgk1i"]
@@ -16,10 +15,6 @@
 [sub_resource type="CanvasTexture" id="CanvasTexture_76qrb"]
 diffuse_texture = ExtResource("2_nnhru")
 normal_texture = ExtResource("4_677wj")
-
-[sub_resource type="CanvasTexture" id="CanvasTexture_8e0xo"]
-diffuse_texture = ExtResource("5_25awc")
-normal_texture = ExtResource("7_t4hqg")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jgonr"]
 atlas = ExtResource("8_fwtmy")
@@ -133,29 +128,25 @@ fill_to = Vector2(0.980057, 0.538462)
 [node name="background" type="Sprite2D" parent="."]
 texture = ExtResource("1_5prii")
 
-[node name="house" type="Sprite2D" parent="."]
-position = Vector2(-234, 51)
-texture = ExtResource("6_lvuwe")
-
-[node name="tree" type="Sprite2D" parent="."]
-position = Vector2(-470, 49)
-texture = SubResource("CanvasTexture_76qrb")
-
-[node name="cloud" type="Sprite2D" parent="."]
-position = Vector2(-359, -198)
-texture = ExtResource("3_is3qu")
-
 [node name="sun" type="Sprite2D" parent="."]
-position = Vector2(217, -255)
+position = Vector2(493, -228)
 scale = Vector2(1.3, 1.3)
 texture = ExtResource("4_sn0se")
 
+[node name="house" type="Sprite2D" parent="."]
+position = Vector2(-98, 57)
+texture = ExtResource("6_lvuwe")
+
+[node name="tree" type="Sprite2D" parent="."]
+position = Vector2(-468, 87)
+texture = SubResource("CanvasTexture_76qrb")
+
+[node name="cloud" type="Sprite2D" parent="."]
+position = Vector2(586, -98)
+texture = ExtResource("3_is3qu")
+
 [node name="player" type="Sprite2D" parent="."]
 position = Vector2(47, 67)
-texture = SubResource("CanvasTexture_8e0xo")
-
-[node name="player2" type="Sprite2D" parent="."]
-position = Vector2(137, 66)
 texture = ExtResource("5_25awc")
 
 [node name="skeleton" type="AnimatedSprite2D" parent="."]

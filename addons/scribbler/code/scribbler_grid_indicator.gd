@@ -59,3 +59,6 @@ func texture_from_img():# update displayed texture from image
 func set_grid_visibility(input_visibility: bool)->void: # CALLS from scribbler
 	grid_on=input_visibility
 	update_canvas()
+
+#func _draw():
+	#draw_line(Vector2(1.5, 1.0), Vector2(1.5, 4.0), Color.GREEN, 1.0)
